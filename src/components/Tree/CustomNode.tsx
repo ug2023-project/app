@@ -2,20 +2,19 @@ import React from 'react'
 import { ChevronRightIcon } from '@heroicons/react/24/solid'
 import { NodeModel, RenderParams, useDragOver } from '@minoru/react-dnd-treeview'
 
-import FileProperties from './FileProperties'
 import { TypeIcon } from './TypeIcon'
 
 type CustomNodeProps = RenderParams & {
-  node: NodeModel<FileProperties>
+  node: NodeModel
   isSelected: boolean
   isDragging: boolean
   testIdPrefix?: string
-  onClick: (e: React.MouseEvent, node: NodeModel<FileProperties>) => void
+  onClick: (e: React.MouseEvent, node: NodeModel) => void
   onToggle: (id: NodeModel['id']) => void
 }
 
 const CustomNode = ({ testIdPrefix = '', ...props }: CustomNodeProps) => {
-  const { id, droppable, data } = props.node
+  const { id } = props.node
   const indent = props.depth * 24
 
   const handleClick = (e: React.MouseEvent) => {
@@ -63,7 +62,7 @@ const CustomNode = ({ testIdPrefix = '', ...props }: CustomNodeProps) => {
         )}
       </div>
       <div className="flex">
-        <TypeIcon droppable={droppable || false} fileType={data?.fileType} />
+        <TypeIcon />
       </div>
       <div className="pl-1">
         <p>{props.node.text}</p>

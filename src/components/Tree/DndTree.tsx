@@ -12,7 +12,6 @@ import {
 
 import CustomDragPreview from './CustomDragPreview'
 import CustomNode from './CustomNode'
-import FileProperties from './FileProperties'
 import MultipleDragPreview from './MultipleDragPreview'
 import Placeholder from './Placeholder'
 import TreeData from './TreeData'
@@ -26,12 +25,12 @@ const DndTree = ({ data }: DndTreeProps) => {
 
   useSelectNodeListener({ setSelectedNodes, setIsCtrlPressing })
 
-  const handleSingleSelect = useCallback((node: NodeModel<FileProperties>) => {
+  const handleSingleSelect = useCallback((node: NodeModel) => {
     setSelectedNodes([node])
   }, [])
 
   const handleMultiSelect = useCallback(
-    (clickedNode: NodeModel<FileProperties>) => {
+    (clickedNode: NodeModel) => {
       const selectedIds = selectedNodes.map((n) => n.id)
 
       if (selectedIds.includes(clickedNode.id)) {
@@ -52,7 +51,7 @@ const DndTree = ({ data }: DndTreeProps) => {
   )
 
   const handleClick = useCallback(
-    (e: React.MouseEvent, node: NodeModel<FileProperties>) => {
+    (e: React.MouseEvent, node: NodeModel) => {
       if (e.ctrlKey || e.metaKey) {
         handleMultiSelect(node)
       } else {
@@ -63,7 +62,7 @@ const DndTree = ({ data }: DndTreeProps) => {
   )
 
   const handleDragStart = useCallback(
-    (node: NodeModel<FileProperties>) => {
+    (node: NodeModel) => {
       const isSelectedNode = selectedNodes.some((n) => n.id === node.id)
       setIsDragging(true)
 
@@ -90,7 +89,7 @@ const DndTree = ({ data }: DndTreeProps) => {
   }, [])
 
   const handleDrop = useCallback(
-    (newTree: TreeData, options: DropOptions<FileProperties>) => {
+    (newTree: TreeData, options: DropOptions) => {
       const { dropTargetId } = options
 
       setTreeData(
@@ -130,7 +129,7 @@ const DndTree = ({ data }: DndTreeProps) => {
         }}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
-        dragPreviewRender={(monitorProps: DragLayerMonitorProps<FileProperties>) => {
+        dragPreviewRender={(monitorProps: DragLayerMonitorProps<unknown>) => {
           if (selectedNodes.length > 1) {
             return <MultipleDragPreview dragSources={selectedNodes} />
           }

@@ -10,7 +10,7 @@ const MultipleDragPreview = ({ dragSources }: MultipleDragPreviewProps) => {
       {dragSources.map((node) => (
         <div className="flex items-center gap-2 text-sm text-white" key={node.id}>
           <div className="flex items-center">
-            <TypeIcon droppable={node.droppable || false} fileType={node?.data?.fileType} />
+            <TypeIcon />
           </div>
           <div className="flex items-center">{node.text}</div>
         </div>

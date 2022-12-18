@@ -2,12 +2,10 @@ import { StrictMode } from 'react'
 import { createRoot, hydrateRoot } from 'react-dom/client'
 import { Routes } from 'generouted/react-location'
 
-import MainLoader from './components/Loaders/MainLoader'
-
 function Client() {
   return (
     <StrictMode>
-      <Routes defaultPendingMs={0} defaultPendingElement={<MainLoader />} defaultErrorElement={<p>Błąd</p>} />
+      <Routes defaultPendingMs={0} defaultErrorElement={<p>Błąd</p>} />
     </StrictMode>
   )
 }
