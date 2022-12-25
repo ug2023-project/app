@@ -1,21 +1,31 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
-    "target": "es2017",
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "allowJs": true,
+    "target": "ESNext",
+    "useDefineForClassFields": true,
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "allowJs": false,
     "skipLibCheck": true,
+    "esModuleInterop": false,
+    "allowSyntheticDefaultImports": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
-    "noEmit": true,
-    "esModuleInterop": true,
-    "module": "esnext",
-    "moduleResolution": "node",
+    "module": "ESNext",
+    "moduleResolution": "Node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
-    "paths": { "@/*": ["src/*"] },
-    "types": ["react", "react-dom", "node", "vite/client"]
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "paths": {
+      "@/components/*": ["./src/components/*"],
+      "@/hooks/*": ["./src/hooks/*"],
+      "@/containers/*": ["./src/containers/*"],
+      "@/utils/*": ["./src/utils/*"],
+      "@/types/*": ["./src/types/*"],
+      "@/router/*": ["./src/router/*"],
+      "@/layouts/*": ["./src/layouts/*"],
+      "@/pages/*": ["./src/pages/*"]
+    }
   },
-  "include": ["./src", "./prerender.ts"]
+  "include": ["./src"],
+  "references": [{ "path": "./tsconfig.node.json" }]
 }

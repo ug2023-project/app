@@ -1,0 +1,3 @@
+.placeholder {
+  @apply absolute right-0 top-0 h-[2px] -translate-y-1/2 bg-[#1967d2];
+}

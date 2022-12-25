@@ -1,0 +1,11 @@
+.header {
+  @apply flex items-center justify-between;
+}
+
+.list {
+  @apply flex items-center gap-4;
+}
+
+.link {
+  @apply p-2 hover:underline;
+}

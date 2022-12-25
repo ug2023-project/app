@@ -1,0 +1,11 @@
+.container {
+  @apply pointer-events-none inline-grid grid-cols-1 items-center gap-2 rounded bg-[#1967d2] py-1 px-2 text-sm text-white shadow-tree;
+}
+
+.nodePreview {
+  @apply flex items-center gap-2 text-sm text-white;
+}
+
+.centerVertical {
+  @apply flex items-center;
+}

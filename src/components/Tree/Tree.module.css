@@ -1,0 +1,11 @@
+.root {
+  @apply h-full;
+}
+
+.draggingSource {
+  @apply opacity-30;
+}
+
+.placeholder {
+  @apply relative;
+}

@@ -1,0 +1,39 @@
+.container {
+  @apply flex h-8 items-center;
+}
+
+.node {
+  @apply flex h-6 w-6 rotate-0 cursor-pointer items-center justify-center transition-transform duration-100;
+}
+
+.nodeExpanded {
+  @apply rotate-90;
+}
+
+.centerVertical {
+  @apply flex items-center;
+}
+
+.arrow {
+  @apply h-6 w-6;
+}
+
+.iconWrapper {
+  @apply relative h-5 w-5;
+}
+
+.full {
+  @apply h-full w-full;
+}
+
+.textSpace {
+  @apply pl-2;
+}
+
+.isSelected {
+  @apply bg-[#e8f0fe];
+}
+
+.isDragging {
+  @apply opacity-50;
+}

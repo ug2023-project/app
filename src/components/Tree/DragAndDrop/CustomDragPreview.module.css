@@ -1,0 +1,7 @@
+.container {
+  @apply inline-grid grid-cols-2 items-center gap-2 rounded bg-[#1967d2] py-1 px-2 text-sm text-white shadow-tree;
+}
+
+.centerVertical {
+  @apply flex items-center;
+}
