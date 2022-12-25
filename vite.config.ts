@@ -16,6 +16,8 @@ export default defineConfig((configEnv) => {
         '@/router': resolve(__dirname, 'src', 'router'),
         '@/layouts': resolve(__dirname, 'src', 'layouts'),
         '@/pages': resolve(__dirname, 'src', 'pages'),
+        '@/locales': resolve(__dirname, 'public', 'locales'),
+        '@/types': resolve(__dirname, 'src', 'types'),
       },
     },
     css: {

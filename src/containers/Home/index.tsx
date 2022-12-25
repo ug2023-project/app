@@ -1,4 +1,5 @@
 import Tree from '@/components/Tree';
+import { useTranslation } from 'react-i18next';
 
 const sampleData = [
   {
@@ -45,6 +46,14 @@ const sampleData = [
   },
 ];
 
-const Home = () => <Tree data={sampleData} />;
+const Home = () => {
+  const { t } = useTranslation();
+  return (
+    <>
+      <h2>{t('test')}</h2>
+      <Tree data={sampleData} />
+    </>
+  );
+};
 
 export default Home;

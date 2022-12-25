@@ -23,7 +23,8 @@
       "@/types/*": ["./src/types/*"],
       "@/router/*": ["./src/router/*"],
       "@/layouts/*": ["./src/layouts/*"],
-      "@/pages/*": ["./src/pages/*"]
+      "@/pages/*": ["./src/pages/*"],
+      "@/locales/*": ["./public/locales/*"]
     }
   },
   "include": ["./src"],
