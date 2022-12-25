@@ -1,5 +1,5 @@
 .header {
-  @apply flex items-center justify-between px-3;
+  @apply flex items-center justify-between px-3 dark:bg-pink-500;
 }
 
 .list {

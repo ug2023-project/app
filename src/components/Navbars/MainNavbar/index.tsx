@@ -2,6 +2,7 @@ import { Link } from '@tanstack/react-location';
 
 import styles from './MainNavbar.module.css';
 import LanguageSelect from '@/components/LanguageSelect';
+import ThemeSwitcher from '@/components/ThemeSwitcher';
 
 const MainNavbar = () => (
   <header className={styles.header}>
@@ -29,6 +30,9 @@ const MainNavbar = () => (
       <ul className={styles.list}>
         <li>
           <LanguageSelect />
+        </li>
+        <li>
+          <ThemeSwitcher />
         </li>
       </ul>
     </nav>
