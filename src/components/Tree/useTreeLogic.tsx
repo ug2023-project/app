@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   DragLayerMonitorProps,
   DropOptions,
@@ -22,6 +22,18 @@ const useTreeLogic = ({ data }: UseTreeLogicProps) => {
   const [isCtrlPressing, setIsCtrlPressing] = useState(false);
 
   useSelectNodeListener({ setSelectedNodes, setIsCtrlPressing });
+
+  // useEffect(() => {
+  //   console.log({ treeData });
+
+  //   return () => {};
+  // }, [treeData]);
+
+  useEffect(() => {
+    console.log({ selectedNodes });
+
+    return () => {};
+  }, [selectedNodes]);
 
   const handleTextChange = useCallback(
     (id: NodeModel['id'], value: string) => {
@@ -110,23 +122,23 @@ const useTreeLogic = ({ data }: UseTreeLogicProps) => {
   }, []);
 
   const handleDrop = useCallback(
-    (newTree: TreeData, options: DropOptions) => {
+    (tree: TreeData, options: DropOptions) => {
       const { dropTargetId } = options;
 
-      setTreeData(
-        newTree.map((node) => {
-          if (
-            selectedNodes.some((selectedNode) => selectedNode.id === node.id)
-          ) {
-            return {
-              ...node,
-              parent: dropTargetId,
-            };
-          }
+      const newTree = tree.map((node) => {
+        if (selectedNodes.some((selectedNode) => selectedNode.id === node.id)) {
+          return {
+            ...node,
+            parent: dropTargetId,
+          };
+        }
 
-          return node;
-        }),
-      );
+        return node;
+      });
+
+      console.log({ newTree });
+
+      setTreeData(newTree);
 
       setSelectedNodes([]);
     },

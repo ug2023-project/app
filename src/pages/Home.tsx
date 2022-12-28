@@ -1,9 +1,9 @@
-import Home from '@/containers/Home';
+import Dashboard from '@/containers/Dashboard';
 import MainLayout from '@/layouts/MainLayout';
 
 const HomePage = () => (
   <MainLayout>
-    <Home />
+    <Dashboard />
   </MainLayout>
 );
 

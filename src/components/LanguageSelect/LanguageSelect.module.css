@@ -1,0 +1,3 @@
+.languageSelect > label {
+  @apply text-main-200;
+}

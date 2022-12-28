@@ -1,0 +1,7 @@
+.layout {
+  @apply flex min-h-screen;
+}
+
+.main {
+  @apply flex w-full flex-col;
+}

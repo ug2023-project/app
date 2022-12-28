@@ -3,6 +3,8 @@ import { Select } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import languageSource from './languageSource';
 
+import styles from './LanguageSelect.module.css';
+
 const LanguageSelect = () => {
   const { t, i18n } = useTranslation();
   const currentLanguage = isLanguage(i18n.language) ? i18n.language : 'en';
@@ -16,6 +18,7 @@ const LanguageSelect = () => {
       data={data}
       onChange={(value) => value && i18n.changeLanguage(value)}
       value={currentLanguage}
+      className={styles.languageSelect}
     />
   );
 };

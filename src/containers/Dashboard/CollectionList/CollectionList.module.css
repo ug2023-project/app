@@ -1,0 +1,3 @@
+.collectionList {
+  @apply w-[200px] border-r border-alpha-400 bg-main-500 text-main-200;
+}

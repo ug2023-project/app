@@ -1,0 +1,3 @@
+.searchBar {
+  @apply flex h-20 justify-between border-b border-alpha-400 bg-main-500 py-1 px-2 text-main-200;
+}
