@@ -1,11 +1,11 @@
 import store from '@/redux/store';
 import { LoaderFunctionArgs } from 'react-router-dom';
-import { fetchCollectionSearch } from '../ducks/collection.actions';
+import { fetchCollectionBookmarksSearch } from '../ducks/bookmark/bookmark.actions';
 
 const bookmarkLoader = async ({ params, request }: LoaderFunctionArgs) => {
   const { collectionId } = params;
   const searchQuery = new URL(request.url).searchParams.get('search');
-  return await store.dispatch(fetchCollectionSearch({ collectionId: collectionId ?? '0', searchQuery })).unwrap();
+  return await store.dispatch(fetchCollectionBookmarksSearch({ collectionId: collectionId ?? '0', searchQuery })).unwrap();
 };
 
 export default bookmarkLoader;

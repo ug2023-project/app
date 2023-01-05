@@ -1,4 +1,4 @@
-import {CollectionState }from './types';
+import { CollectionState } from '../types';
 
 const collectionInitialState: CollectionState = {
   collections: [],
