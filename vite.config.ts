@@ -18,6 +18,7 @@ export default defineConfig((configEnv) => {
         '@/pages': resolve(__dirname, 'src', 'pages'),
         '@/locales': resolve(__dirname, 'public', 'locales'),
         '@/types': resolve(__dirname, 'src', 'types'),
+        '@/redux': resolve(__dirname, 'src', 'redux'),
       },
     },
     css: {

@@ -1,0 +1,3 @@
+.collectionList {
+  @apply flex w-[200px] flex-col border-r border-alpha-400 bg-main-500 text-main-200;
+}

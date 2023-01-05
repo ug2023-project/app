@@ -1,0 +1,3 @@
+.bookmarkList {
+  @apply flex h-full bg-main-500;
+}

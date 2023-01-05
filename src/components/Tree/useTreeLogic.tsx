@@ -9,13 +9,15 @@ import {
 } from '@minoru/react-dnd-treeview';
 
 import CustomDragPreview from './DragAndDrop/CustomDragPreview';
-import CustomNode from './Node';
+import Node from './Node';
 import MultipleDragPreview from './DragAndDrop/MultipleDragPreview';
 import Placeholder from './Placeholder';
 import TreeData from './TreeData';
 import useSelectNodeListener from './useSelectNodeListener';
+import { useNavigate } from 'react-router-dom';
 
 const useTreeLogic = ({ data }: UseTreeLogicProps) => {
+  const navigate = useNavigate();
   const [selectedNodes, setSelectedNodes] = useState<TreeData>([]);
   const [treeData, setTreeData] = useState(data);
   const [isDragging, setIsDragging] = useState(false);
@@ -43,6 +45,8 @@ const useTreeLogic = ({ data }: UseTreeLogicProps) => {
 
   const handleSingleSelect = useCallback((node: NodeModel) => {
     setSelectedNodes([node]);
+    navigate(`/dashboard/${node.id}`);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleMultiSelect = useCallback(
@@ -66,8 +70,13 @@ const useTreeLogic = ({ data }: UseTreeLogicProps) => {
           !isAncestor(treeData, clickedNode.id, selectedNode.id),
       );
 
+      if (selectedNodes.length < 1) {
+        navigate(`/dashboard/${clickedNode.id}`);
+      }
+
       setSelectedNodes([...updateNodes, clickedNode]);
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [selectedNodes, treeData],
   );
 
@@ -110,24 +119,21 @@ const useTreeLogic = ({ data }: UseTreeLogicProps) => {
   }, []);
 
   const handleDrop = useCallback(
-    (newTree: TreeData, options: DropOptions) => {
+    (tree: TreeData, options: DropOptions) => {
       const { dropTargetId } = options;
 
-      setTreeData(
-        newTree.map((node) => {
-          if (
-            selectedNodes.some((selectedNode) => selectedNode.id === node.id)
-          ) {
-            return {
-              ...node,
-              parent: dropTargetId,
-            };
-          }
+      const newTree = tree.map((node) => {
+        if (selectedNodes.some((selectedNode) => selectedNode.id === node.id)) {
+          return {
+            ...node,
+            parent: dropTargetId,
+          };
+        }
 
-          return node;
-        }),
-      );
+        return node;
+      });
 
+      setTreeData(newTree);
       setSelectedNodes([]);
     },
     [selectedNodes],
@@ -167,7 +173,7 @@ const useTreeLogic = ({ data }: UseTreeLogicProps) => {
         (selectedNode) => selectedNode.id === node.id,
       );
       return (
-        <CustomNode
+        <Node
           node={node}
           {...options}
           isSelected={selected}

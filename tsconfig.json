@@ -24,7 +24,8 @@
       "@/router/*": ["./src/router/*"],
       "@/layouts/*": ["./src/layouts/*"],
       "@/pages/*": ["./src/pages/*"],
-      "@/locales/*": ["./public/locales/*"]
+      "@/locales/*": ["./public/locales/*"],
+      "@/redux/*": ["./src/redux/*"]
     }
   },
   "include": ["./src"],
