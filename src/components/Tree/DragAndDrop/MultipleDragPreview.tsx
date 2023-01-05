@@ -7,7 +7,7 @@ const MultipleDragPreview = ({ dragSources }: MultipleDragPreviewProps) => (
     {dragSources.map((node) => (
       <div className={styles.nodePreview} key={node.id}>
         <div className={styles.centerVertical}>
-          <TypeIcon />
+          <TypeIcon isOpen={false} />
         </div>
         <div className={styles.centerVertical}>{node.text}</div>
       </div>

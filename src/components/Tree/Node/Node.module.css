@@ -1,9 +1,13 @@
 .container {
-  @apply flex h-8 items-center;
+  @apply flex h-8 items-center justify-between;
+}
+
+.contentContainer {
+  @apply flex items-center;
 }
 
 .node {
-  @apply flex h-6 w-6 rotate-0 cursor-pointer items-center justify-center transition-transform duration-100;
+  @apply flex h-5 w-5 rotate-0 cursor-pointer items-center justify-center transition-transform duration-100;
 }
 
 .nodeExpanded {
@@ -15,11 +19,11 @@
 }
 
 .arrow {
-  @apply h-6 w-6;
+  @apply h-4 w-4;
 }
 
 .iconWrapper {
-  @apply relative h-5 w-5;
+  @apply relative h-4 w-4;
 }
 
 .full {
@@ -31,9 +35,17 @@
 }
 
 .isSelected {
-  @apply bg-[#e8f0fe];
+  @apply bg-main-300;
 }
 
 .isDragging {
   @apply opacity-50;
+}
+
+.nodeText {
+  @apply overflow-clip text-ellipsis text-sm;
+}
+
+.nodeTextSelected {
+  @apply font-medium;
 }

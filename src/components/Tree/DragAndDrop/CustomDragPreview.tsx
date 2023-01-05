@@ -5,7 +5,7 @@ import styles from './CustomDragPreview.module.css';
 const CustomDragPreview = ({ monitorProps: { item } }: CustomDragMenuProps) => (
   <div className={styles.container}>
     <div className={styles.centerVertical}>
-      <TypeIcon />
+      <TypeIcon isOpen={false} />
     </div>
     <div className={styles.centerVertical}>{item.text}</div>
   </div>
