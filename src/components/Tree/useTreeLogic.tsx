@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import {
   DragLayerMonitorProps,
   DropOptions,
@@ -9,31 +9,21 @@ import {
 } from '@minoru/react-dnd-treeview';
 
 import CustomDragPreview from './DragAndDrop/CustomDragPreview';
-import CustomNode from './Node';
+import Node from './Node';
 import MultipleDragPreview from './DragAndDrop/MultipleDragPreview';
 import Placeholder from './Placeholder';
 import TreeData from './TreeData';
 import useSelectNodeListener from './useSelectNodeListener';
+import { useNavigate } from 'react-router-dom';
 
 const useTreeLogic = ({ data }: UseTreeLogicProps) => {
+  const navigate = useNavigate();
   const [selectedNodes, setSelectedNodes] = useState<TreeData>([]);
   const [treeData, setTreeData] = useState(data);
   const [isDragging, setIsDragging] = useState(false);
   const [isCtrlPressing, setIsCtrlPressing] = useState(false);
 
   useSelectNodeListener({ setSelectedNodes, setIsCtrlPressing });
-
-  // useEffect(() => {
-  //   console.log({ treeData });
-
-  //   return () => {};
-  // }, [treeData]);
-
-  useEffect(() => {
-    console.log({ selectedNodes });
-
-    return () => {};
-  }, [selectedNodes]);
 
   const handleTextChange = useCallback(
     (id: NodeModel['id'], value: string) => {
@@ -55,6 +45,8 @@ const useTreeLogic = ({ data }: UseTreeLogicProps) => {
 
   const handleSingleSelect = useCallback((node: NodeModel) => {
     setSelectedNodes([node]);
+    navigate(`/dashboard/${node.id}`);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleMultiSelect = useCallback(
@@ -78,8 +70,13 @@ const useTreeLogic = ({ data }: UseTreeLogicProps) => {
           !isAncestor(treeData, clickedNode.id, selectedNode.id),
       );
 
+      if (selectedNodes.length < 1) {
+        navigate(`/dashboard/${clickedNode.id}`);
+      }
+
       setSelectedNodes([...updateNodes, clickedNode]);
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [selectedNodes, treeData],
   );
 
@@ -136,10 +133,7 @@ const useTreeLogic = ({ data }: UseTreeLogicProps) => {
         return node;
       });
 
-      console.log({ newTree });
-
       setTreeData(newTree);
-
       setSelectedNodes([]);
     },
     [selectedNodes],
@@ -179,7 +173,7 @@ const useTreeLogic = ({ data }: UseTreeLogicProps) => {
         (selectedNode) => selectedNode.id === node.id,
       );
       return (
-        <CustomNode
+        <Node
           node={node}
           {...options}
           isSelected={selected}

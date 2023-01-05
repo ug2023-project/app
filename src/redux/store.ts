@@ -1,10 +1,11 @@
+import collectionSlice from '@/containers/Dashboard/ducks/collection.slice';
 import { configureStore, ThunkAction } from '@reduxjs/toolkit';
 import { Action } from 'redux';
 
 const makeStore = () =>
   configureStore({
     reducer: {
-      //
+      [collectionSlice.name]: collectionSlice.reducer,
     },
     devTools: process.env.NODE_ENV !== 'production',
   });
@@ -19,4 +20,6 @@ export type AppThunk<ReturnType = void> = ThunkAction<
   Action
 >;
 
-export default makeStore;
+const store = makeStore();
+
+export default store;

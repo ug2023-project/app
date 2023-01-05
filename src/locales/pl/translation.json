@@ -2,5 +2,6 @@
   "test": "Polski test",
   "LanguageLabel_Polish": "Polski",
   "LanguageLabel_English": "Angielski",
-  "LanguageSelect_Label": "Wybierz język"
+  "LanguageSelect_Label": "Wybierz język",
+  "Autocomplete_Collection_Placeholder": "Szukaj kolekcji"
 }

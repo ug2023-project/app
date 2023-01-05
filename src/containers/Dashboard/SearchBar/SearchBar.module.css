@@ -1,3 +1,11 @@
+.mainNav {
+  @apply flex items-center;
+}
+
 .searchBar {
-  @apply flex h-20 justify-between border-b border-alpha-400 bg-main-500 py-1 px-2 text-main-200;
+  @apply flex h-20 justify-between border-b border-alpha-400 bg-main-400 py-1 px-2 text-main-200;
+}
+
+.settingsList {
+  @apply flex items-center gap-3;
 }

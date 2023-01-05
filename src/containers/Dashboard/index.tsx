@@ -1,4 +1,7 @@
 import Tree from '@/components/Tree';
+import { TextInput, Button } from '@mantine/core';
+import { useInputState } from '@mantine/hooks';
+import useAxios from 'axios-hooks';
 import { useTranslation } from 'react-i18next';
 
 const sampleData = [
@@ -48,10 +51,33 @@ const sampleData = [
 
 const Home = () => {
   const { t } = useTranslation();
+  const [email, setEmail] = useInputState('');
+  const [password, setPassword] = useInputState('');
+  const [, execute] = useAxios(
+    {
+      method: 'POST',
+      url: '/auth/login',
+      data: {
+        email,
+        password,
+      },
+    },
+    {
+      manual: true,
+    },
+  );
+
+  const handleLogin = () => {
+    execute();
+  };
+
   return (
     <>
       <h2>{t('test')}</h2>
       <Tree data={sampleData} />
+      <TextInput value={email} onChange={setEmail} />
+      <TextInput value={password} onChange={setPassword} />
+      <Button onClick={handleLogin}>Login</Button>
     </>
   );
 };
