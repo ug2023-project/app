@@ -5,5 +5,8 @@
     "source.fixAll": true,
     "source.organizeImports": false
   },
-  "eslint.workingDirectories": ["./src"]
+  "eslint.workingDirectories": ["./src"],
+  "[typescript]": {
+    "editor.defaultFormatter": "ms-vsliveshare.vsliveshare"
+  }
 }
