@@ -1,8 +1,8 @@
 import Bookmark from '@/types/Bookmark';
-import Collection from '@/types/Collection';
+import CollectionApiResponse from '@/types/CollectionApiResponse';
 
 export type CollectionState = {
-  collections: Collection[];
+  collections: CollectionApiResponse;
   loading: boolean;
   error: string;
 };

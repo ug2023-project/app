@@ -1,6 +1,9 @@
 import Tree from '@/components/Tree';
 import styles from './CollectionList.module.css';
 import { Divider } from '@mantine/core';
+import useTypedDispatch from '@/hooks/useTypedDispatch';
+import { useEffect } from 'react';
+import { fetchAllCollections } from '../ducks/collection/collection.actions';
 
 const sampleData = [
   {
@@ -10,17 +13,18 @@ const sampleData = [
     text: 'Folder 1',
   },
   {
-    id: 2,
-    parent: 0,
-    droppable: true,
-    text: 'Folder 2',
-  },
-  {
     id: 3,
-    parent: 0,
+    parent: 1,
     droppable: true,
     text: 'Folder 3',
   },
+  {
+    id: 2,
+    parent: 1,
+    droppable: true,
+    text: 'Folder 2',
+  },
+
   {
     id: 4,
     parent: 0,
@@ -46,12 +50,21 @@ const sampleData = [
     text: 'Folder 7',
   },
 ];
-const CollectionList = () => (
-  <div className={styles.collectionList}>
-    <span>Your favorites...</span>
-    <Divider size="xs" />
-    <Tree data={sampleData} />
-  </div>
-);
+const CollectionList = () => {
+  const dispatch = useTypedDispatch();
+
+  useEffect(() => {
+    dispatch(fetchAllCollections());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return (
+    <div className={styles.collectionList}>
+      <span>Your favorites...</span>
+      <Divider size="xs" />
+      <Tree data={sampleData} />
+    </div>
+  );
+};
 
 export default CollectionList;
