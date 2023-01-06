@@ -6,11 +6,12 @@ import {
   XMarkIcon,
 } from '@heroicons/react/24/solid';
 import { Input } from '@mantine/core';
-import { NodeModel, RenderParams } from '@minoru/react-dnd-treeview';
+import { RenderParams } from '@minoru/react-dnd-treeview';
 import { TypeIcon } from '../Common/TypeIcon';
 import useNodeLogic from './useNodeLogic';
 import styles from './Node.module.css';
 import classNames from 'classnames';
+import Collection from '@/types/Collection';
 
 const Node = ({ testIdPrefix = '', ...props }: NodeProps) => {
   const {
@@ -41,7 +42,8 @@ const Node = ({ testIdPrefix = '', ...props }: NodeProps) => {
     >
       <div className={styles.contentContainer}>
         <div className={nodeStyles}>
-          {props.node.droppable && (
+          {props.node.droppable &&
+            (props.node.data?.childrenOrder.length as number) > 0 && (
             <div onClick={handleToggle}>
               <ChevronRightIcon
                 data-testid={`arrow-right-icon-${props.node.id}`}
@@ -87,13 +89,13 @@ const Node = ({ testIdPrefix = '', ...props }: NodeProps) => {
 };
 
 type NodeProps = RenderParams & {
-  node: NodeModel;
+  node: Collection;
   isSelected: boolean;
   isDragging: boolean;
   testIdPrefix?: string;
-  onClick: (e: React.MouseEvent, node: NodeModel) => void;
-  onToggle: (id: NodeModel['id']) => void;
-  onTextChange: (id: NodeModel['id'], value: string) => void;
+  onClick: (e: React.MouseEvent, node: Collection) => void;
+  onToggle: (id: Collection['id']) => void;
+  onTextChange: (id: Collection['id'], value: string) => void;
 };
 
 export default Node;

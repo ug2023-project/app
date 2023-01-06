@@ -1,10 +1,7 @@
 import { CollectionState } from '../types';
 
 const collectionInitialState: CollectionState = {
-  collections: {
-    rootCollectionOrder: [],
-    collections: [],
-  },
+  collections: [],
   loading: false,
   error: '',
 };

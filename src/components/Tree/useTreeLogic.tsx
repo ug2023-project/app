@@ -15,6 +15,8 @@ import Placeholder from './Placeholder';
 import TreeData from './TreeData';
 import useSelectNodeListener from './useSelectNodeListener';
 import { useNavigate } from 'react-router-dom';
+import Collection from '@/types/Collection';
+import CollectionData from '@/types/CollectionData';
 
 const useTreeLogic = ({ data }: UseTreeLogicProps) => {
   const navigate = useNavigate();
@@ -26,7 +28,7 @@ const useTreeLogic = ({ data }: UseTreeLogicProps) => {
   useSelectNodeListener({ setSelectedNodes, setIsCtrlPressing });
 
   const handleTextChange = useCallback(
-    (id: NodeModel['id'], value: string) => {
+    (id: Collection['id'], value: string) => {
       const newTree = treeData.map((node) => {
         if (node.id === id) {
           return {
@@ -43,14 +45,14 @@ const useTreeLogic = ({ data }: UseTreeLogicProps) => {
     [treeData],
   );
 
-  const handleSingleSelect = useCallback((node: NodeModel) => {
+  const handleSingleSelect = useCallback((node: Collection) => {
     setSelectedNodes([node]);
     navigate(`/dashboard/${node.id}`);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleMultiSelect = useCallback(
-    (clickedNode: NodeModel) => {
+    (clickedNode: Collection) => {
       const selectedIds = selectedNodes.map((n) => n.id);
 
       if (selectedIds.includes(clickedNode.id)) {
@@ -81,7 +83,7 @@ const useTreeLogic = ({ data }: UseTreeLogicProps) => {
   );
 
   const handleClick = useCallback(
-    (e: React.MouseEvent, node: NodeModel) => {
+    (e: React.MouseEvent, node: Collection) => {
       if (e.ctrlKey || e.metaKey) {
         handleMultiSelect(node);
       } else {
@@ -92,7 +94,7 @@ const useTreeLogic = ({ data }: UseTreeLogicProps) => {
   );
 
   const handleDragStart = useCallback(
-    (node: NodeModel) => {
+    (node: Collection) => {
       const isSelectedNode = selectedNodes.some((n) => n.id === node.id);
       setIsDragging(true);
 
@@ -152,7 +154,7 @@ const useTreeLogic = ({ data }: UseTreeLogicProps) => {
 
   const handleCanDrop = useCallback(
     (
-      _tree: NodeModel<unknown>[],
+      _tree: Collection[],
       { dragSource, dropTargetId }: DropOptions<unknown>,
     ) => {
       if (
@@ -168,7 +170,7 @@ const useTreeLogic = ({ data }: UseTreeLogicProps) => {
   );
 
   const handleRender = useCallback(
-    (node: NodeModel, options: RenderParams) => {
+    (node: Collection, options: RenderParams) => {
       const selected = selectedNodes.some(
         (selectedNode) => selectedNode.id === node.id,
       );
@@ -187,7 +189,7 @@ const useTreeLogic = ({ data }: UseTreeLogicProps) => {
   );
 
   const handlePlaceholderRender = useCallback(
-    (_node: NodeModel, { depth }: PlaceholderRenderParams) => (
+    (_node: Collection, { depth }: PlaceholderRenderParams) => (
       <Placeholder depth={depth} />
     ),
     [],

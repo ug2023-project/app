@@ -1,36 +1,46 @@
+import Collection from '@/types/Collection';
 import CollectionApi from '@/types/CollectionApi';
 import CollectionApiResponse from '@/types/CollectionApiResponse';
 
-const collectionApiMapper = ({rootCollectionOrder, collections}: CollectionApiResponse) => {
-  const collectionToReturn: CollectionApi[] = [];
+const toCollection = (
+  { id, title, ...rest }: CollectionApi,
+  parentId: number | string,
+): Collection => ({
+  id,
+  parent: parentId,
+  text: title,
+  droppable: true,
+  data: {
+    ...rest,
+  },
+});
 
-  const recursiveCheck = (collectionId: number, newCollections: CollectionApi[]) => {
-    const collectionToCheck = collections.find((collection) => collection.id === collectionId);
+const collectionApiMapper = ({
+  rootCollectionOrder,
+  collections,
+}: CollectionApiResponse): Collection[] => {
+  const normalizedCollections = collections.reduce<
+    Record<number, CollectionApi>
+  >((acc, collection) => {
+    acc[collection.id] = collection;
+    return acc;
+  }, {});
 
-    if (!collectionToCheck) {
-      throw new Error('Collection not found, should not happen');
-    }
+  const recursiveAddChildren = (collection: Collection) =>
+    collection.data.childrenOrder.reduce<Collection[]>((acc, childId) => {
+      const child = toCollection(normalizedCollections[childId], collection.id);
+      acc.push(child, ...recursiveAddChildren(child));
+      return acc;
+    }, []);
 
-    collectionToReturn.push(collectionToCheck);
-    if (collectionToCheck.childrenOrder.length === 0) {
-      return newCollections; 
-    }
+  const flattenedCollections: Collection[] = rootCollectionOrder.flatMap(
+    (collectionId) => {
+      const collection = toCollection(normalizedCollections[collectionId], 0);
+      return [collection, ...recursiveAddChildren(collection)];
+    },
+  );
 
-    for (const childrenCollection of collectionToCheck.childrenOrder) {
-      const childrenCollectionData = collections.find((collection) => collection.id === childrenCollection);
-      if (!childrenCollectionData) continue;
-      recursiveCheck(childrenCollection, [childrenCollectionData]);
-    }
-  };
-
-
-  for (const collectionOrder of rootCollectionOrder) {
-    const rootCollection = collections.find((collection) => collection.id === collectionOrder);
-    if (!rootCollection) continue;
-    recursiveCheck(collectionOrder, [rootCollection]);
-  }
-
-  return collectionToReturn;
+  return flattenedCollections;
 };
 
 export default collectionApiMapper;

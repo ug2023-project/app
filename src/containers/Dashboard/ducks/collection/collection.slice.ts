@@ -11,15 +11,11 @@ const collectionSlice = createSlice({
     builder.addCase(fetchAllCollections.pending, (state) => {
       state.loading = true;
     });
-    builder.addCase(
-      fetchAllCollections.fulfilled,
-      (state, action) => {
-        console.log(collectionApiMapper(action.payload));
-        state.collections = action.payload;
-        state.loading = false;
-        state.error = '';
-      },
-    );
+    builder.addCase(fetchAllCollections.fulfilled, (state, action) => {
+      state.collections = collectionApiMapper(action.payload);
+      state.loading = false;
+      state.error = '';
+    });
     builder.addCase(fetchAllCollections.rejected, (state, action) => {
       state.loading = false;
       state.error = action.error.message || 'Something went wrong';
