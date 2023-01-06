@@ -27,11 +27,11 @@ const collectionApiMapper = ({
   }, {});
 
   const recursiveAddChildren = (collection: Collection) =>
-    collection.data.childrenOrder.reduce<Collection[]>((acc, childId) => {
+    collection.data?.childrenOrder.reduce<Collection[]>((acc, childId) => {
       const child = toCollection(normalizedCollections[childId], collection.id);
       acc.push(child, ...recursiveAddChildren(child));
       return acc;
-    }, []);
+    }, []) ?? [];
 
   const flattenedCollections: Collection[] = rootCollectionOrder.flatMap(
     (collectionId) => {

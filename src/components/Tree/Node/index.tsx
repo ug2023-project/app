@@ -42,8 +42,7 @@ const Node = ({ testIdPrefix = '', ...props }: NodeProps) => {
     >
       <div className={styles.contentContainer}>
         <div className={nodeStyles}>
-          {props.node.droppable &&
-            (props.node.data?.childrenOrder.length as number) > 0 && (
+          {props.node.droppable && (
             <div onClick={handleToggle}>
               <ChevronRightIcon
                 data-testid={`arrow-right-icon-${props.node.id}`}
