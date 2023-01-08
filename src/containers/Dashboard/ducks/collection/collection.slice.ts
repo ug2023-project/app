@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { fetchAllCollections } from './collection.actions';
+import { fetchAllCollections, moveCollections } from './collection.actions';
 import collectionInitialState from './collection.state';
 import collectionApiMapper from '@/utils/collectionMapper';
 
@@ -8,6 +8,7 @@ const collectionSlice = createSlice({
   initialState: collectionInitialState,
   reducers: {},
   extraReducers: (builder) => {
+    // Fetch all collections
     builder.addCase(fetchAllCollections.pending, (state) => {
       state.loading = true;
     });
@@ -19,6 +20,19 @@ const collectionSlice = createSlice({
     builder.addCase(fetchAllCollections.rejected, (state, action) => {
       state.loading = false;
       state.error = action.error.message || 'Something went wrong';
+    });
+    // Move collections
+    builder.addCase(moveCollections.pending, (state) => {
+      state.previousCollections = state.collections;
+    });
+    builder.addCase(moveCollections.fulfilled, (state) => {
+      state.previousCollections = null;
+    });
+    builder.addCase(moveCollections.rejected, (state) => {
+      if (state.previousCollections) {
+        state.collections = [...state.previousCollections];
+        state.previousCollections = null;
+      }
     });
   },
 });

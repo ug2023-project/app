@@ -25,6 +25,8 @@ const Tree = ({ data }: DndTreeProps) => {
     handlePlaceholderRender,
   } = useTreeLogic({ data });
 
+  if (treeData.length === 0) return <div>Empty</div>;
+
   return (
     <DndProvider backend={MultiBackend} options={getBackendOptions()}>
       <DndTree
