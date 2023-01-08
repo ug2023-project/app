@@ -1,5 +1,5 @@
-import { NodeModel } from '@minoru/react-dnd-treeview';
+import Collection from '@/types/Collection';
 
-type TreeData = NodeModel[];
+type TreeData = Collection[];
 
 export default TreeData;

@@ -1,3 +1,4 @@
+import Home from '@/containers/Dashboard';
 import BookmarkList from '@/containers/Dashboard/BookmarkList';
 import BookmarkError from '@/containers/Dashboard/BookmarkList/BookmarkError';
 import bookmarkLoader from '@/containers/Dashboard/BookmarkList/bookmarkLoader';
@@ -14,7 +15,7 @@ import {
 const routes = createRoutesFromElements(
   // main to implement later
   <Route path="/" element={<Outlet />}>
-    <Route index element={<Outlet />} />
+    <Route index element={<Home />} />
     <Route
       path="dashboard"
       element={

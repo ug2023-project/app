@@ -11,11 +11,9 @@ export type BookmarkState = {
   bookmarks: Bookmark[];
   loading: boolean;
   error: string;
-}
+};
 
 export type FetchCollectionBookmarksParams = {
   collectionId: string;
   searchQuery: string | null;
-}
-
-
+};

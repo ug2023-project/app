@@ -7,8 +7,13 @@ import {
 import TreeData from './TreeData';
 import useTreeLogic from './useTreeLogic';
 import styles from './Tree.module.css';
+import { useState } from 'react';
 
 const Tree = ({ data }: DndTreeProps) => {
+  const [initialOpen, setInitialOpen] = useState(
+    data.filter((item) => item.data?.expanded).map((item) => item.id),
+  );
+
   const {
     handleDragEnd,
     handleDragStart,
@@ -40,6 +45,8 @@ const Tree = ({ data }: DndTreeProps) => {
         insertDroppableFirst={false}
         canDrop={handleCanDrop}
         dropTargetOffset={10}
+        initialOpen={initialOpen}
+        onChangeOpen={(open) => setInitialOpen(open)}
         placeholderRender={handlePlaceholderRender}
       />
     </DndProvider>

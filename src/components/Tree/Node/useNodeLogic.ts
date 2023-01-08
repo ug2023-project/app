@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
-import { NodeModel, useDragOver } from '@minoru/react-dnd-treeview';
+import { useDragOver } from '@minoru/react-dnd-treeview';
+import Collection from '@/types/Collection';
 
 import styles from './Node.module.css';
 
@@ -83,10 +84,10 @@ const useNodeLogic = ({
 };
 
 type UseNodeLogicProps = {
-  onTextChange: (id: NodeModel['id'], value: string) => void;
-  onClick: (e: React.MouseEvent, node: NodeModel) => void;
-  onToggle: (id: NodeModel['id']) => void;
-  node: NodeModel;
+  onTextChange: (id: Collection['id'], value: string) => void;
+  onClick: (e: React.MouseEvent, node: Collection) => void;
+  onToggle: (id: Collection['id']) => void;
+  node: Collection;
   depth: number;
   isSelected: boolean;
   isDragging: boolean;
