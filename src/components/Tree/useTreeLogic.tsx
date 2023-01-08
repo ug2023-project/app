@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   DragLayerMonitorProps,
   DropOptions,
@@ -25,6 +25,10 @@ const useTreeLogic = ({ data }: UseTreeLogicProps) => {
   const [treeData, setTreeData] = useState(data);
   const [isDragging, setIsDragging] = useState(false);
   const [isCtrlPressing, setIsCtrlPressing] = useState(false);
+
+  useEffect(() => {
+    setTreeData(data);
+  }, [data]);
 
   useSelectNodeListener({ setSelectedNodes, setIsCtrlPressing });
 

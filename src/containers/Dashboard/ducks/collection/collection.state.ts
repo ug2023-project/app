@@ -2,7 +2,7 @@ import { CollectionState } from '../types';
 
 const collectionInitialState: CollectionState = {
   collections: [],
-  previousCollectionsUpdatedState: {},
+  previousCollections: [],
   loading: false,
   error: '',
 };

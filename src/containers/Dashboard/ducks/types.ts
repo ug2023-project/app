@@ -3,7 +3,7 @@ import Collection from '@/types/Collection';
 
 export type CollectionState = {
   collections: Collection[];
-  previousCollectionsUpdatedState: Record<string | number, Collection> | null;
+  previousCollections: Collection[] | null;
   loading: boolean;
   error: string;
 };

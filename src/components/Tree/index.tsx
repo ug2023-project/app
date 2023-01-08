@@ -13,7 +13,7 @@ const Tree = ({ data }: DndTreeProps) => {
   const [initialOpen, setInitialOpen] = useState(
     data.filter((item) => item.data?.expanded).map((item) => item.id),
   );
-  console.log('data', data);
+
   const {
     handleDragEnd,
     handleDragStart,
@@ -24,6 +24,8 @@ const Tree = ({ data }: DndTreeProps) => {
     handleRender,
     handlePlaceholderRender,
   } = useTreeLogic({ data });
+
+  if (treeData.length === 0) return <div>Empty</div>;
 
   return (
     <DndProvider backend={MultiBackend} options={getBackendOptions()}>
