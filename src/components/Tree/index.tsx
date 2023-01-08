@@ -13,7 +13,7 @@ const Tree = ({ data }: DndTreeProps) => {
   const [initialOpen, setInitialOpen] = useState(
     data.filter((item) => item.data?.expanded).map((item) => item.id),
   );
-
+  console.log('data', data);
   const {
     handleDragEnd,
     handleDragStart,

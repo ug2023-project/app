@@ -3,7 +3,6 @@ import {
   DragLayerMonitorProps,
   DropOptions,
   isAncestor,
-  NodeModel,
   PlaceholderRenderParams,
   RenderParams,
 } from '@minoru/react-dnd-treeview';
@@ -16,9 +15,11 @@ import TreeData from './TreeData';
 import useSelectNodeListener from './useSelectNodeListener';
 import { useNavigate } from 'react-router-dom';
 import Collection from '@/types/Collection';
-import CollectionData from '@/types/CollectionData';
+import { moveCollections } from '@/containers/Dashboard/ducks/collection/collection.actions';
+import useTypedDispatch from '@/hooks/useTypedDispatch';
 
 const useTreeLogic = ({ data }: UseTreeLogicProps) => {
+  const dispatch = useTypedDispatch();
   const navigate = useNavigate();
   const [selectedNodes, setSelectedNodes] = useState<TreeData>([]);
   const [treeData, setTreeData] = useState(data);
@@ -121,7 +122,7 @@ const useTreeLogic = ({ data }: UseTreeLogicProps) => {
   }, []);
 
   const handleDrop = useCallback(
-    (tree: TreeData, options: DropOptions) => {
+    async (tree: TreeData, options: DropOptions) => {
       const { dropTargetId } = options;
 
       const newTree = tree.map((node) => {
@@ -134,6 +135,20 @@ const useTreeLogic = ({ data }: UseTreeLogicProps) => {
 
         return node;
       });
+      console.log('dispatch');
+
+      dispatch(
+        moveCollections({
+          params: { collectionId: options.dragSource?.parent },
+          body: {
+            collectionId: dropTargetId,
+            index: options.relativeIndex,
+            collectionIds: selectedNodes.map((node) => node.id),
+          },
+          newTree,
+        }),
+      );
+      console.log('dispatch after');
 
       setTreeData(newTree);
       setSelectedNodes([]);
