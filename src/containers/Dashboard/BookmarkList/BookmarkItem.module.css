@@ -1,3 +1,6 @@
+.item span {
+  @apply rounded-sm bg-yellow-200 p-[2px] not-italic text-main-400;
+}
 .titleBold {
   font-weight: bold;
 }

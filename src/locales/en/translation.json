@@ -1,7 +1,21 @@
 {
   "test": "English test",
+  "Error": "Error",
   "LanguageLabel_Polish": "Polish",
   "LanguageLabel_English": "English",
   "LanguageSelect_Label": "Select language",
-  "Autocomplete_Collection_Placeholder": "Search for a collection"
+  "Autocomplete_Collection_Placeholder": "Search for a collection",
+  "Email_Label": "Email",
+  "Email_Invalid": "Invalid email",
+  "Password_Label": "Password",
+  "Password_Error_Include_Number": "Includes number",
+  "Password_Error_Includes_Lowercase": "Includes lowercase",
+  "Password_Error_Includes_Uppercase": "Includes uppercase",
+  "Password_Error_Includes_Special": "Includes special symbol",
+  "Password_Error_Character_Amount": "Includes at least {{amount}} characters",
+  "Login_Error": "Invalid email or password",
+  "Login_Button": "Login",
+  "Login_Header": "Login to your account",
+  "Register_Header": "Register an account",
+  "Register_Button": "Register"
 }
