@@ -9,9 +9,11 @@ export const fetchCollectionBookmarksSearch = createAsyncThunk(
     const { data } = await axios.get<Bookmark[]>(
       `/collections/${params.collectionId}/bookmarks`,
       {
-        params: {
-          search: params.searchQuery,
-        },
+        params: params.searchQuery
+          ? {
+              search: params.searchQuery,
+            }
+          : {},
       },
     );
     return data;

@@ -7,6 +7,7 @@ import { fetchAllCollections } from '../ducks/collections/collections.actions';
 import useTypedSelector from '@/hooks/useTypedSelector';
 import { Resizable } from 're-resizable';
 import { selectCollections } from '@/redux/selectors';
+import { Droppable } from 'react-beautiful-dnd';
 
 const CollectionList = () => {
   const dispatch = useTypedDispatch();
@@ -18,20 +19,26 @@ const CollectionList = () => {
   }, []);
 
   if (!treeData.length) return <div>Loading...</div>;
-
   return (
     <Resizable
       className={styles.collectionList}
-      minWidth="200px"
+      minWidth="250px"
       maxWidth="500px"
       enable={{
         right: true,
       }}
     >
-      {/*<Tree data={treeData}/>*/}
-      {/*<Divider size="xs"/>*/}
-      <div>Divide</div>
-      <Tree data={treeData} />
+      <Droppable droppableId="collection-tree">
+        {(provided) => (
+          <div ref={provided.innerRef}>
+            {/*<Tree data={treeData}/>*/}
+            {/*<Divider size="xs"/>*/}
+            <div>Divide</div>
+            <Tree data={treeData} />
+            {provided.placeholder}
+          </div>
+        )}
+      </Droppable>
     </Resizable>
   );
 };

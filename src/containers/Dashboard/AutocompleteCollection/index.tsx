@@ -7,19 +7,21 @@ import { useEffect, useState } from 'react';
 const AutocompleteCollection = () => {
   const { t } = useTranslation();
   const { value, handleChange } = useAutocompleteCollection();
-  const [search, setSearch] = useState(value);
-  const [debounced] = useDebouncedValue(search, 350);
+  const [input, setInput] = useState(value);
+
+  const [debounced] = useDebouncedValue(input, 350);
 
   useEffect(() => {
-    handleChange(debounced);
-  }, [debounced]);
+    handleChange(debounced ?? '');
+  }, [debounced, handleChange]);
 
   return (
     <Autocomplete
       placeholder={t('Autocomplete_Collection_Placeholder')}
       data={[]}
-      defaultValue={search}
-      onChange={setSearch}
+      defaultValue={value}
+      value={input}
+      onChange={setInput}
     />
   );
 };

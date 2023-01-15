@@ -1,21 +1,18 @@
-import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useCallback } from 'react';
 
 const useAutocompleteCollection = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const collectionSearchParam = searchParams.get('search');
 
-  const [searchCollectionValue, setSearchCollectionValue] = useState(
-    collectionSearchParam,
+  const handleChange = useCallback(
+    (value: string) => {
+      setSearchParams(value ? { search: value } : {});
+    },
+    [setSearchParams],
   );
 
-  const handleChange = (value: string) => {
-    setSearchCollectionValue(value);
-    setSearchParams(value.length ? { search: value } : {});
-  };
-
   return {
-    value: searchCollectionValue ?? '',
+    value: searchParams.get('search') ?? '',
     handleChange,
   };
 };
