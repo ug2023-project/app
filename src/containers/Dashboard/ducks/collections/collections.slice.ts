@@ -14,6 +14,27 @@ import {
 } from '@/utils/collectionMapper';
 import { copy } from 'copy-anything';
 import CollectionApi from '@/types/CollectionApi';
+import { moveBookmarksToCollection } from '@/containers/Dashboard/ducks/bookmarks/bookmarks.actions';
+
+function insertValuesOnIndex<T>(
+  array: T[],
+  values: T[],
+  index: number,
+  removeDuplicates = false,
+): T[] {
+  if (removeDuplicates) {
+    const result = [
+      ...array.filter((item) => !values.includes(item)),
+      ...new Array(values.length).fill(null),
+    ];
+    return [
+      ...result.slice(0, index),
+      ...values,
+      ...result.slice(index),
+    ].filter((item) => item !== null);
+  }
+  return [...array.slice(0, index), ...values, ...array.slice(index)];
+}
 
 const collectionsSlice = createSlice({
   name: 'collections',
@@ -47,7 +68,7 @@ const collectionsSlice = createSlice({
 
       const collections = state.ids.map((id) => state.collections[id]);
       const firstChildCollectionIndex = collections.findIndex(
-        (collection) => collection.parent === parentId,
+        (collection) => collection?.parent === parentId,
       );
 
       const temporaryCollectionApi: CollectionApi = {
@@ -88,7 +109,7 @@ const collectionsSlice = createSlice({
       });
       state.collections[newCollection.id] = toCollection(
         newCollection,
-        collection.parent,
+        collection?.parent ?? 0,
       );
       delete state.collections[action.meta.arg.temporaryId];
 
@@ -138,12 +159,14 @@ const collectionsSlice = createSlice({
 
       collectionIds.forEach((collectionId) => {
         const collection = state.collections[collectionId];
-        collection.parent = newParentId;
+        if (collection) {
+          collection.parent = newParentId;
+        }
       });
 
       const collections = state.ids.map((id) => state.collections[id]);
       const firstChildCollectionIndex = collections.findIndex(
-        (collection) => collection.parent === newParentId,
+        (collection) => collection?.parent === newParentId,
       );
 
       state.ids = [
@@ -178,7 +201,9 @@ const collectionsSlice = createSlice({
       const setOfAllCollectionsIds = new Set(state.ids);
       setOfAllCollectionsIds.forEach((id) => {
         const collection = state.collections[id];
-        collection.data!.expanded = setOfExpandedCollectionsIds.has(id);
+        if (collection?.data) {
+          collection.data.expanded = setOfExpandedCollectionsIds.has(id);
+        }
       });
     });
     builder.addCase(expandCollections.fulfilled, (state) => {
@@ -192,6 +217,53 @@ const collectionsSlice = createSlice({
       }
       state.previousIds = null;
       state.previousCollections = null;
+    });
+    // Move bookmarks to collection
+    builder.addCase(moveBookmarksToCollection.pending, (state, action) => {
+      state.previousIds = copy(state.ids);
+      state.previousCollections = copy(state.collections);
+      const { collectionId } = action.meta.arg.params;
+      const {
+        collectionId: newCollectionId,
+        index,
+        bookmarkIds,
+      } = action.meta.arg.body;
+
+      const collection = state.collections[collectionId];
+      if (newCollectionId === collectionId && collection?.data) {
+        collection.data.bookmarkOrder = insertValuesOnIndex(
+          collection.data.bookmarkOrder,
+          bookmarkIds,
+          index,
+          true,
+        );
+      } else if (collection) {
+        const newCollection = state.collections[newCollectionId];
+
+        if (collection.data?.bookmarkOrder) {
+          collection.data.bookmarkOrder = collection.data?.bookmarkOrder.filter(
+            (id) => !bookmarkIds.includes(id),
+          );
+        }
+
+        if (newCollection?.data?.bookmarkOrder) {
+          newCollection.data.bookmarkOrder = insertValuesOnIndex(
+            newCollection.data.bookmarkOrder,
+            bookmarkIds,
+            index,
+          );
+        }
+      }
+    });
+    builder.addCase(moveBookmarksToCollection.fulfilled, (state) => {
+      state.previousIds = null;
+      state.previousCollections = null;
+    });
+    builder.addCase(moveBookmarksToCollection.rejected, (state) => {
+      if (state.previousIds && state.previousCollections) {
+        state.ids = state.previousIds;
+        state.collections = state.previousCollections;
+      }
     });
     // Add bookmark
     builder.addCase(createBookmark.fulfilled, (state, action) => {

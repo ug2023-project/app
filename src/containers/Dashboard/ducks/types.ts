@@ -3,15 +3,16 @@ import TreeCollection, { CollectionId } from '@/types/TreeCollection';
 
 export type CollectionState = {
   ids: CollectionId[];
-  collections: Record<CollectionId, TreeCollection>;
+  collections: Partial<Record<CollectionId, TreeCollection>>;
   previousIds: CollectionId[] | null;
-  previousCollections: Record<CollectionId, TreeCollection> | null;
+  previousCollections: Partial<Record<CollectionId, TreeCollection>> | null;
   loading: boolean;
   error: string | null;
 };
 
 export type BookmarkState = {
-  bookmarks: Record<number | string, Bookmark>;
+  bookmarks: Partial<Record<number | string, Bookmark>>;
+  previousBookmarks: Partial<Record<number | string, Bookmark>> | null;
   currentSearch: Bookmark[];
   draggingIds: number[];
   loading: boolean;
@@ -19,7 +20,7 @@ export type BookmarkState = {
 };
 
 export type FetchCollectionBookmarksParams = {
-  collectionId: string;
+  collectionId: number | string;
   searchQuery: string | null;
 };
 
@@ -44,9 +45,9 @@ export type MoveBookmarks = {
     collectionId: CollectionId;
   };
   body: {
-    newCollectionId: CollectionId;
+    collectionId: CollectionId;
     index: number;
-    bookmarkIds: number[];
+    bookmarkIds: (number | string)[];
   };
 };
 

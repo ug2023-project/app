@@ -44,7 +44,7 @@ const BookmarkItem = ({ index, item }: Props) => {
   return (
     <Draggable
       index={index}
-      draggableId={item.id.toString()}
+      draggableId={`${item.id}-${item.collectionId}`}
       isDragDisabled={isSearchResult}
     >
       {(provided, snapshot) => (

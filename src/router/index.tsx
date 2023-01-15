@@ -51,14 +51,12 @@ const routes = createRoutesFromElements(
       <Route
         index
         element={<Navigate to="5" />}
-        loader={bookmarkLoader}
         errorElement={<BookmarkError />}
       />
 
       <Route
         path=":collectionId"
         element={<BookmarkList />}
-        loader={bookmarkLoader}
         errorElement={<BookmarkError />}
       />
     </Route>

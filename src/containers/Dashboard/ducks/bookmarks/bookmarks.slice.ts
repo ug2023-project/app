@@ -2,9 +2,11 @@ import { createSlice } from '@reduxjs/toolkit';
 import {
   createBookmark,
   fetchCollectionBookmarksSearch,
+  moveBookmarksToCollection,
   updateSelectedBookmarks,
 } from './bookmarks.actions';
 import bookmarkInitialState from './bookmarks.state';
+import { copy } from 'copy-anything';
 
 const bookmarkSlice = createSlice({
   name: 'bookmarks',
@@ -37,6 +39,27 @@ const bookmarkSlice = createSlice({
     // Update dragging bookmarks
     builder.addCase(updateSelectedBookmarks, (state, action) => {
       state.draggingIds = action.payload;
+    });
+    // Move bookmarks to collection
+    builder.addCase(moveBookmarksToCollection.pending, (state, action) => {
+      state.previousBookmarks = copy(state.bookmarks);
+      const { collectionId: newCollectionId, bookmarkIds } =
+        action.meta.arg.body;
+
+      const bookmarks = bookmarkIds.map((id) => state.bookmarks[id]);
+      bookmarks.forEach((bookmark) => {
+        if (bookmark) {
+          bookmark.collectionId = newCollectionId;
+        }
+      });
+    });
+    builder.addCase(moveBookmarksToCollection.fulfilled, (state) => {
+      state.previousBookmarks = null;
+    });
+    builder.addCase(moveBookmarksToCollection.rejected, (state) => {
+      if (state.previousBookmarks) {
+        state.bookmarks = state.previousBookmarks;
+      }
     });
     // Add bookmark
     builder.addCase(createBookmark.pending, (state) => {

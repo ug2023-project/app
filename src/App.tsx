@@ -30,22 +30,20 @@ const App = () => {
         <ReduxProvider store={store}>
           <PersistGate loading={null} persistor={persistor}>
             <AuthProvider>
-              <DndProvider backend={MultiBackend} options={getBackendOptions()}>
                 <ColorSchemeProvider
-                  colorScheme={colorScheme}
-                  toggleColorScheme={toggleColorScheme}
+                colorScheme={colorScheme}
+                toggleColorScheme={toggleColorScheme}
+              >
+                <MantineProvider
+                  withCSSVariables
+                  withGlobalStyles
+                  withNormalizeCSS
+                  theme={{ colorScheme }}
                 >
-                  <MantineProvider
-                    withCSSVariables
-                    withGlobalStyles
-                    withNormalizeCSS
-                    theme={{ colorScheme }}
-                  >
-                    <RouterProvider router={router} />
-                  </MantineProvider>
-                </ColorSchemeProvider>
-              </DndProvider>
-            </AuthProvider>
+                  <RouterProvider router={router} />
+                </MantineProvider>
+              </ColorSchemeProvider>
+              </AuthProvider>
           </PersistGate>
         </ReduxProvider>
       </I18nextProvider>

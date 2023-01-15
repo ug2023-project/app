@@ -14,12 +14,20 @@ import {
   selectDraggingBookmarkIds,
   selectHasChildrenCollections,
 } from '@/redux/selectors';
+import { useParams } from 'react-router-dom';
+import {
+  moveBookmarksToCollection,
+  updateSelectedBookmarks,
+} from '@/containers/Dashboard/ducks/bookmarks/bookmarks.actions';
+import useTypedDispatch from '@/hooks/useTypedDispatch';
 import EditCollectionModal from '@/components/Modals/CollectionModal/EditCollectionModal';
 
 const Node = ({ testIdPrefix = '', ...props }: NodeProps) => {
+  const { collectionId } = useParams();
   const [isHover, setIsHover] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const dispatch = useTypedDispatch();
 
   const { handleClick, handleToggle, indent, dragOverProps } = useNodeLogic({
     ...props,
@@ -32,8 +40,8 @@ const Node = ({ testIdPrefix = '', ...props }: NodeProps) => {
     selectHasChildrenCollections(props.node.id),
   );
 
-  const isDraggingBookmarks =
-    useTypedSelector(selectDraggingBookmarkIds).length > 0;
+  const draggingBookmarkIds = useTypedSelector(selectDraggingBookmarkIds);
+  const isDraggingBookmarks = draggingBookmarkIds.length > 0;
 
   return (
     <>
@@ -48,7 +56,20 @@ const Node = ({ testIdPrefix = '', ...props }: NodeProps) => {
         onMouseLeave={() => setIsHover(false)}
         onMouseUpCapture={() => {
           if (isDraggingBookmarks) {
-            console.log('mouse up capture');
+            dispatch(updateSelectedBookmarks([]));
+            if (collectionId === props.node.id.toString()) return;
+            dispatch(
+              moveBookmarksToCollection({
+                params: {
+                  collectionId: collectionId as unknown as number,
+                },
+                body: {
+                  collectionId: props.node.id,
+                  index: 0,
+                  bookmarkIds: draggingBookmarkIds,
+                },
+              }),
+            );
           }
         }}
         {...dragOverProps}
