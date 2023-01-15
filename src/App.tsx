@@ -15,31 +15,37 @@ import {
   getBackendOptions,
   MultiBackend,
 } from '@minoru/react-dnd-treeview';
+import AuthProvider from './router/AuthProvider';
+
+import styles from './App.module.css';
 
 const persistor = persistStore(store);
 
 const App = () => {
   const { colorScheme, toggleColorScheme } = useColorScheme();
+
   return (
-    <Suspense fallback={<div>Loading..</div>}>
+    <Suspense fallback={<div className={styles.loader}></div>}>
       <I18nextProvider i18n={i18n}>
         <ReduxProvider store={store}>
           <PersistGate loading={null} persistor={persistor}>
-            <DndProvider backend={MultiBackend} options={getBackendOptions()}>
-              <ColorSchemeProvider
-                colorScheme={colorScheme}
-                toggleColorScheme={toggleColorScheme}
-              >
-                <MantineProvider
-                  withCSSVariables
-                  withGlobalStyles
-                  withNormalizeCSS
-                  theme={{ colorScheme }}
+            <AuthProvider>
+              <DndProvider backend={MultiBackend} options={getBackendOptions()}>
+                <ColorSchemeProvider
+                  colorScheme={colorScheme}
+                  toggleColorScheme={toggleColorScheme}
                 >
-                  <RouterProvider router={router} />
-                </MantineProvider>
-              </ColorSchemeProvider>
-            </DndProvider>
+                  <MantineProvider
+                    withCSSVariables
+                    withGlobalStyles
+                    withNormalizeCSS
+                    theme={{ colorScheme }}
+                  >
+                    <RouterProvider router={router} />
+                  </MantineProvider>
+                </ColorSchemeProvider>
+              </DndProvider>
+            </AuthProvider>
           </PersistGate>
         </ReduxProvider>
       </I18nextProvider>
