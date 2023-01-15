@@ -1,5 +1,6 @@
 import bookmarkSlice from '@/containers/Dashboard/ducks/bookmarks/bookmarks.slice';
 import collectionsSlice from '@/containers/Dashboard/ducks/collections/collections.slice';
+import authSlice from './auth/auth.slice';
 import { combineReducers, configureStore, ThunkAction } from '@reduxjs/toolkit';
 import { Action } from 'redux';
 import storage from 'redux-persist/lib/storage';
@@ -16,6 +17,7 @@ import {
 const rootReducer = combineReducers({
   [collectionsSlice.name]: collectionsSlice.reducer,
   [bookmarkSlice.name]: bookmarkSlice.reducer,
+  [authSlice.name]: authSlice.reducer,
 });
 
 const persistConfig = {

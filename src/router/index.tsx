@@ -15,18 +15,37 @@ import {
   createRoutesFromElements,
   Navigate,
 } from 'react-router-dom';
+import PrivateRoute from './PrivateRoute';
 
 const routes = createRoutesFromElements(
   // main to implement later
   <Route path="/" element={<Outlet />}>
     <Route index element={<Home />} />
     <Route
+      path="login"
+      element={
+        <FormLayout>
+          <Login />
+        </FormLayout>
+      }
+    />
+    <Route
+      path="register"
+      element={
+        <FormLayout>
+          <Register />
+        </FormLayout>
+      }
+    />
+    <Route
       path="collections"
       element={
-        <MainLayout
-          asideContent={<CollectionList />}
-          searchBarContent={<SearchBar />}
-        />
+        <PrivateRoute>
+          <MainLayout
+            asideContent={<CollectionList />}
+            searchBarContent={<SearchBar />}
+          />
+        </PrivateRoute>
       }
     >
       <Route
@@ -35,18 +54,13 @@ const routes = createRoutesFromElements(
         loader={bookmarkLoader}
         errorElement={<BookmarkError />}
       />
+
       <Route
         path=":collectionId"
         element={<BookmarkList />}
         loader={bookmarkLoader}
         errorElement={<BookmarkError />}
       />
-    </Route>
-    <Route path="account">
-      <Route path="actions" element={<FormLayout />}>
-        <Route path="login" element={<Login />} />
-        <Route path="register" element={<Register />} />
-      </Route>
     </Route>
   </Route>,
 );
