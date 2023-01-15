@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   DragLayerMonitorProps,
   DropOptions,
@@ -6,7 +6,6 @@ import {
   PlaceholderRenderParams,
   RenderParams,
 } from '@minoru/react-dnd-treeview';
-
 import CustomDragPreview from './DragAndDrop/CustomDragPreview';
 import Node from './Node';
 import MultipleDragPreview from './DragAndDrop/MultipleDragPreview';
@@ -14,8 +13,8 @@ import Placeholder from './Placeholder';
 import TreeData from './TreeData';
 import useSelectNodeListener from './useSelectNodeListener';
 import { useNavigate } from 'react-router-dom';
-import Collection from '@/types/Collection';
-import { moveCollections } from '@/containers/Dashboard/ducks/collection/collection.actions';
+import TreeCollection from '@/types/TreeCollection';
+import { moveCollections } from '@/containers/Dashboard/ducks/collections/collections.actions';
 import useTypedDispatch from '@/hooks/useTypedDispatch';
 
 const useTreeLogic = ({ data }: UseTreeLogicProps) => {
@@ -30,37 +29,37 @@ const useTreeLogic = ({ data }: UseTreeLogicProps) => {
     setTreeData(data);
   }, [data]);
 
+  // const sortSelectedNodes = () => {
+  //   const indexes = selectedNodes.reduce<Record<CollectionId, number>>((acc, node) => {
+  //     acc[node.id] = treeData.findIndex(n => n.id === node.id);
+  //     return acc;
+  //   }, {});
+  //   const sortedSelectedNodes = [...selectedNodes].sort((a, b) => {
+  //     const indexA = indexes[a.id];
+  //     const indexB = indexes[b.id];
+  //     return indexA - indexB;
+  //   });
+  //   setSelectedNodes(sortedSelectedNodes);
+  // };
+
   useSelectNodeListener({ setSelectedNodes, setIsCtrlPressing });
 
-  const handleTextChange = useCallback(
-    (id: Collection['id'], value: string) => {
-      const newTree = treeData.map((node) => {
-        if (node.id === id) {
-          return {
-            ...node,
-            text: value,
-          };
-        }
-
-        return node;
-      });
-
-      setTreeData(newTree);
-    },
-    [treeData],
-  );
-
-  const handleSingleSelect = useCallback((node: Collection) => {
+  const handleSingleSelect = useCallback((node: TreeCollection) => {
     setSelectedNodes([node]);
-    navigate(`/dashboard/${node.id}`);
+    navigate(`/collections/${node.id}`);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleMultiSelect = useCallback(
-    (clickedNode: Collection) => {
+    (clickedNode: TreeCollection) => {
       const selectedIds = selectedNodes.map((n) => n.id);
 
       if (selectedIds.includes(clickedNode.id)) {
+        setSelectedNodes(
+          selectedNodes.filter(
+            (selectedNode) => selectedNode.id !== clickedNode.id,
+          ),
+        );
         return;
       }
 
@@ -78,7 +77,7 @@ const useTreeLogic = ({ data }: UseTreeLogicProps) => {
       );
 
       if (selectedNodes.length < 1) {
-        navigate(`/dashboard/${clickedNode.id}`);
+        navigate(`/collections/${clickedNode.id}`);
       }
 
       setSelectedNodes([...updateNodes, clickedNode]);
@@ -88,7 +87,7 @@ const useTreeLogic = ({ data }: UseTreeLogicProps) => {
   );
 
   const handleClick = useCallback(
-    (e: React.MouseEvent, node: Collection) => {
+    (e: React.MouseEvent, node: TreeCollection) => {
       if (e.ctrlKey || e.metaKey) {
         handleMultiSelect(node);
       } else {
@@ -99,8 +98,9 @@ const useTreeLogic = ({ data }: UseTreeLogicProps) => {
   );
 
   const handleDragStart = useCallback(
-    (node: Collection) => {
+    (node: TreeCollection) => {
       const isSelectedNode = selectedNodes.some((n) => n.id === node.id);
+      // sortSelectedNodes();
       setIsDragging(true);
 
       if (!isCtrlPressing && isSelectedNode) {
@@ -127,37 +127,21 @@ const useTreeLogic = ({ data }: UseTreeLogicProps) => {
 
   const handleDrop = useCallback(
     async (tree: TreeData, options: DropOptions) => {
-      const { dropTargetId } = options;
-
-      const newTree = tree.map((node) => {
-        if (selectedNodes.some((selectedNode) => selectedNode.id === node.id)) {
-          return {
-            ...node,
-            parent: dropTargetId,
-          };
-        }
-
-        return node;
-      });
-      console.log('dispatch');
+      const { dropTargetId, relativeIndex } = options;
 
       dispatch(
         moveCollections({
-          params: { collectionId: options.dragSource?.parent },
           body: {
-            collectionId: dropTargetId,
-            index: options.relativeIndex,
+            parentId: dropTargetId,
+            index: relativeIndex ?? 0,
             collectionIds: selectedNodes.map((node) => node.id),
           },
-          newTree,
         }),
       );
-      console.log('dispatch after');
 
-      setTreeData(newTree);
       setSelectedNodes([]);
     },
-    [selectedNodes],
+    [dispatch, selectedNodes],
   );
 
   const handleDragPreviewRender = useCallback(
@@ -172,10 +156,7 @@ const useTreeLogic = ({ data }: UseTreeLogicProps) => {
   );
 
   const handleCanDrop = useCallback(
-    (
-      _tree: Collection[],
-      { dragSource, dropTargetId }: DropOptions<unknown>,
-    ) => {
+    (_tree: TreeCollection[], { dragSource, dropTargetId }: DropOptions) => {
       if (
         selectedNodes.some((selectedNode) => selectedNode.id === dropTargetId)
       ) {
@@ -189,7 +170,7 @@ const useTreeLogic = ({ data }: UseTreeLogicProps) => {
   );
 
   const handleRender = useCallback(
-    (node: Collection, options: RenderParams) => {
+    (node: TreeCollection, options: RenderParams) => {
       const selected = selectedNodes.some(
         (selectedNode) => selectedNode.id === node.id,
       );
@@ -200,15 +181,14 @@ const useTreeLogic = ({ data }: UseTreeLogicProps) => {
           isSelected={selected}
           isDragging={selected && isDragging}
           onClick={handleClick}
-          onTextChange={handleTextChange}
         />
       );
     },
-    [handleClick, handleTextChange, isDragging, selectedNodes],
+    [handleClick, isDragging, selectedNodes],
   );
 
   const handlePlaceholderRender = useCallback(
-    (_node: Collection, { depth }: PlaceholderRenderParams) => (
+    (_node: TreeCollection, { depth }: PlaceholderRenderParams) => (
       <Placeholder depth={depth} />
     ),
     [],

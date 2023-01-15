@@ -1,11 +1,10 @@
-import { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 import { useDragOver } from '@minoru/react-dnd-treeview';
-import Collection from '@/types/Collection';
+import TreeCollection from '@/types/TreeCollection';
 
 import styles from './Node.module.css';
 
 const useNodeLogic = ({
-  onTextChange,
   onToggle,
   onClick,
   node,
@@ -15,8 +14,6 @@ const useNodeLogic = ({
   containerRef,
   isOpen,
 }: UseNodeLogicProps) => {
-  const [labelText, setLabelText] = useState(node.text);
-  const [visibleInput, setVisibleInput] = useState(false);
   const indent = depth * 24;
 
   const handleClick = useCallback(
@@ -34,27 +31,6 @@ const useNodeLogic = ({
     [node.id, onToggle],
   );
 
-  const handleShowInput = useCallback(() => {
-    setVisibleInput(true);
-  }, []);
-
-  const handleCancel = useCallback(() => {
-    setVisibleInput(false);
-    setLabelText(node.text);
-  }, [node.text]);
-
-  const handleChangeText = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setLabelText(e.target.value);
-    },
-    [],
-  );
-
-  const handleSubmit = useCallback(() => {
-    setVisibleInput(false);
-    onTextChange(node.id, labelText);
-  }, [onTextChange, node.id, labelText]);
-
   const dragOverProps = useDragOver(node.id, isOpen, onToggle);
 
   if (isSelected) {
@@ -70,24 +46,17 @@ const useNodeLogic = ({
   }
 
   return {
-    labelText,
-    visibleInput,
     handleClick,
     handleToggle,
-    handleShowInput,
-    handleCancel,
-    handleChangeText,
-    handleSubmit,
     indent,
     dragOverProps,
   };
 };
 
 type UseNodeLogicProps = {
-  onTextChange: (id: Collection['id'], value: string) => void;
-  onClick: (e: React.MouseEvent, node: Collection) => void;
-  onToggle: (id: Collection['id']) => void;
-  node: Collection;
+  onClick: (e: React.MouseEvent, node: TreeCollection) => void;
+  onToggle: (id: TreeCollection['id']) => void;
+  node: TreeCollection;
   depth: number;
   isSelected: boolean;
   isDragging: boolean;

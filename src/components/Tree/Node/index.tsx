@@ -1,58 +1,73 @@
-import React from 'react';
-import { PencilIcon } from '@heroicons/react/24/solid';
-import {
-  CheckIcon,
-  ChevronRightIcon,
-  XMarkIcon,
-} from '@heroicons/react/24/solid';
-import { Input } from '@mantine/core';
+import React, { useState } from 'react';
+import { ChevronRightIcon } from '@heroicons/react/24/solid';
+import { Button, Menu } from '@mantine/core';
 import { RenderParams } from '@minoru/react-dnd-treeview';
-import { TypeIcon } from '../Common/TypeIcon';
 import useNodeLogic from './useNodeLogic';
 import styles from './Node.module.css';
 import classNames from 'classnames';
-import Collection from '@/types/Collection';
+import TreeCollection from '@/types/TreeCollection';
+import useTypedSelector from '@/hooks/useTypedSelector';
+import { BsThreeDots } from 'react-icons/bs';
+import TypeIcon from '../Common/TypeIcon';
+import CreateCollectionModal from '@/components/Modals/CollectionModal/CreateCollectionModal';
+import {
+  selectDraggingBookmarkIds,
+  selectHasChildrenCollections,
+} from '@/redux/selectors';
 
 const Node = ({ testIdPrefix = '', ...props }: NodeProps) => {
-  const {
-    labelText,
-    visibleInput,
-    handleClick,
-    handleToggle,
-    handleShowInput,
-    handleCancel,
-    handleChangeText,
-    handleSubmit,
-    indent,
-    dragOverProps,
-  } = useNodeLogic({
+  const [isHover, setIsHover] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const { handleClick, handleToggle, indent, dragOverProps } = useNodeLogic({
     ...props,
   });
   const nodeStyles = classNames(styles.node, {
     [styles.nodeExpanded]: props.isOpen,
   });
 
+  const hasChildren = useTypedSelector(
+    selectHasChildrenCollections(props.node.id),
+  );
+
+  const isDraggingBookmarks =
+    useTypedSelector(selectDraggingBookmarkIds).length > 0;
+
   return (
-    <div
-      className={styles.container}
-      style={{ paddingInlineStart: indent }}
-      data-testid={`${testIdPrefix}custom-node-${props.node.id}`}
-      onClick={handleClick}
-      {...dragOverProps}
-    >
-      <div className={styles.contentContainer}>
-        <div className={nodeStyles}>
-          {props.node.droppable && (
-            <div onClick={handleToggle}>
-              <ChevronRightIcon
-                data-testid={`arrow-right-icon-${props.node.id}`}
-                className={styles.arrow}
-              />
+    <>
+      <div
+        className={styles.container}
+        style={{
+          paddingInlineStart: indent,
+          border: isDraggingBookmarks && isHover ? '1px dashed #ccc' : 'none',
+        }}
+        data-testid={`${testIdPrefix}custom-node-${props.node.id}`}
+        onMouseEnter={() => setIsHover(true)}
+        onMouseLeave={() => setIsHover(false)}
+        onMouseUpCapture={() => {
+          if (isDraggingBookmarks) {
+            console.log('mouse up capture');
+          }
+        }}
+        {...dragOverProps}
+      >
+        <div className={styles.contentContainer} onClick={handleClick}>
+          {hasChildren ? (
+            <div className={nodeStyles}>
+              {props.node.droppable && (
+                <div onClick={handleToggle}>
+                  <ChevronRightIcon
+                    data-testid={`arrow-right-icon-${props.node.id}`}
+                    className={styles.arrow}
+                  />
+                </div>
+              )}
             </div>
+          ) : (
+            // make indent when no children
+            <div style={{ width: '20px' }}></div>
           )}
-        </div>
-        <TypeIcon isOpen={props.isOpen} />
-        {!visibleInput && (
+          <TypeIcon />
           <div className={styles.textSpace}>
             <p
               className={classNames(styles.nodeText, {
@@ -62,39 +77,45 @@ const Node = ({ testIdPrefix = '', ...props }: NodeProps) => {
               {props.node.text}
             </p>
           </div>
-        )}
+        </div>
+        <Menu shadow="md" width={200}>
+          <Menu.Target>
+            <Button size="xs" compact>
+              <BsThreeDots />
+            </Button>
+          </Menu.Target>
+
+          <Menu.Dropdown
+            style={{
+              marginLeft: '80px',
+            }}
+          >
+            <Menu.Item>Open all bookmarks</Menu.Item>
+            <Menu.Divider />
+            <Menu.Item onClick={() => setIsModalOpen(true)}>
+              Create nested collections
+            </Menu.Item>
+            <Menu.Divider />
+            <Menu.Item>Rename</Menu.Item>
+          </Menu.Dropdown>
+        </Menu>
+        <CreateCollectionModal
+          parentId={props.node.id}
+          isModalOpen={isModalOpen}
+          setIsModalOpen={setIsModalOpen}
+        />
       </div>
-      {visibleInput ? (
-        <div className={styles.centerVertical}>
-          <Input
-            placeholder={props.node.text}
-            value={labelText}
-            onChange={handleChangeText}
-          />
-          <div className={styles.iconWrapper} onClick={handleSubmit}>
-            <CheckIcon className={styles.full} />
-          </div>
-          <div className={styles.iconWrapper} onClick={handleCancel}>
-            <XMarkIcon className={styles.full} />
-          </div>
-        </div>
-      ) : (
-        <div className={styles.iconWrapper} onClick={handleShowInput}>
-          <PencilIcon className={styles.full} />
-        </div>
-      )}
-    </div>
+    </>
   );
 };
 
 type NodeProps = RenderParams & {
-  node: Collection;
+  node: TreeCollection;
   isSelected: boolean;
   isDragging: boolean;
   testIdPrefix?: string;
-  onClick: (e: React.MouseEvent, node: Collection) => void;
-  onToggle: (id: Collection['id']) => void;
-  onTextChange: (id: Collection['id'], value: string) => void;
+  onClick: (e: React.MouseEvent, node: TreeCollection) => void;
+  onToggle: (id: TreeCollection['id']) => void;
 };
 
 export default Node;

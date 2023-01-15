@@ -1,18 +1,16 @@
-import { DndProvider } from 'react-dnd';
-import {
-  getBackendOptions,
-  MultiBackend,
-  Tree as DndTree,
-} from '@minoru/react-dnd-treeview';
+import { Tree as DndTree } from '@minoru/react-dnd-treeview';
 import TreeData from './TreeData';
 import useTreeLogic from './useTreeLogic';
 import styles from './Tree.module.css';
-import { useState } from 'react';
+import useTypedDispatch from '@/hooks/useTypedDispatch';
+import { CollectionId } from '@/types/TreeCollection';
+import { expandCollections } from '@/containers/Dashboard/ducks/collections/collections.actions';
 
 const Tree = ({ data }: DndTreeProps) => {
-  const [initialOpen, setInitialOpen] = useState(
-    data.filter((item) => item.data?.expanded).map((item) => item.id),
-  );
+  const dispatch = useTypedDispatch();
+  const initialOpenCollections = data
+    .filter((item) => item.data?.expanded)
+    .map((item) => item.id);
 
   const {
     handleDragEnd,
@@ -25,10 +23,18 @@ const Tree = ({ data }: DndTreeProps) => {
     handlePlaceholderRender,
   } = useTreeLogic({ data });
 
-  if (treeData.length === 0) return <div>Empty</div>;
+  const handleOnChangeOpen = (openedCollectionIds: CollectionId[]) => {
+    dispatch(expandCollections(openedCollectionIds));
+  };
 
   return (
-    <DndProvider backend={MultiBackend} options={getBackendOptions()}>
+    <div
+      style={
+        {
+          // border: '1px solid red',
+        }
+      }
+    >
       <DndTree
         tree={treeData}
         rootId={0}
@@ -41,17 +47,18 @@ const Tree = ({ data }: DndTreeProps) => {
           root: styles.root,
           draggingSource: styles.draggingSource,
           placeholder: styles.placeholder,
+          dropTarget: styles.dropTarget,
         }}
         sort={false}
-        enableAnimateExpand
+        // enableAnimateExpand
         insertDroppableFirst={false}
         canDrop={handleCanDrop}
         dropTargetOffset={10}
-        initialOpen={initialOpen}
-        onChangeOpen={(open) => setInitialOpen(open)}
+        initialOpen={initialOpenCollections}
+        onChangeOpen={handleOnChangeOpen}
         placeholderRender={handlePlaceholderRender}
       />
-    </DndProvider>
+    </div>
   );
 };
 

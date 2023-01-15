@@ -1,5 +1,5 @@
+import TypeIcon from '../Common/TypeIcon';
 import TreeData from '../TreeData';
-import { TypeIcon } from '../Common/TypeIcon';
 import styles from './MultipleDragPreview.module.css';
 
 const MultipleDragPreview = ({ dragSources }: MultipleDragPreviewProps) => (
@@ -7,7 +7,7 @@ const MultipleDragPreview = ({ dragSources }: MultipleDragPreviewProps) => (
     {dragSources.map((node) => (
       <div className={styles.nodePreview} key={node.id}>
         <div className={styles.centerVertical}>
-          <TypeIcon isOpen={false} />
+          <TypeIcon />
         </div>
         <div className={styles.centerVertical}>{node.text}</div>
       </div>

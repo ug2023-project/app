@@ -1,7 +1,7 @@
 import CollectionApi from './CollectionApi';
 
 type CollectionApiResponse = {
-  rootCollectionOrder: number[];
+  collectionOrder: number[];
   collections: CollectionApi[];
 };
 

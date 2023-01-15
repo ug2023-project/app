@@ -1,9 +1,11 @@
 import { BookmarkState } from '../types';
 
 const bookmarkInitialState: BookmarkState = {
-  bookmarks: [],
+  bookmarks: {},
+  currentSearch: [],
+  draggingIds: [],
   loading: false,
-  error: '',
+  error: null,
 };
 
 export default bookmarkInitialState;
