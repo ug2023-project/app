@@ -1,3 +1,4 @@
+import { createBookmark } from './../bookmarks/bookmarks.actions';
 import { createSlice } from '@reduxjs/toolkit';
 import {
   createCollection,
@@ -191,6 +192,16 @@ const collectionsSlice = createSlice({
       }
       state.previousIds = null;
       state.previousCollections = null;
+    });
+    // Add bookmark
+    builder.addCase(createBookmark.fulfilled, (state, action) => {
+      const bookmark = action.payload;
+      const collection = state.collections[bookmark.collectionId];
+      if (collection.data) {
+        const order = collection.data.bookmarkOrder;
+        const newOrder = [bookmark.id, ...order];
+        collection.data.bookmarkOrder = newOrder;
+      }
     });
   },
 });

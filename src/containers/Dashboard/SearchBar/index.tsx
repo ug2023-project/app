@@ -6,6 +6,10 @@ import styles from './SearchBar.module.css';
 import AutocompleteCollection from '../AutocompleteCollection';
 import { useEffect, useState } from 'react';
 import { BsFillStarFill } from 'react-icons/bs';
+import useTypedDispatch from '@/hooks/useTypedDispatch';
+import { createBookmark } from '../ducks/bookmarks/bookmarks.actions';
+import { useParams } from 'react-router-dom';
+import { useValidatedState } from '@mantine/hooks';
 
 const handleDefaultValue = async () => {
   const clipboard = await navigator.clipboard.readText();
@@ -14,7 +18,26 @@ const handleDefaultValue = async () => {
 };
 
 const SearchBar = () => {
-  const [value, setValue] = useState('');
+  const [{ value, valid }, setValue] = useValidatedState(
+    '',
+    (value) => {
+      const urlRegex = new RegExp(
+        /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi,
+      );
+      return urlRegex.test(value) || value === '';
+    },
+    true,
+  );
+
+  const dispatch = useTypedDispatch();
+
+  const { collectionId } = useParams();
+
+  const createBookmarkHandler = (url: string) => {
+    if (collectionId === undefined) return;
+    dispatch(createBookmark({ collectionId, bookmark: { link: url } }));
+    setValue('');
+  };
 
   useEffect(() => {
     handleDefaultValue().then((value) => setValue(value));
@@ -60,7 +83,16 @@ const SearchBar = () => {
               size="xs"
               value={value}
               onChange={(e) => setValue(e.currentTarget.value)}
+              error={!valid && 'Invalid URL'}
             />
+            <Button
+              variant="outline"
+              color="blue"
+              onClick={() => createBookmarkHandler(value)}
+              disabled={!valid || value === ''}
+            >
+              Add
+            </Button>
           </Popover.Dropdown>
         </Popover>
       </nav>

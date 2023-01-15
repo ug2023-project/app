@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import {
+  createBookmark,
   fetchCollectionBookmarksSearch,
   updateSelectedBookmarks,
 } from './bookmarks.actions';
@@ -36,6 +37,17 @@ const bookmarkSlice = createSlice({
     // Update dragging bookmarks
     builder.addCase(updateSelectedBookmarks, (state, action) => {
       state.draggingIds = action.payload;
+    });
+    // Add bookmark
+    builder.addCase(createBookmark.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(createBookmark.fulfilled, (state, action) => {
+      state.bookmarks[action.payload.id] = action.payload;
+    });
+    builder.addCase(createBookmark.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.error.message || 'Something went wrong';
     });
   },
 });
