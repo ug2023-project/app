@@ -1,5 +1,5 @@
-import Collection from '@/types/Collection';
+import TreeCollection from '@/types/TreeCollection';
 
-type TreeData = Collection[];
+type TreeData = TreeCollection[];
 
 export default TreeData;

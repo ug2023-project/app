@@ -11,7 +11,7 @@ const useAutocompleteCollection = () => {
 
   const handleChange = (value: string) => {
     setSearchCollectionValue(value);
-    setSearchParams({ search: value });
+    setSearchParams(value.length ? { search: value } : {});
   };
 
   return {

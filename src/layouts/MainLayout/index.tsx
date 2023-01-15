@@ -1,5 +1,6 @@
 import { Outlet } from 'react-router-dom';
 import styles from './MainLayout.module.css';
+import React from 'react';
 
 const MainLayout = ({ asideContent, searchBarContent }: MainLayoutProps) => (
   <div className={styles.layout}>

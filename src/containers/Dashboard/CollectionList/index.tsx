@@ -3,27 +3,36 @@ import styles from './CollectionList.module.css';
 import { Divider } from '@mantine/core';
 import useTypedDispatch from '@/hooks/useTypedDispatch';
 import { useEffect } from 'react';
-import { fetchAllCollections } from '../ducks/collection/collection.actions';
+import { fetchAllCollections } from '../ducks/collections/collections.actions';
 import useTypedSelector from '@/hooks/useTypedSelector';
+import { Resizable } from 're-resizable';
+import { selectCollections } from '@/redux/selectors';
 
 const CollectionList = () => {
   const dispatch = useTypedDispatch();
-  const isLoading = useTypedSelector((x) => x.collection.loading);
-  const treeData = useTypedSelector((x) => x.collection.collections);
+  const treeData = useTypedSelector(selectCollections);
 
   useEffect(() => {
     dispatch(fetchAllCollections());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (isLoading) return <div>Loading...</div>;
+  if (!treeData.length) return <div>Loading...</div>;
 
   return (
-    <div className={styles.collectionList}>
-      <span>Your favorites...</span>
-      <Divider size="xs" />
+    <Resizable
+      className={styles.collectionList}
+      minWidth="200px"
+      maxWidth="500px"
+      enable={{
+        right: true,
+      }}
+    >
+      {/*<Tree data={treeData}/>*/}
+      {/*<Divider size="xs"/>*/}
+      <div>Divide</div>
       <Tree data={treeData} />
-    </div>
+    </Resizable>
   );
 };
 

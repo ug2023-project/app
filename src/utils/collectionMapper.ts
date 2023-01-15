@@ -1,11 +1,11 @@
-import Collection from '@/types/Collection';
+import TreeCollection, { CollectionId } from '@/types/TreeCollection';
 import CollectionApi from '@/types/CollectionApi';
-import CollectionApiResponse from '@/types/CollectionApiResponse';
+// import CollectionApiResponse from '@/types/CollectionApiResponse';
 
-const toCollection = (
+export const toCollection = (
   { id, title, ...rest }: CollectionApi,
-  parentId: number | string,
-): Collection => ({
+  parentId: CollectionId,
+): TreeCollection => ({
   id,
   parent: parentId,
   text: title,
@@ -15,32 +15,42 @@ const toCollection = (
   },
 });
 
-const collectionApiMapper = ({
-  rootCollectionOrder,
-  collections,
-}: CollectionApiResponse): Collection[] => {
-  const normalizedCollections = collections.reduce<
-    Record<number, CollectionApi>
-  >((acc, collection) => {
-    acc[collection.id] = collection;
-    return acc;
-  }, {});
-
-  const recursiveAddChildren = (collection: Collection) =>
-    collection.data?.childrenOrder.reduce<Collection[]>((acc, childId) => {
-      const child = toCollection(normalizedCollections[childId], collection.id);
-      acc.push(child, ...recursiveAddChildren(child));
+export const normalizeCollectionsApi = (
+  collections: CollectionApi[],
+): Record<CollectionId, TreeCollection> =>
+  collections.reduce<Record<CollectionId, TreeCollection>>(
+    (acc, collection) => {
+      acc[collection.id] = toCollection(collection, collection.parentId ?? 0);
       return acc;
-    }, []) ?? [];
-
-  const flattenedCollections: Collection[] = rootCollectionOrder.flatMap(
-    (collectionId) => {
-      const collection = toCollection(normalizedCollections[collectionId], 0);
-      return [collection, ...recursiveAddChildren(collection)];
     },
+    {},
   );
 
-  return flattenedCollections;
-};
+// const collectionApiMapper = ({
+//   collectionOrder,
+//   collections: apiCollections,
+// }: CollectionApiResponse): Collection[] => {
+//   const normalizedApiCollections = apiCollections.reduce<
+//     Record<CollectionId, CollectionApi>
+//   >((acc, collection) => {
+//     acc[collection.id] = collection;
+//     return acc;
+//   }, {});
 
-export default collectionApiMapper;
+//   const recursiveAddChildren = (collection: Collection): Collection[] => {
+//     const children = collection.data?.childrenOrder.map((childId) => toCollection(normalizedApiCollections[childId], collection.id)) ?? [];
+//     return [
+//       ...children,
+//       ...children.flatMap(recursiveAddChildren),
+//     ];
+//   };
+
+//   const flattenedCollections: Collection[] = [
+//     ...collectionOrder.map((collectionId) => toCollection(normalizedApiCollections[collectionId], 0)),
+//     ...collectionOrder.flatMap((collectionId) => recursiveAddChildren(toCollection(normalizedApiCollections[collectionId], 0))),
+//   ];
+
+//   return flattenedCollections;
+// };
+
+// export default collectionApiMapper;

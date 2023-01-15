@@ -1,17 +1,22 @@
+import TreeData from '@/components/Tree/TreeData';
 import Bookmark from '@/types/Bookmark';
-import Collection from '@/types/Collection';
+import TreeCollection, { CollectionId } from '@/types/TreeCollection';
 
 export type CollectionState = {
-  collections: Collection[];
-  previousCollections: Collection[] | null;
+  ids: CollectionId[];
+  collections: Record<CollectionId, TreeCollection>;
+  previousIds: CollectionId[] | null;
+  previousCollections: Record<CollectionId, TreeCollection> | null;
   loading: boolean;
-  error: string;
+  error: string | null;
 };
 
 export type BookmarkState = {
-  bookmarks: Bookmark[];
+  bookmarks: Record<number | string, Bookmark>;
+  currentSearch: Bookmark[];
+  draggingIds: number[];
   loading: boolean;
-  error: string;
+  error: string | null;
 };
 
 export type FetchCollectionBookmarksParams = {
@@ -19,14 +24,29 @@ export type FetchCollectionBookmarksParams = {
   searchQuery: string | null;
 };
 
+export type CreateCollection = {
+  body: {
+    title: string;
+    parentId: CollectionId;
+  };
+  temporaryId: string;
+};
+
 export type MoveCollection = {
+  body: {
+    parentId: CollectionId;
+    index: number;
+    collectionIds: CollectionId[];
+  };
+};
+
+export type MoveBookmarks = {
   params: {
-    collectionId: string | number | undefined;
+    collectionId: CollectionId;
   };
   body: {
-    collectionId: string | number | undefined;
-    index: number | undefined;
-    collectionIds: (string | number)[];
+    newCollectionId: CollectionId;
+    index: number;
+    bookmarkIds: number[];
   };
-  newTree: Collection[];
 };

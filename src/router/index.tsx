@@ -10,6 +10,7 @@ import {
   Route,
   createBrowserRouter,
   createRoutesFromElements,
+  Navigate,
 } from 'react-router-dom';
 
 const routes = createRoutesFromElements(
@@ -17,7 +18,7 @@ const routes = createRoutesFromElements(
   <Route path="/" element={<Outlet />}>
     <Route index element={<Home />} />
     <Route
-      path="dashboard"
+      path="collections"
       element={
         <MainLayout
           asideContent={<CollectionList />}
@@ -27,7 +28,7 @@ const routes = createRoutesFromElements(
     >
       <Route
         index
-        element={<BookmarkList />}
+        element={<Navigate to="5" />}
         loader={bookmarkLoader}
         errorElement={<BookmarkError />}
       />
