@@ -1,6 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import {
   createCollection,
+  editCollection,
   expandCollections,
   fetchAllCollections,
   moveCollections,
@@ -99,6 +100,29 @@ const collectionsSlice = createSlice({
         state.collections = state.previousCollections;
       }
       state.previousIds = null;
+      state.previousCollections = null;
+    });
+    // Edit collection
+    builder.addCase(editCollection.pending, (state, action) => {
+      state.previousCollections = copy(state.collections);
+
+      const id = action.meta.arg.collectionId;
+      const { title } = action.meta.arg.body;
+
+      const collection = {
+        ...state.collections[id],
+        text: title,
+      };
+
+      state.collections[id] = collection;
+    });
+    builder.addCase(editCollection.fulfilled, (state) => {
+      state.previousCollections = null;
+    });
+    builder.addCase(editCollection.rejected, (state) => {
+      if (state.previousCollections) {
+        state.collections = state.previousCollections;
+      }
       state.previousCollections = null;
     });
     // Move collections

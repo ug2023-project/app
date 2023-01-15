@@ -1,9 +1,9 @@
-import { Button, Group, Modal, TextInput } from '@mantine/core';
-import { useForm } from '@mantine/form';
+import { Modal, Text } from '@mantine/core';
 import { createCollection } from '@/containers/Dashboard/ducks/collections/collections.actions';
 import { nanoid } from '@reduxjs/toolkit';
 import { CollectionId } from '@/types/TreeCollection';
 import useTypedDispatch from '@/hooks/useTypedDispatch';
+import CollectionForm from './CollectionForm';
 
 type CreateCollectionModalProps = {
   parentId: CollectionId;
@@ -18,16 +18,6 @@ const CreateCollectionModal = ({
 }: CreateCollectionModalProps) => {
   const dispatch = useTypedDispatch();
 
-  const newCollectionForm = useForm({
-    initialValues: {
-      title: '',
-    },
-
-    validate: {
-      title: (value) => (value.length > 0 ? null : 'Title is required'),
-    },
-  });
-
   const handleCreateNewCollection = async ({ title }: { title: string }) => {
     dispatch(
       createCollection({ body: { title, parentId }, temporaryId: nanoid() }),
@@ -37,21 +27,12 @@ const CreateCollectionModal = ({
 
   return (
     <Modal opened={isModalOpen} onClose={() => setIsModalOpen(false)}>
-      <form
-        onSubmit={newCollectionForm.onSubmit((values) =>
-          handleCreateNewCollection(values),
-        )}
-      >
-        <TextInput
-          withAsterisk
-          label="Title"
-          placeholder="e.g. Inspiration, shopping.."
-          {...newCollectionForm.getInputProps('title')}
-        />
-        <Group position="right" mt="md">
-          <Button type="submit">Submit</Button>
-        </Group>
-      </form>
+      <Text size="xl" weight={500} mb="md">
+        Create new collection
+      </Text>
+      <CollectionForm
+        onSubmit={(values) => handleCreateNewCollection(values)}
+      />
     </Modal>
   );
 };
