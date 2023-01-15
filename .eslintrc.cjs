@@ -14,7 +14,13 @@ module.exports = {
     ecmaVersion: 'latest',
     sourceType: 'module',
   },
-  plugins: ['react-hooks', 'jsx-a11y', 'import', '@typescript-eslint'],
+  plugins: [
+    'react-hooks',
+    'prettier',
+    'jsx-a11y',
+    'import',
+    '@typescript-eslint',
+  ],
   rules: {
     indent: ['error', 2],
     quotes: ['error', 'single'],
@@ -51,5 +57,6 @@ module.exports = {
     'no-shadowed-variable': 0,
     'arrow-body-style': [2, 'as-needed'],
     'class-methods-use-this': 0,
+    'prettier/prettier': 'error',
   },
 };

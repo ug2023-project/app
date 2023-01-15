@@ -1,7 +1,21 @@
 {
   "test": "Polski test",
+  "Error": "Błąd",
   "LanguageLabel_Polish": "Polski",
   "LanguageLabel_English": "Angielski",
   "LanguageSelect_Label": "Wybierz język",
-  "Autocomplete_Collection_Placeholder": "Szukaj kolekcji"
+  "Autocomplete_Collection_Placeholder": "Szukaj kolekcji",
+  "Email_Label": "Email",
+  "Email_Invalid": "Nieprawidłowy email",
+  "Password_Label": "Hasło",
+  "Password_Error_Include_Number": "Zawiera liczbę",
+  "Password_Error_Includes_Lowercase": "Zawiera małą literę",
+  "Password_Error_Includes_Uppercase": "Zawiera wielką literę",
+  "Password_Error_Character_Amount": "Zawiera conajmniej {{amount}} znaków",
+  "Password_Error_Includes_Special": "Zawiera znak specjalny",
+  "Login_Header": "Logowanie",
+  "Login_Error": "Nieprawidłowy email lub hasło",
+  "Login_Button": "Zaloguj",
+  "Register_Header": "Zarejestruj się",
+  "Register_Button": "Zarejestruj"
 }

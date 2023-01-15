@@ -1,6 +1,5 @@
 import Tree from '@/components/Tree';
 import styles from './CollectionList.module.css';
-import { Divider } from '@mantine/core';
 import useTypedDispatch from '@/hooks/useTypedDispatch';
 import { useEffect } from 'react';
 import { fetchAllCollections } from '../ducks/collections/collections.actions';
