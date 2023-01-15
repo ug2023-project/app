@@ -20,11 +20,13 @@ import {
   updateSelectedBookmarks,
 } from '@/containers/Dashboard/ducks/bookmarks/bookmarks.actions';
 import useTypedDispatch from '@/hooks/useTypedDispatch';
+import EditCollectionModal from '@/components/Modals/CollectionModal/EditCollectionModal';
 
 const Node = ({ testIdPrefix = '', ...props }: NodeProps) => {
   const { collectionId } = useParams();
   const [isHover, setIsHover] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const dispatch = useTypedDispatch();
 
   const { handleClick, handleToggle, indent, dragOverProps } = useNodeLogic({
@@ -113,8 +115,11 @@ const Node = ({ testIdPrefix = '', ...props }: NodeProps) => {
           >
             <Menu.Item>Open all bookmarks</Menu.Item>
             <Menu.Divider />
-            <Menu.Item onClick={() => setIsModalOpen(true)}>
+            <Menu.Item onClick={() => setIsCreateModalOpen(true)}>
               Create nested collections
+            </Menu.Item>
+            <Menu.Item onClick={() => setIsEditModalOpen(true)}>
+              Edit collection
             </Menu.Item>
             <Menu.Divider />
             <Menu.Item>Rename</Menu.Item>
@@ -122,8 +127,13 @@ const Node = ({ testIdPrefix = '', ...props }: NodeProps) => {
         </Menu>
         <CreateCollectionModal
           parentId={props.node.id}
-          isModalOpen={isModalOpen}
-          setIsModalOpen={setIsModalOpen}
+          isModalOpen={isCreateModalOpen}
+          setIsModalOpen={setIsCreateModalOpen}
+        />
+        <EditCollectionModal
+          node={props.node}
+          isModalOpen={isEditModalOpen}
+          setIsModalOpen={setIsEditModalOpen}
         />
       </div>
     </>

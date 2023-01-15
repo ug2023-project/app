@@ -1,6 +1,8 @@
+import { createBookmark } from './../bookmarks/bookmarks.actions';
 import { createSlice } from '@reduxjs/toolkit';
 import {
   createCollection,
+  editCollection,
   expandCollections,
   fetchAllCollections,
   moveCollections,
@@ -122,6 +124,29 @@ const collectionsSlice = createSlice({
       state.previousIds = null;
       state.previousCollections = null;
     });
+    // Edit collection
+    builder.addCase(editCollection.pending, (state, action) => {
+      state.previousCollections = copy(state.collections);
+
+      const id = action.meta.arg.collectionId;
+      const { title } = action.meta.arg.body;
+
+      const collection = {
+        ...state.collections[id],
+        text: title,
+      };
+
+      state.collections[id] = collection;
+    });
+    builder.addCase(editCollection.fulfilled, (state) => {
+      state.previousCollections = null;
+    });
+    builder.addCase(editCollection.rejected, (state) => {
+      if (state.previousCollections) {
+        state.collections = state.previousCollections;
+      }
+      state.previousCollections = null;
+    });
     // Move collections
     builder.addCase(moveCollections.pending, (state, action) => {
       state.previousIds = copy(state.ids);
@@ -238,6 +263,16 @@ const collectionsSlice = createSlice({
       if (state.previousIds && state.previousCollections) {
         state.ids = state.previousIds;
         state.collections = state.previousCollections;
+      }
+    });
+    // Add bookmark
+    builder.addCase(createBookmark.fulfilled, (state, action) => {
+      const bookmark = action.payload;
+      const collection = state.collections[bookmark.collectionId];
+      if (collection.data) {
+        const order = collection.data.bookmarkOrder;
+        const newOrder = [bookmark.id, ...order];
+        collection.data.bookmarkOrder = newOrder;
       }
     });
   },

@@ -1,0 +1,7 @@
+.icon {
+  @apply h-4 w-4;
+}
+
+.formWrapper {
+  @apply min-w-[300px] rounded-lg bg-main-300 p-4;
+}

@@ -3,6 +3,8 @@ import { createStyles, Text } from '@mantine/core';
 import Bookmark from '@/types/Bookmark';
 import { useSearchParams } from 'react-router-dom';
 import { useMemo } from 'react';
+import { emphasizeText } from '@/utils/emphasizeText';
+import styles from './BookmarkItem.module.css';
 
 const useStyles = createStyles((theme) => ({
   item: {
@@ -56,7 +58,15 @@ const BookmarkItem = ({ index, item }: Props) => {
         >
           <Text className={classes.symbol}>{item.id}</Text>
           <div>
-            <Text>{item.title}</Text>
+            {emphasizeText(item.title).map((entry, index) =>
+              entry.bold ? (
+                <span key={index} className={styles.titleBold}>
+                  {entry.text}
+                </span>
+              ) : (
+                entry.text
+              ),
+            )}
             <Text color="dimmed" size="sm">
               {item.link}
             </Text>

@@ -1,6 +1,5 @@
 import Tree from '@/components/Tree';
 import styles from './CollectionList.module.css';
-import { Divider } from '@mantine/core';
 import useTypedDispatch from '@/hooks/useTypedDispatch';
 import { useEffect } from 'react';
 import { fetchAllCollections } from '../ducks/collections/collections.actions';
@@ -8,6 +7,7 @@ import useTypedSelector from '@/hooks/useTypedSelector';
 import { Resizable } from 're-resizable';
 import { selectCollections } from '@/redux/selectors';
 import { Droppable } from 'react-beautiful-dnd';
+import CollectionListMenu from './CollectionListMenu';
 
 const CollectionList = () => {
   const dispatch = useTypedDispatch();
@@ -34,6 +34,7 @@ const CollectionList = () => {
             {/*<Tree data={treeData}/>*/}
             {/*<Divider size="xs"/>*/}
             <div>Divide</div>
+            <CollectionListMenu />
             <Tree data={treeData} />
             {provided.placeholder}
           </div>
