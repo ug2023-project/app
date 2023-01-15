@@ -6,6 +6,7 @@ import { fetchAllCollections } from '../ducks/collections/collections.actions';
 import useTypedSelector from '@/hooks/useTypedSelector';
 import { Resizable } from 're-resizable';
 import { selectCollections } from '@/redux/selectors';
+import CollectionListMenu from './CollectionListMenu';
 
 const CollectionList = () => {
   const dispatch = useTypedDispatch();
@@ -30,6 +31,7 @@ const CollectionList = () => {
       {/*<Tree data={treeData}/>*/}
       {/*<Divider size="xs"/>*/}
       <div>Divide</div>
+      <CollectionListMenu />
       <Tree data={treeData} />
     </Resizable>
   );

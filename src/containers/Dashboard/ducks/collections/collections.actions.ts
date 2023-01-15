@@ -1,3 +1,4 @@
+import { EditCollection } from './../types';
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from '@/utils/axios/axiosConfig';
 import type CollectionApiResponse from '@/types/CollectionApiResponse';
@@ -32,5 +33,16 @@ export const expandCollections = createAsyncThunk(
   'collection/expandCollections',
   async (collectionIds: CollectionId[]) => {
     await axios.put('collections/expand', { collectionIds });
+  },
+);
+
+export const editCollection = createAsyncThunk(
+  'collection/editCollection',
+  async (body: EditCollection) => {
+    const { data } = await axios.put<CollectionApi>(
+      `collections/${body.collectionId}`,
+      body.body,
+    );
+    return data;
   },
 );

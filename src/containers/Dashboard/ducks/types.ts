@@ -50,3 +50,10 @@ export type MoveBookmarks = {
     bookmarkIds: number[];
   };
 };
+
+export type EditCollection = {
+  collectionId: CollectionId;
+  body: {
+    title: string;
+  };
+};
