@@ -1,4 +1,3 @@
-import TreeData from '@/components/Tree/TreeData';
 import Bookmark from '@/types/Bookmark';
 import TreeCollection, { CollectionId } from '@/types/TreeCollection';
 
@@ -56,4 +55,9 @@ export type EditCollection = {
   body: {
     title: string;
   };
+};
+
+export type CreateBookmark = {
+  collectionId: CollectionId;
+  bookmark: Partial<Bookmark>;
 };
