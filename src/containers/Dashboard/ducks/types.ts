@@ -15,6 +15,7 @@ export type BookmarkState = {
   previousBookmarks: Partial<Record<number | string, Bookmark>> | null;
   currentSearch: Bookmark[];
   draggingIds: number[];
+  dropDisabled: boolean;
   loading: boolean;
   error: string | null;
 };

@@ -30,7 +30,7 @@ const App = () => {
         <ReduxProvider store={store}>
           <PersistGate loading={null} persistor={persistor}>
             <AuthProvider>
-                <ColorSchemeProvider
+              <ColorSchemeProvider
                 colorScheme={colorScheme}
                 toggleColorScheme={toggleColorScheme}
               >
@@ -43,7 +43,7 @@ const App = () => {
                   <RouterProvider router={router} />
                 </MantineProvider>
               </ColorSchemeProvider>
-              </AuthProvider>
+            </AuthProvider>
           </PersistGate>
         </ReduxProvider>
       </I18nextProvider>

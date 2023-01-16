@@ -5,6 +5,7 @@ const bookmarkInitialState: BookmarkState = {
   previousBookmarks: {},
   currentSearch: [],
   draggingIds: [],
+  dropDisabled: false,
   loading: false,
   error: null,
 };

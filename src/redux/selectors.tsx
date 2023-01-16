@@ -50,3 +50,8 @@ export const selectDraggingBookmarkIds = createSelector(
   selectSelf,
   (state) => state.bookmarks.draggingIds,
 );
+
+export const selectDropDisabled = createSelector(
+  selectSelf,
+  (state) => state.bookmarks.dropDisabled,
+);

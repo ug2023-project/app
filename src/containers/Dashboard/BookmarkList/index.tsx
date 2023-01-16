@@ -6,6 +6,7 @@ import { useEffect, useMemo } from 'react';
 import {
   selectCollectionBookmarks,
   selectCurrentSearchBookmarks,
+  selectDropDisabled,
 } from '@/redux/selectors';
 import BookmarkItem from '@/containers/Dashboard/BookmarkList/BookmarkItem';
 import useTypedDispatch from '@/hooks/useTypedDispatch';
@@ -27,6 +28,8 @@ const BookmarkList = () => {
       : selectCollectionBookmarks(collectionId),
   );
 
+  const isDropDisabled = useTypedSelector(selectDropDisabled);
+
   useEffect(() => {
     dispatch(
       fetchCollectionBookmarksSearch({
@@ -38,7 +41,11 @@ const BookmarkList = () => {
 
   const items =
     bookmarks?.map((item, index) => (
-      <BookmarkItem key={item.id} index={index} item={item} />
+      <BookmarkItem
+        key={`${item.id}-${item.collectionId}`}
+        index={index}
+        item={item}
+      />
     )) ?? [];
 
   return (
@@ -47,7 +54,11 @@ const BookmarkList = () => {
         CollectionId: {collectionId}, IsSearching:{' '}
         {JSON.stringify(isSearchResult)}
       </div>
-      <Droppable droppableId="bookmark-list" direction="vertical">
+      <Droppable
+        droppableId="bookmark-list"
+        direction="vertical"
+        isDropDisabled={isDropDisabled}
+      >
         {(provided) => (
           <div {...provided.droppableProps} ref={provided.innerRef}>
             {items}

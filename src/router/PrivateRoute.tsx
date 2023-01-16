@@ -3,6 +3,7 @@ import { isFetchingUser, isUserLoggedIn } from '@/redux/auth/auth.selectors';
 import { Navigate, Outlet } from 'react-router-dom';
 
 import styles from './PrivateRoute.module.css';
+import React from 'react';
 
 const PrivateRoute = ({ children }: PrivateRouteProps) => {
   const loggedIn = useTypedSelector(isUserLoggedIn);

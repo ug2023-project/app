@@ -9,6 +9,7 @@ import styles from './BookmarkItem.module.css';
 const useStyles = createStyles((theme) => ({
   item: {
     ...theme.fn.focusStyles(),
+    width: '90%',
     display: 'flex',
     alignItems: 'center',
     borderRadius: theme.radius.md,
@@ -24,6 +25,7 @@ const useStyles = createStyles((theme) => ({
   itemDragging: {
     boxShadow: theme.shadows.sm,
     opacity: 0.5,
+    height: '20px',
   },
 
   symbol: {
@@ -43,8 +45,8 @@ const BookmarkItem = ({ index, item }: Props) => {
 
   return (
     <Draggable
-      index={index}
       draggableId={`${item.id}-${item.collectionId}`}
+      index={index}
       isDragDisabled={isSearchResult}
     >
       {(provided, snapshot) => (
@@ -67,9 +69,11 @@ const BookmarkItem = ({ index, item }: Props) => {
                 entry.text
               ),
             )}
-            <Text color="dimmed" size="sm">
-              {item.link}
-            </Text>
+            <a href={item.link} target="_blank" rel="noreferrer">
+              <Text color="dimmed" size="sm">
+                {item.link}
+              </Text>
+            </a>
           </div>
         </div>
       )}

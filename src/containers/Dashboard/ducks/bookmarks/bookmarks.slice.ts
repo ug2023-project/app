@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
   createBookmark,
   fetchCollectionBookmarksSearch,
@@ -11,7 +11,11 @@ import { copy } from 'copy-anything';
 const bookmarkSlice = createSlice({
   name: 'bookmarks',
   initialState: bookmarkInitialState,
-  reducers: {},
+  reducers: {
+    updateDropDisabled: (state, action: PayloadAction<boolean>) => {
+      state.dropDisabled = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     // Fetch collection bookmarks search
     builder.addCase(fetchCollectionBookmarksSearch.pending, (state) => {
@@ -76,3 +80,4 @@ const bookmarkSlice = createSlice({
 });
 
 export default bookmarkSlice;
+export const { updateDropDisabled } = bookmarkSlice.actions;

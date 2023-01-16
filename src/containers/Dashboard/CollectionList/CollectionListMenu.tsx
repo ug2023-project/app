@@ -17,9 +17,18 @@ const CollectionListMenu = () => {
   return (
     <Menu shadow="md" width={200}>
       <Menu.Target>
-        <Button size="xs" compact>
-          <BsThreeDots />
-        </Button>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+          }}
+        >
+          Collections
+          <Button size="xs" compact>
+            <BsThreeDots />
+          </Button>
+        </div>
       </Menu.Target>
 
       <Menu.Dropdown

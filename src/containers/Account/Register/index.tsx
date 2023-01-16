@@ -46,7 +46,7 @@ const Register = () => {
         password: values.password,
       })
       .then(() => {
-        navigate('/account/actions/login');
+        navigate('/login');
       })
       .catch(() => setError(true));
     form.reset();
