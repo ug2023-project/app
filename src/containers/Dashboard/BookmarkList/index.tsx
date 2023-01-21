@@ -51,7 +51,7 @@ const BookmarkList = () => {
   return (
     <main className={styles.bookmarkList}>
       <div>
-        CollectionId: {collectionId}, IsSearching:{' '}
+        {/* CollectionId: {collectionId}, IsSearching:{' '} */}
         {JSON.stringify(isSearchResult)}
       </div>
       <Droppable
