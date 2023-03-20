@@ -8,6 +8,7 @@ module.exports = {
     'plugin:react/recommended',
     'plugin:react/jsx-runtime',
     'plugin:react-hooks/recommended',
+    'prettier',
   ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
@@ -22,9 +23,6 @@ module.exports = {
     '@typescript-eslint',
   ],
   rules: {
-    indent: ['error', 2],
-    quotes: ['error', 'single'],
-    semi: ['error', 'always'],
     'comma-dangle': 'off',
     'multiline-ternary': 'off',
     'no-use-before-define': 'off',
