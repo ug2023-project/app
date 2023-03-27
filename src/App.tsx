@@ -10,11 +10,6 @@ import router from './router';
 import { Suspense } from 'react';
 import { PersistGate } from 'redux-persist/integration/react';
 import { persistStore } from 'redux-persist';
-import {
-  DndProvider,
-  getBackendOptions,
-  MultiBackend,
-} from '@minoru/react-dnd-treeview';
 import AuthProvider from './router/AuthProvider';
 
 import styles from './App.module.css';

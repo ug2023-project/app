@@ -1,65 +1,66 @@
 import Bookmark from '@/types/Bookmark';
-import TreeCollection, { CollectionId } from '@/types/TreeCollection';
+import { UniqueIdentifier } from '@dnd-kit/core';
 
 export type CollectionState = {
-  ids: CollectionId[];
-  collections: Partial<Record<CollectionId, TreeCollection>>;
-  previousIds: CollectionId[] | null;
-  previousCollections: Partial<Record<CollectionId, TreeCollection>> | null;
+  ids: UniqueIdentifier[];
+
+  collections: Partial<Record<UniqueIdentifier, any>>;
+  previousIds: UniqueIdentifier[] | null;
+  previousCollections: Partial<Record<number, any>> | null;
   loading: boolean;
   error: string | null;
 };
 
 export type BookmarkState = {
-  bookmarks: Partial<Record<number | string, Bookmark>>;
-  previousBookmarks: Partial<Record<number | string, Bookmark>> | null;
+  bookmarks: Partial<Record<UniqueIdentifier, Bookmark>>;
+  previousBookmarks: Partial<Record<UniqueIdentifier, Bookmark>> | null;
   currentSearch: Bookmark[];
-  draggingIds: number[];
+  draggingIds: UniqueIdentifier[];
   dropDisabled: boolean;
   loading: boolean;
   error: string | null;
 };
 
 export type FetchCollectionBookmarksParams = {
-  collectionId: number | string;
+  collectionId: UniqueIdentifier;
   searchQuery: string | null;
 };
 
 export type CreateCollection = {
   body: {
     title: string;
-    parentId: CollectionId;
+    parentId: UniqueIdentifier;
   };
   temporaryId: string;
 };
 
 export type MoveCollection = {
   body: {
-    parentId: CollectionId;
+    parentId: UniqueIdentifier;
     index: number;
-    collectionIds: CollectionId[];
+    collectionIds: UniqueIdentifier[];
   };
 };
 
 export type MoveBookmarks = {
   params: {
-    collectionId: CollectionId;
+    collectionId: UniqueIdentifier;
   };
   body: {
-    collectionId: CollectionId;
+    collectionId: UniqueIdentifier;
     index: number;
-    bookmarkIds: (number | string)[];
+    bookmarkIds: UniqueIdentifier[];
   };
 };
 
 export type EditCollection = {
-  collectionId: CollectionId;
+  collectionId: UniqueIdentifier;
   body: {
     title: string;
   };
 };
 
 export type CreateBookmark = {
-  collectionId: CollectionId;
+  collectionId: UniqueIdentifier;
   bookmark: Partial<Bookmark>;
 };

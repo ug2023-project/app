@@ -1,8 +1,7 @@
 import BookmarkType from './BookmarkType';
-import { CollectionId } from '@/types/TreeCollection';
 
 type Bookmark = {
-  id: number;
+  id: number | string;
   link: string;
   title: string;
   description: string;
@@ -10,7 +9,7 @@ type Bookmark = {
   deleted: boolean;
   cacheUrl: string | null;
   authorId: number;
-  collectionId: CollectionId;
+  collectionId: number | string;
   tags: string[];
   image: string;
   icon: string;

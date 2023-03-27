@@ -1,10 +1,9 @@
-import TreeCollection from '@/types/TreeCollection';
 import { Button, Group, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 
 interface CollectionFormProps {
   onSubmit: ({ title }: { title: string }) => void;
-  node?: TreeCollection;
+  node?: any;
 }
 
 const CollectionForm = ({ onSubmit, node }: CollectionFormProps) => {

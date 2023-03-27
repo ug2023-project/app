@@ -1,4 +1,3 @@
-import { Draggable } from 'react-beautiful-dnd';
 import { createStyles, Text } from '@mantine/core';
 import Bookmark from '@/types/Bookmark';
 import { useSearchParams } from 'react-router-dom';
@@ -44,40 +43,25 @@ const BookmarkItem = ({ index, item }: Props) => {
   );
 
   return (
-    <Draggable
-      draggableId={`${item.id}-${item.collectionId}`}
-      index={index}
-      isDragDisabled={isSearchResult}
-    >
-      {(provided, snapshot) => (
-        <div
-          className={cx(classes.item, {
-            [classes.itemDragging]: snapshot.isDragging,
-          })}
-          {...provided.draggableProps}
-          {...provided.dragHandleProps}
-          ref={provided.innerRef}
-        >
-          <Text className={classes.symbol}>{item.id}</Text>
-          <div>
-            {emphasizeText(item.title).map((entry, index) =>
-              entry.bold ? (
-                <span key={index} className={styles.titleBold}>
-                  {entry.text}
-                </span>
-              ) : (
-                entry.text
-              ),
-            )}
-            <a href={item.link} target="_blank" rel="noreferrer">
-              <Text color="dimmed" size="sm">
-                {item.link}
-              </Text>
-            </a>
-          </div>
-        </div>
-      )}
-    </Draggable>
+    <>
+      <Text className={classes.symbol}>{item.id}</Text>
+      <div>
+        {emphasizeText(item.title).map((entry, index) =>
+          entry.bold ? (
+            <span key={index} className={styles.titleBold}>
+              {entry.text}
+            </span>
+          ) : (
+            entry.text
+          ),
+        )}
+        <a href={item.link} target="_blank" rel="noreferrer">
+          <Text color="dimmed" size="sm">
+            {item.link}
+          </Text>
+        </a>
+      </div>
+    </>
   );
 };
 

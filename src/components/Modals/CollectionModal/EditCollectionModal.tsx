@@ -1,16 +1,15 @@
 import { Modal, Text } from '@mantine/core';
-import TreeCollection from '@/types/TreeCollection';
 import CollectionForm from './CollectionForm';
 import { editCollection } from '@/containers/Dashboard/ducks/collections/collections.actions';
 import useTypedDispatch from '@/hooks/useTypedDispatch';
 
 type EditCollectionModalProps = {
-  node: TreeCollection;
+  node?: any;
   isModalOpen: boolean;
   setIsModalOpen: (value: boolean) => void;
 };
 
-const EditColletionModal = ({
+const EditCollectionModal = ({
   isModalOpen,
   node,
   setIsModalOpen,
@@ -35,4 +34,4 @@ const EditColletionModal = ({
   );
 };
 
-export default EditColletionModal;
+export default EditCollectionModal;

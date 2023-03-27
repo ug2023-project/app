@@ -1,7 +1,5 @@
 import { AppState } from '@/redux/store';
 import { createSelector } from '@reduxjs/toolkit';
-import { CollectionId } from '@/types/TreeCollection';
-import TreeData from '@/components/Tree/TreeData';
 import Bookmark from '@/types/Bookmark';
 
 const selectSelf = (state: AppState) => state;
@@ -20,7 +18,7 @@ export const selectCollections = createSelector(
     ids.map((id) => collections[id]).filter(Boolean) as TreeData,
 );
 
-export const selectHasChildrenCollections = (collectionId: CollectionId) =>
+export const selectHasChildrenCollections = (collectionId: number) =>
   createSelector(selectCollections, (collections) =>
     collections.some((collection) => collection?.parent === collectionId),
   );
@@ -30,7 +28,7 @@ const selectNormalizedBookmarks = createSelector(
   (state) => state.bookmarks.bookmarks,
 );
 
-export const selectCollectionBookmarks = (collectionId: CollectionId) =>
+export const selectCollectionBookmarks = (collectionId: number) =>
   createSelector(
     selectNormalizedCollections,
     selectNormalizedBookmarks,

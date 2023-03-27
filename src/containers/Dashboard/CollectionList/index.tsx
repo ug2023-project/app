@@ -1,4 +1,3 @@
-import Tree from '@/components/Tree';
 import styles from './CollectionList.module.css';
 import useTypedDispatch from '@/hooks/useTypedDispatch';
 import { Fragment, useEffect } from 'react';
@@ -6,9 +5,36 @@ import { fetchAllCollections } from '../ducks/collections/collections.actions';
 import useTypedSelector from '@/hooks/useTypedSelector';
 import { Resizable } from 're-resizable';
 import { selectCollections } from '@/redux/selectors';
-import { Droppable } from 'react-beautiful-dnd';
 import CollectionListMenu from './CollectionListMenu';
-import { updateDropDisabled } from '@/containers/Dashboard/ducks/bookmarks/bookmarks.slice';
+import { SortableTree } from '@/components/Tree/SortableTree';
+import { TreeItems } from '@/components/Tree/types';
+
+const items: TreeItems = [
+  {
+    id: 'Home',
+    children: [],
+  },
+  {
+    id: 'Collections',
+    children: [
+      { id: 'Spring', children: [] },
+      { id: 'Summer', children: [] },
+      { id: 'Fall', children: [] },
+      { id: 'Winter', children: [] },
+    ],
+  },
+  {
+    id: 'About Us',
+    children: [],
+  },
+  {
+    id: 'My Account',
+    children: [
+      { id: 'Addresses', children: [] },
+      { id: 'Order History', children: [] },
+    ],
+  },
+];
 
 const CollectionList = () => {
   const dispatch = useTypedDispatch();
@@ -29,24 +55,10 @@ const CollectionList = () => {
           right: true,
         }}
       >
-        <Droppable droppableId="collection-tree">
-          {(provided) => (
-            <div
-              ref={provided.innerRef}
-              style={{
-                maxHeight: '3px',
-              }}
-              onMouseEnter={() => dispatch(updateDropDisabled(true))}
-              onMouseLeave={() => dispatch(updateDropDisabled(false))}
-            >
-              {/*<Tree data={treeData}/>*/}
-              {/*<Divider size="xs"/>*/}
-              <CollectionListMenu />
-              <Tree data={treeData} />
-              {provided.placeholder}
-            </div>
-          )}
-        </Droppable>
+        <SortableTree defaultItems={items} collapsible removable />
+        {/*<Tree data={treeData}/>*/}
+        {/*<Divider size="xs"/>*/}
+        <CollectionListMenu />
       </Resizable>
     </Fragment>
   );

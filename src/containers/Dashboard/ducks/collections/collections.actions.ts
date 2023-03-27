@@ -3,8 +3,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from '@/utils/axios/axiosConfig';
 import type CollectionApiResponse from '@/types/CollectionApiResponse';
 import { CreateCollection, MoveCollection } from '../types';
-import { CollectionId } from '@/types/TreeCollection';
-import CollectionApi from '@/types/CollectionApi';
+import Collection from '@/types/CollectionApi';
 
 export const fetchAllCollections = createAsyncThunk(
   'collection/fetchAllCollections',
@@ -17,7 +16,7 @@ export const fetchAllCollections = createAsyncThunk(
 export const createCollection = createAsyncThunk(
   'collection/createCollection',
   async ({ body }: CreateCollection) => {
-    const { data } = await axios.post<CollectionApi>('collections', body);
+    const { data } = await axios.post<Collection>('collections', body);
     return data;
   },
 );
@@ -31,7 +30,7 @@ export const moveCollections = createAsyncThunk(
 
 export const expandCollections = createAsyncThunk(
   'collection/expandCollections',
-  async (collectionIds: CollectionId[]) => {
+  async (collectionIds: number[]) => {
     await axios.put('collections/expand', { collectionIds });
   },
 );
@@ -39,7 +38,7 @@ export const expandCollections = createAsyncThunk(
 export const editCollection = createAsyncThunk(
   'collection/editCollection',
   async (body: EditCollection) => {
-    const { data } = await axios.put<CollectionApi>(
+    const { data } = await axios.put<Collection>(
       `collections/${body.collectionId}`,
       body.body,
     );

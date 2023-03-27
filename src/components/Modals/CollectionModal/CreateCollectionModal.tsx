@@ -1,12 +1,11 @@
 import { Modal, Text } from '@mantine/core';
 import { createCollection } from '@/containers/Dashboard/ducks/collections/collections.actions';
 import { nanoid } from '@reduxjs/toolkit';
-import { CollectionId } from '@/types/TreeCollection';
 import useTypedDispatch from '@/hooks/useTypedDispatch';
 import CollectionForm from './CollectionForm';
 
 type CreateCollectionModalProps = {
-  parentId: CollectionId;
+  parentId: number;
   isModalOpen: boolean;
   setIsModalOpen: (value: boolean) => void;
 };

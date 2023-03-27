@@ -1,11 +1,12 @@
-import TreeCollection, { CollectionId } from '@/types/TreeCollection';
-import CollectionApi from '@/types/CollectionApi';
+import { TreeItem } from '@/components/Tree/types';
+import Collection from '@/types/CollectionApi';
+import { UniqueIdentifier } from '@dnd-kit/core';
 // import CollectionApiResponse from '@/types/CollectionApiResponse';
 
-export const toCollection = (
-  { id, title, ...rest }: CollectionApi,
-  parentId: CollectionId,
-): TreeCollection => ({
+export const toTreeItem = (
+  { id, title, ...rest }: Collection,
+  parentId: UniqueIdentifier,
+): TreeItem => ({
   id,
   parent: parentId,
   text: title,
@@ -16,15 +17,12 @@ export const toCollection = (
 });
 
 export const normalizeCollectionsApi = (
-  collections: CollectionApi[],
-): Record<CollectionId, TreeCollection> =>
-  collections.reduce<Record<CollectionId, TreeCollection>>(
-    (acc, collection) => {
-      acc[collection.id] = toCollection(collection, collection.parentId ?? 0);
-      return acc;
-    },
-    {},
-  );
+  collections: Collection[],
+): Record<number, TreeItem> =>
+  collections.reduce<Record<number, TreeItem>>((acc, collection) => {
+    acc[collection.id] = toTreeItem(collection, collection.parentId ?? 0);
+    return acc;
+  }, {});
 
 // const collectionApiMapper = ({
 //   collectionOrder,

@@ -8,12 +8,9 @@ import {
   moveCollections,
 } from './collections.actions';
 import collectionInitialState from './collections.state';
-import {
-  normalizeCollectionsApi,
-  toCollection,
-} from '@/utils/collectionMapper';
+import { normalizeCollectionsApi, toTreeItem } from '@/utils/collectionMapper';
 import { copy } from 'copy-anything';
-import CollectionApi from '@/types/CollectionApi';
+import Collection from '@/types/CollectionApi';
 import { moveBookmarksToCollection } from '@/containers/Dashboard/ducks/bookmarks/bookmarks.actions';
 
 function insertValuesOnIndex<T>(
@@ -71,7 +68,7 @@ const collectionsSlice = createSlice({
         (collection) => collection?.parent === parentId,
       );
 
-      const temporaryCollectionApi: CollectionApi = {
+      const temporaryCollectionApi: Collection = {
         id: temporaryId,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -86,7 +83,7 @@ const collectionsSlice = createSlice({
         parentId,
         bookmarkOrder: [],
       };
-      state.collections[temporaryId] = toCollection(
+      state.collections[temporaryId] = toTreeItem(
         temporaryCollectionApi,
         parentId,
       );
@@ -107,7 +104,7 @@ const collectionsSlice = createSlice({
         }
         return collectionId;
       });
-      state.collections[newCollection.id] = toCollection(
+      state.collections[newCollection.id] = toTreeItem(
         newCollection,
         collection?.parent ?? 0,
       );

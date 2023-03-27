@@ -1,7 +1,5 @@
-import { CollectionId } from './TreeCollection';
-
-type CollectionApi = {
-  id: CollectionId;
+type Collection = {
+  id: number | string;
   createdAt: string;
   updatedAt: string;
   title: string;
@@ -12,8 +10,8 @@ type CollectionApi = {
   public: boolean;
   expanded: boolean;
   authorId: number;
-  parentId: CollectionId | null;
-  bookmarkOrder: CollectionId[];
+  parentId: number | string | null;
+  bookmarkOrder: (number | string)[];
 };
 
-export default CollectionApi;
+export default Collection;

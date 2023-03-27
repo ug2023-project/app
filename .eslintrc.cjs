@@ -1,4 +1,4 @@
-module.exports = {
+const config = {
   env: {
     browser: true,
     es2021: true,
@@ -16,8 +16,8 @@ module.exports = {
     sourceType: 'module',
   },
   plugins: [
-    'react-hooks',
     'prettier',
+    'react-hooks',
     'jsx-a11y',
     'import',
     '@typescript-eslint',
@@ -58,3 +58,5 @@ module.exports = {
     'prettier/prettier': 'error',
   },
 };
+
+module.exports = config;
