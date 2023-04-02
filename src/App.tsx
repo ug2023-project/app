@@ -13,6 +13,7 @@ import { persistStore } from 'redux-persist';
 import AuthProvider from './router/AuthProvider';
 
 import styles from './App.module.css';
+import { Notifications } from '@mantine/notifications';
 
 const persistor = persistStore(store);
 
@@ -35,6 +36,7 @@ const App = () => {
                   withNormalizeCSS
                   theme={{ colorScheme }}
                 >
+                  <Notifications />
                   <RouterProvider router={router} />
                 </MantineProvider>
               </ColorSchemeProvider>

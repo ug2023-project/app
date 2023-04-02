@@ -34,7 +34,7 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-const BookmarkItem = ({ index, item }: Props) => {
+const BookmarkItem = ({ item }: Props) => {
   const { classes, cx } = useStyles();
   const [searchParams] = useSearchParams();
   const isSearchResult = useMemo(
@@ -66,7 +66,6 @@ const BookmarkItem = ({ index, item }: Props) => {
 };
 
 type Props = {
-  index: number;
   item: Bookmark;
 };
 

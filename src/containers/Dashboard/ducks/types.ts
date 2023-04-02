@@ -1,12 +1,13 @@
 import Bookmark from '@/types/Bookmark';
+import Collection from '@/types/Collection';
 import { UniqueIdentifier } from '@dnd-kit/core';
 
 export type CollectionState = {
   ids: UniqueIdentifier[];
 
-  collections: Partial<Record<UniqueIdentifier, any>>;
+  collections: Partial<Record<UniqueIdentifier, Collection>>;
   previousIds: UniqueIdentifier[] | null;
-  previousCollections: Partial<Record<number, any>> | null;
+  previousCollections: Partial<Record<number, Collection>> | null;
   loading: boolean;
   error: string | null;
 };
@@ -31,14 +32,13 @@ export type CreateCollection = {
     title: string;
     parentId: UniqueIdentifier;
   };
-  temporaryId: string;
 };
 
 export type MoveCollection = {
   body: {
-    parentId: UniqueIdentifier;
+    parentId: UniqueIdentifier | null;
     index: number;
-    collectionIds: UniqueIdentifier[];
+    collectionId: UniqueIdentifier;
   };
 };
 

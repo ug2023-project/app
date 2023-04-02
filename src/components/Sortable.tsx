@@ -3,7 +3,6 @@ import { createPortal } from 'react-dom';
 
 import {
   Active,
-  Announcements,
   closestCenter,
   CollisionDetection,
   DragOverlay,
@@ -15,7 +14,6 @@ import {
   MouseSensor,
   MeasuringConfiguration,
   PointerActivationConstraint,
-  ScreenReaderInstructions,
   TouchSensor,
   UniqueIdentifier,
   useSensor,
@@ -34,6 +32,7 @@ import {
 
 import { Item, List, Wrapper } from '@/components/dnd-kit';
 import { SortableItem } from './SortableItem';
+import Bookmark from '@/types/Bookmark';
 
 export interface SortableProps {
   activationConstraint?: PointerActivationConstraint;
@@ -44,13 +43,10 @@ export interface SortableProps {
   Container?: any; // To-do: Fix me
   dropAnimation?: DropAnimation | null;
   getNewIndex?: NewIndexGetter;
-  handle?: boolean;
-  items: UniqueIdentifier[];
+  bookmarks: Bookmark[];
   measuring?: MeasuringConfiguration;
   modifiers?: Modifiers;
-  renderItem?: any;
   removable?: boolean;
-  reorderItems?: typeof arrayMove;
   strategy?: SortingStrategy;
   style?: React.CSSProperties;
   useDragOverlay?: boolean;
@@ -68,7 +64,6 @@ export interface SortableProps {
     isDragging: boolean;
     id: UniqueIdentifier;
   }): React.CSSProperties;
-  isDisabled?(id: UniqueIdentifier): boolean;
 }
 
 const dropAnimationConfig: DropAnimation = {
@@ -81,14 +76,6 @@ const dropAnimationConfig: DropAnimation = {
   }),
 };
 
-const screenReaderInstructions: ScreenReaderInstructions = {
-  draggable: `
-    To pick up a sortable item, press the space bar.
-    While sorting, use the arrow keys to move the item.
-    Press space again to drop the item in its new position, or press escape to cancel.
-  `,
-};
-
 export function Sortable({
   activationConstraint,
   animateLayoutChanges,
@@ -97,25 +84,23 @@ export function Sortable({
   collisionDetection = closestCenter,
   coordinateGetter = sortableKeyboardCoordinates,
   dropAnimation = dropAnimationConfig,
-  getItemStyles = () => ({}),
   getNewIndex,
-  handle = false,
-  items: initialItems,
-  isDisabled = () => false,
+  bookmarks: initialBookmarks = [],
   measuring,
   modifiers,
-  removable,
-  renderItem,
-  reorderItems = arrayMove,
   strategy = rectSortingStrategy,
   style,
   useDragOverlay = true,
   wrapperStyle = () => ({}),
 }: SortableProps) {
-  const [items, setItems] = useState<UniqueIdentifier[]>(() => initialItems);
+  const [bookmarks, setBookmarks] = useState<Bookmark[]>(
+    () => initialBookmarks,
+  );
+
   useEffect(() => {
-    setItems(initialItems);
-  }, [initialItems]);
+    setBookmarks(initialBookmarks);
+  }, [initialBookmarks]);
+
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
   const sensors = useSensors(
     useSensor(MouseSensor, {
@@ -131,56 +116,13 @@ export function Sortable({
     }),
   );
   const isFirstAnnouncement = useRef(true);
-  const getIndex = (id: UniqueIdentifier) => items.indexOf(id);
-  const getPosition = (id: UniqueIdentifier) => getIndex(id) + 1;
+  const getIndex = (id: UniqueIdentifier) =>
+    bookmarks.findIndex((b) => b.id === id);
   const activeIndex = activeId ? getIndex(activeId) : -1;
-  const handleRemove = removable
-    ? (id: UniqueIdentifier) =>
-        setItems((items) => items.filter((item) => item !== id))
-    : undefined;
-  const announcements: Announcements = {
-    onDragStart({ active: { id } }) {
-      return `Picked up sortable item ${String(
-        id,
-      )}. Sortable item ${id} is in position ${getPosition(id)} of ${
-        items.length
-      }`;
-    },
-    onDragOver({ active, over }) {
-      // In this specific use-case, the picked up item's `id` is always the same as the first `over` id.
-      // The first `onDragOver` event therefore doesn't need to be announced, because it is called
-      // immediately after the `onDragStart` announcement and is redundant.
-      if (isFirstAnnouncement.current === true) {
-        isFirstAnnouncement.current = false;
-        return;
-      }
-
-      if (over) {
-        return `Sortable item ${
-          active.id
-        } was moved into position ${getPosition(over.id)} of ${items.length}`;
-      }
-
-      return;
-    },
-    onDragEnd({ active, over }) {
-      console.log('===========================');
-      console.log('onDragEnd', active, over);
-      console.log('===========================');
-      if (over) {
-        return `Sortable item ${
-          active.id
-        } was dropped at position ${getPosition(over.id)} of ${items.length}`;
-      }
-
-      return;
-    },
-    onDragCancel({ active: { id } }) {
-      return `Sorting was cancelled. Sortable item ${id} was dropped and returned to position ${getPosition(
-        id,
-      )} of ${items.length}.`;
-    },
-  };
+  const handleRemove = (id: UniqueIdentifier) =>
+    setBookmarks((bookmarks) =>
+      bookmarks.filter((bookmark) => bookmark.id !== id),
+    );
 
   useEffect(() => {
     if (!activeId) {
@@ -190,10 +132,6 @@ export function Sortable({
 
   return (
     <DndContext
-      accessibility={{
-        announcements,
-        screenReaderInstructions,
-      }}
       sensors={sensors}
       collisionDetection={collisionDetection}
       onDragStart={({ active }) => {
@@ -209,7 +147,7 @@ export function Sortable({
         if (over) {
           const overIndex = getIndex(over.id);
           if (activeIndex !== overIndex) {
-            setItems((items) => reorderItems(items, activeIndex, overIndex));
+            setBookmarks((items) => arrayMove(items, activeIndex, overIndex));
           }
         }
       }}
@@ -218,18 +156,16 @@ export function Sortable({
       modifiers={modifiers}
     >
       <Wrapper style={style} center>
-        <SortableContext items={items} strategy={strategy}>
+        <SortableContext items={bookmarks} strategy={strategy}>
           <Container>
-            {items.map((value, index) => (
+            {bookmarks.map((value, index) => (
               <SortableItem
-                key={value}
-                id={value}
-                handle={handle}
+                key={value.id}
+                id={value.id}
+                item={value}
                 index={index}
-                style={getItemStyles}
                 wrapperStyle={wrapperStyle}
-                disabled={isDisabled(value)}
-                renderItem={renderItem}
+                disabled={false}
                 onRemove={handleRemove}
                 animateLayoutChanges={animateLayoutChanges}
                 useDragOverlay={useDragOverlay}
@@ -247,22 +183,12 @@ export function Sortable({
             >
               {activeId ? (
                 <Item
-                  value={items[activeIndex]}
-                  handle={handle}
-                  renderItem={renderItem}
+                  item={bookmarks.find((b) => b.id === activeId) as Bookmark}
                   wrapperStyle={wrapperStyle({
                     active: { id: activeId },
                     index: activeIndex,
                     isDragging: true,
-                    id: items[activeIndex],
-                  })}
-                  style={getItemStyles({
-                    id: items[activeIndex],
-                    index: activeIndex,
-                    isSorting: activeId !== null,
-                    isDragging: true,
-                    overIndex: -1,
-                    isDragOverlay: true,
+                    id: bookmarks.findIndex((b) => b.id === activeId),
                   })}
                   dragOverlay
                 />

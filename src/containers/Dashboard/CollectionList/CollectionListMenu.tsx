@@ -3,7 +3,7 @@ import useTypedDispatch from '@/hooks/useTypedDispatch';
 import { Button, Menu } from '@mantine/core';
 import { useState } from 'react';
 import { BsThreeDots } from 'react-icons/bs';
-import { expandCollections } from '../ducks/collections/collections.actions';
+import { collapseAllCollections } from '../ducks/collections/collections.actions';
 
 const CollectionListMenu = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -11,7 +11,7 @@ const CollectionListMenu = () => {
   const dispatch = useTypedDispatch();
 
   const collapseAll = () => {
-    dispatch(expandCollections([]));
+    dispatch(collapseAllCollections());
   };
 
   return (

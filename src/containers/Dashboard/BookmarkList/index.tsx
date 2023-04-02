@@ -19,6 +19,7 @@ import {
 } from '@dnd-kit/sortable';
 import { MeasuringStrategy } from '@dnd-kit/core';
 import { GridContainer } from '@/components/GridContainer';
+import { Button } from '@mantine/core';
 
 const listProps: Partial<SortableProps> = {
   strategy: verticalListSortingStrategy,
@@ -65,11 +66,7 @@ const BookmarkList = () => {
 
   const items =
     bookmarks?.map((item, index) => (
-      <BookmarkItem
-        key={`${item.id}-${item.collectionId}`}
-        index={index}
-        item={item}
-      />
+      <BookmarkItem key={`${item.id}-${item.collectionId}`} item={item} />
     )) ?? [];
 
   const animateLayoutChanges: AnimateLayoutChanges = (args) =>
@@ -81,21 +78,25 @@ const BookmarkList = () => {
         {JSON.stringify(isSearchResult)}
         <br />
         <br />
-        <button
+        <Button
           onClick={() => {
             setIsList(!isList);
             setProps(isList ? gridProps : listProps);
           }}
-          style={{ border: '1px solid red' }}
+          style={{ border: '1px solid green' }}
         >
-          Click me
-        </button>
+          Change view
+        </Button>
         <Sortable
           {...props}
-          items={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]}
+          bookmarks={bookmarks}
           animateLayoutChanges={animateLayoutChanges}
           measuring={{ droppable: { strategy: MeasuringStrategy.Always } }}
           removable
+          // activationConstraint={{
+          //   delay: 90,
+          //   tolerance: 5,
+          // }}
         />
       </div>
     </main>

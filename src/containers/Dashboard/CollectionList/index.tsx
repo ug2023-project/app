@@ -7,38 +7,15 @@ import { Resizable } from 're-resizable';
 import { selectCollections } from '@/redux/selectors';
 import CollectionListMenu from './CollectionListMenu';
 import { SortableTree } from '@/components/Tree/SortableTree';
-import { TreeItems } from '@/components/Tree/types';
-
-const items: TreeItems = [
-  {
-    id: 'Home',
-    children: [],
-  },
-  {
-    id: 'Collections',
-    children: [
-      { id: 'Spring', children: [] },
-      { id: 'Summer', children: [] },
-      { id: 'Fall', children: [] },
-      { id: 'Winter', children: [] },
-    ],
-  },
-  {
-    id: 'About Us',
-    children: [],
-  },
-  {
-    id: 'My Account',
-    children: [
-      { id: 'Addresses', children: [] },
-      { id: 'Order History', children: [] },
-    ],
-  },
-];
+import { Divider } from '@mantine/core';
 
 const CollectionList = () => {
   const dispatch = useTypedDispatch();
+
+  console.time('selectCollections');
   const treeData = useTypedSelector(selectCollections);
+  console.timeEnd('selectCollections');
+  console.log('=================================================');
 
   useEffect(() => {
     dispatch(fetchAllCollections());
@@ -49,16 +26,21 @@ const CollectionList = () => {
     <Fragment>
       <Resizable
         className={styles.collectionList}
+        defaultSize={{
+          width: '350px',
+          height: '100%',
+        }}
         minWidth="250px"
         maxWidth="500px"
         enable={{
           right: true,
         }}
       >
-        <SortableTree defaultItems={items} collapsible removable />
-        {/*<Tree data={treeData}/>*/}
-        {/*<Divider size="xs"/>*/}
+        <Divider size="xs" />
         <CollectionListMenu />
+        <SortableTree defaultItems={treeData} collapsible />
+        <Divider size="xs" />
+        {/*<SortableTree defaultItems={...} collapsible />*/}
       </Resizable>
     </Fragment>
   );

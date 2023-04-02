@@ -1,6 +1,6 @@
 import React from 'react';
 
-import styles from './GridContainer.module.css';
+import styles from './GridContainer.module.scss';
 
 export interface Props {
   children: React.ReactNode;

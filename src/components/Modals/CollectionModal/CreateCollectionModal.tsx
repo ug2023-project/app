@@ -1,11 +1,11 @@
 import { Modal, Text } from '@mantine/core';
 import { createCollection } from '@/containers/Dashboard/ducks/collections/collections.actions';
-import { nanoid } from '@reduxjs/toolkit';
 import useTypedDispatch from '@/hooks/useTypedDispatch';
 import CollectionForm from './CollectionForm';
+import { UniqueIdentifier } from '@dnd-kit/core';
 
 type CreateCollectionModalProps = {
-  parentId: number;
+  parentId: UniqueIdentifier;
   isModalOpen: boolean;
   setIsModalOpen: (value: boolean) => void;
 };
@@ -18,9 +18,7 @@ const CreateCollectionModal = ({
   const dispatch = useTypedDispatch();
 
   const handleCreateNewCollection = async ({ title }: { title: string }) => {
-    dispatch(
-      createCollection({ body: { title, parentId }, temporaryId: nanoid() }),
-    );
+    dispatch(createCollection({ body: { title, parentId } }));
     setIsModalOpen(false);
   };
 

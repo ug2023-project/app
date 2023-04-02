@@ -24,6 +24,7 @@ const persistConfig = {
   key: 'root',
   version: 1,
   storage,
+  serialize: true,
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

@@ -1,4 +1,4 @@
-import Collection from './CollectionApi';
+import Collection from './Collection';
 
 type CollectionApiResponse = {
   collectionOrder: number[];

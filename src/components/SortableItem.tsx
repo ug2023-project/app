@@ -6,31 +6,28 @@ import {
 } from '@dnd-kit/sortable';
 import { Item } from './dnd-kit';
 import { SortableProps } from './Sortable';
+import Bookmark from '@/types/Bookmark';
 
 interface SortableItemProps {
+  item: Bookmark;
   animateLayoutChanges?: AnimateLayoutChanges;
   disabled?: boolean;
   getNewIndex?: NewIndexGetter;
   id: UniqueIdentifier;
   index: number;
-  handle: boolean;
   useDragOverlay?: boolean;
   onRemove?(id: UniqueIdentifier): void;
-  style(values: any): React.CSSProperties;
-  renderItem?(args: any): React.ReactElement;
   wrapperStyle: SortableProps['wrapperStyle'];
 }
 
 export function SortableItem({
+  item,
   disabled,
   animateLayoutChanges,
   getNewIndex,
-  handle,
   id,
   index,
   onRemove,
-  style,
-  renderItem,
   useDragOverlay,
   wrapperStyle,
 }: SortableItemProps) {
@@ -40,9 +37,7 @@ export function SortableItem({
     isDragging,
     isSorting,
     listeners,
-    overIndex,
     setNodeRef,
-    setActivatorNodeRef,
     transform,
     transition,
   } = useSortable({
@@ -54,28 +49,12 @@ export function SortableItem({
 
   return (
     <Item
+      item={item}
       ref={setNodeRef}
-      value={id}
       disabled={disabled}
       dragging={isDragging}
       sorting={isSorting}
-      handle={handle}
-      handleProps={
-        handle
-          ? {
-              ref: setActivatorNodeRef,
-            }
-          : undefined
-      }
-      renderItem={renderItem}
       index={index}
-      style={style({
-        index,
-        id,
-        isDragging,
-        isSorting,
-        overIndex,
-      })}
       onRemove={onRemove ? () => onRemove(id) : undefined}
       transform={transform}
       transition={transition}

@@ -8,7 +8,7 @@ type Collection = {
   deleted: boolean;
   view: 'LIST' | 'SIMPLE' | 'GRID';
   public: boolean;
-  expanded: boolean;
+  collapsed: boolean;
   authorId: number;
   parentId: number | string | null;
   bookmarkOrder: (number | string)[];

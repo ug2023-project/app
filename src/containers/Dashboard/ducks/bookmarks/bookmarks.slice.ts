@@ -80,4 +80,3 @@ const bookmarkSlice = createSlice({
 });
 
 export default bookmarkSlice;
-export const { updateDropDisabled } = bookmarkSlice.actions;

@@ -1,16 +1,19 @@
-import React, { forwardRef, HTMLAttributes, useState } from 'react';
-
+import React, { CSSProperties, HTMLAttributes, useState } from 'react';
+import { AnimateLayoutChanges, useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { iOS } from '../utilities';
 import classNames from 'classnames';
-
-import styles from './TreeItem.module.css';
-import { Action, Handle, Remove } from '../../dnd-kit';
-
+import styles from '@/components/Tree/TreeItem/TreeItem.module.scss';
+import { Action, Handle } from '@/components/dnd-kit';
+import { UniqueIdentifier } from '@dnd-kit/core';
 import { Button, Menu } from '@mantine/core';
 import { BsThreeDots } from 'react-icons/bs';
 import CreateCollectionModal from '@/components/Modals/CollectionModal/CreateCollectionModal';
 import EditCollectionModal from '@/components/Modals/CollectionModal/EditCollectionModal';
+import { useNavigate, useParams } from 'react-router-dom';
 
-export interface Props extends Omit<HTMLAttributes<HTMLLIElement>, 'id'> {
+interface Props extends Omit<HTMLAttributes<HTMLLIElement>, 'id'> {
+  id: UniqueIdentifier;
   childCount?: number;
   clone?: boolean;
   collapsed?: boolean;
@@ -19,7 +22,6 @@ export interface Props extends Omit<HTMLAttributes<HTMLLIElement>, 'id'> {
   disableSelection?: boolean;
   ghost?: boolean;
   handleProps?: any;
-  indicator?: boolean;
   indentationWidth: number;
   value: string | number;
   onCollapse?(): void;
@@ -27,68 +29,90 @@ export interface Props extends Omit<HTMLAttributes<HTMLLIElement>, 'id'> {
   wrapperRef?(node: HTMLLIElement): void;
 }
 
-export const TreeItem = forwardRef<HTMLDivElement, Props>(
-  (
-    {
-      childCount,
-      clone,
-      depth,
-      disableSelection,
-      disableInteraction,
-      ghost,
-      handleProps,
-      indentationWidth,
-      indicator,
-      collapsed,
-      onCollapse,
-      onRemove,
-      style,
-      value,
-      wrapperRef,
-      ...props
-    },
-    ref,
-  ) => (
+const animateLayoutChanges: AnimateLayoutChanges = ({
+  isSorting,
+  wasDragging,
+}) => !(isSorting || wasDragging);
+
+export function TreeItem({ id, depth, ...props }: Props) {
+  const collectionId = useParams().collectionId;
+  const navigate = useNavigate();
+  const active = parseInt(collectionId ?? '') === id;
+
+  const {
+    attributes,
+    isDragging,
+    isSorting,
+    listeners,
+    setDraggableNodeRef,
+    setDroppableNodeRef,
+    transform,
+    transition,
+  } = useSortable({
+    id,
+    animateLayoutChanges,
+  });
+  const style: CSSProperties = {
+    transform: CSS.Translate.toString(transform),
+    transition,
+  };
+
+  const [isHover, setIsHover] = useState(false);
+  const handleProps = {
+    ...attributes,
+    ...listeners,
+  };
+
+  return (
     <li
       className={classNames(
         styles.Wrapper,
-        clone && styles.clone,
-        ghost && styles.ghost,
-        indicator && styles.indicator,
-        disableSelection && styles.disableSelection,
-        disableInteraction && styles.disableInteraction,
+        props.clone && styles.clone,
+        isDragging && styles.ghost,
+        iOS && styles.disableSelection,
+        isSorting && styles.disableInteraction,
       )}
-      ref={wrapperRef}
+      ref={setDroppableNodeRef}
       style={
         {
-          '--spacing': `${indentationWidth * depth}px`,
+          '--spacing': `${props.indentationWidth * depth}px`,
         } as React.CSSProperties
       }
-      {...props}
     >
-      <div className={styles.TreeItem} ref={ref} style={style}>
+      <div
+        className={classNames(
+          styles.TreeItem,
+          isHover && styles.hover,
+          active && styles.active,
+        )}
+        ref={setDraggableNodeRef}
+        style={style}
+        onClick={() => navigate(`/collections/${id}`)}
+        onMouseEnter={() => setIsHover(true)}
+        onMouseLeave={() => setIsHover(false)}
+      >
         <Handle {...handleProps} />
-        {onCollapse && (
+        {props.onCollapse && (
           <Action
-            onClick={onCollapse}
+            onClick={props.onCollapse}
             className={classNames(
               styles.Collapse,
-              collapsed && styles.collapsed,
+              props.collapsed && styles.collapsed,
             )}
           >
             {collapseIcon}
           </Action>
         )}
-        <span className={styles.Text}>{value}</span>
+        <span className={styles.Text}>{props.value}</span>
         {/* {!clone && onRemove && <Remove onClick={onRemove} />} */}
-        <MenuButton />
-        {clone && childCount && childCount > 1 ? (
-          <span className={styles.Count}>{childCount}</span>
+        <MenuButton id={id} />
+        {props.clone && props.childCount && props.childCount > 1 ? (
+          <span className={styles.Count}>{props.childCount}</span>
         ) : null}
       </div>
     </li>
-  ),
-);
+  );
+}
 
 const collapseIcon = (
   <svg width="10" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 70 41">
@@ -96,7 +120,11 @@ const collapseIcon = (
   </svg>
 );
 
-const MenuButton = () => {
+interface MenuButtonProps {
+  id: UniqueIdentifier;
+}
+
+const MenuButton = ({ id }: MenuButtonProps) => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   return (
@@ -126,12 +154,12 @@ const MenuButton = () => {
         </Menu.Dropdown>
       </Menu>
       <CreateCollectionModal
-        parentId={1}
+        parentId={id}
         isModalOpen={isCreateModalOpen}
         setIsModalOpen={setIsCreateModalOpen}
       />
       <EditCollectionModal
-        node={null}
+        id={id}
         isModalOpen={isEditModalOpen}
         setIsModalOpen={setIsEditModalOpen}
       />

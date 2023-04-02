@@ -1,9 +1,9 @@
 import {
   closestCorners,
+  DroppableContainer,
   getFirstCollision,
   KeyboardCode,
   KeyboardCoordinateGetter,
-  DroppableContainer,
 } from '@dnd-kit/core';
 
 import type { SensorContext } from './types';
@@ -20,10 +20,9 @@ const horizontal: string[] = [KeyboardCode.Left, KeyboardCode.Right];
 
 export const sortableTreeKeyboardCoordinates: (
   context: SensorContext,
-  indicator: boolean,
   indentationWidth: number,
 ) => KeyboardCoordinateGetter =
-  (context, indicator, indentationWidth) =>
+  (context, indentationWidth) =>
   (
     event,
     {
@@ -140,16 +139,12 @@ export const sortableTreeKeyboardCoordinates: (
             );
             const isBelow = newIndex > activeIndex;
             const modifier = isBelow ? 1 : -1;
-            const offset = indicator
-              ? (collisionRect.height - activeRect.height) / 2
-              : 0;
+            const offset = 0;
 
-            const newCoordinates = {
+            return {
               x: newRect.left + depth * indentationWidth,
               y: newRect.top + modifier * offset,
             };
-
-            return newCoordinates;
           }
         }
       }

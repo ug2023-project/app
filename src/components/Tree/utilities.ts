@@ -95,27 +95,6 @@ export function flattenTree(items: TreeItems): FlattenedItem[] {
   return flatten(items);
 }
 
-export function buildTree(flattenedItems: FlattenedItem[]): TreeItems {
-  const root: TreeItem = { id: 'root', children: [] };
-  const nodes: Record<string, TreeItem> = { [root.id]: root };
-  const items = flattenedItems.map((item) => ({ ...item, children: [] }));
-
-  for (const item of items) {
-    const { id, children } = item;
-    const parentId = item.parentId ?? root.id;
-    const parent = nodes[parentId] ?? findItem(items, parentId);
-
-    nodes[id] = { id, children };
-    parent.children.push(item);
-  }
-
-  return root.children;
-}
-
-export function findItem(items: TreeItem[], itemId: UniqueIdentifier) {
-  return items.find(({ id }) => id === itemId);
-}
-
 export function findItemDeep(
   items: TreeItems,
   itemId: UniqueIdentifier,
@@ -156,27 +135,6 @@ export function removeItem(items: TreeItems, id: UniqueIdentifier) {
 
   return newItems;
 }
-
-export function setProperty<T extends keyof TreeItem>(
-  items: TreeItems,
-  id: UniqueIdentifier,
-  property: T,
-  setter: (value: TreeItem[T]) => TreeItem[T],
-) {
-  for (const item of items) {
-    if (item.id === id) {
-      item[property] = setter(item[property]);
-      continue;
-    }
-
-    if (item.children.length) {
-      item.children = setProperty(item.children, id, property, setter);
-    }
-  }
-
-  return [...items];
-}
-
 function countChildren(items: TreeItem[], count = 0): number {
   return items.reduce((acc, { children }) => {
     if (children.length) {

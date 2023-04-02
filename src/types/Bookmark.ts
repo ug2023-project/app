@@ -1,7 +1,8 @@
 import BookmarkType from './BookmarkType';
+import { UniqueIdentifier } from '@dnd-kit/core';
 
 type Bookmark = {
-  id: number | string;
+  id: UniqueIdentifier;
   link: string;
   title: string;
   description: string;

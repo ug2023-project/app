@@ -3,7 +3,8 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from '@/utils/axios/axiosConfig';
 import type CollectionApiResponse from '@/types/CollectionApiResponse';
 import { CreateCollection, MoveCollection } from '../types';
-import Collection from '@/types/CollectionApi';
+import Collection from '@/types/Collection';
+import { UniqueIdentifier } from '@dnd-kit/core';
 
 export const fetchAllCollections = createAsyncThunk(
   'collection/fetchAllCollections',
@@ -21,17 +22,24 @@ export const createCollection = createAsyncThunk(
   },
 );
 
-export const moveCollections = createAsyncThunk(
-  'collection/moveCollections',
+export const moveCollection = createAsyncThunk(
+  'collection/moveCollection',
   async ({ body }: MoveCollection) => {
     await axios.put('collections/children-order', body);
   },
 );
 
-export const expandCollections = createAsyncThunk(
-  'collection/expandCollections',
-  async (collectionIds: number[]) => {
-    await axios.put('collections/expand', { collectionIds });
+export const toggleCollectionCollapsed = createAsyncThunk(
+  'collection/toggleCollectionCollapsed',
+  async (collectionId: UniqueIdentifier) => {
+    await axios.put(`collections/toggle-collapsed/${collectionId}`);
+  },
+);
+
+export const collapseAllCollections = createAsyncThunk(
+  'collection/collapseAllCollections',
+  async () => {
+    await axios.put(`collections/collapse-all`);
   },
 );
 
