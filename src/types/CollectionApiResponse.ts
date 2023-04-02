@@ -1,8 +1,8 @@
-import CollectionApi from './CollectionApi';
+import Collection from './Collection';
 
 type CollectionApiResponse = {
   collectionOrder: number[];
-  collections: CollectionApi[];
+  collections: Collection[];
 };
 
 export default CollectionApiResponse;

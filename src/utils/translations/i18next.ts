@@ -32,6 +32,7 @@ i18n
       escapeValue: false,
     },
     returnNull: false,
-  });
+  })
+  .then(() => {});
 
 export default i18n;

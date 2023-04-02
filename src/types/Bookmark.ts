@@ -1,8 +1,8 @@
 import BookmarkType from './BookmarkType';
-import { CollectionId } from '@/types/TreeCollection';
+import { UniqueIdentifier } from '@dnd-kit/core';
 
 type Bookmark = {
-  id: number;
+  id: UniqueIdentifier;
   link: string;
   title: string;
   description: string;
@@ -10,7 +10,7 @@ type Bookmark = {
   deleted: boolean;
   cacheUrl: string | null;
   authorId: number;
-  collectionId: CollectionId;
+  collectionId: number | string;
   tags: string[];
   image: string;
   icon: string;

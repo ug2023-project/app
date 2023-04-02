@@ -1,20 +1,21 @@
 import { createBookmark } from './../bookmarks/bookmarks.actions';
 import { createSlice } from '@reduxjs/toolkit';
 import {
+  collapseAllCollections,
+  toggleCollectionCollapsed,
   createCollection,
   editCollection,
-  expandCollections,
   fetchAllCollections,
-  moveCollections,
+  moveCollection,
 } from './collections.actions';
 import collectionInitialState from './collections.state';
-import {
-  normalizeCollectionsApi,
-  toCollection,
-} from '@/utils/collectionMapper';
+import { normalizeCollectionsApi } from '@/utils/collectionMapper';
 import { copy } from 'copy-anything';
-import CollectionApi from '@/types/CollectionApi';
 import { moveBookmarksToCollection } from '@/containers/Dashboard/ducks/bookmarks/bookmarks.actions';
+import { arrayMove } from '@dnd-kit/sortable';
+import { notifications } from '@mantine/notifications';
+
+const TEMPORARY_COLLECTION_ID = -1000;
 
 function insertValuesOnIndex<T>(
   array: T[],
@@ -34,6 +35,14 @@ function insertValuesOnIndex<T>(
     ].filter((item) => item !== null);
   }
   return [...array.slice(0, index), ...values, ...array.slice(index)];
+}
+
+function apiErrorNotification() {
+  notifications.show({
+    title: 'API error',
+    message: 'Something went wrong',
+    color: 'red',
+  });
 }
 
 const collectionsSlice = createSlice({
@@ -57,6 +66,7 @@ const collectionsSlice = createSlice({
     builder.addCase(fetchAllCollections.rejected, (state, action) => {
       state.loading = false;
       state.error = action.error.message || 'Something went wrong';
+      apiErrorNotification();
     });
     // Create collection
     builder.addCase(createCollection.pending, (state, action) => {
@@ -64,15 +74,14 @@ const collectionsSlice = createSlice({
       state.previousCollections = copy(state.collections);
 
       const { title, parentId } = action.meta.arg.body;
-      const { temporaryId } = action.meta.arg;
 
       const collections = state.ids.map((id) => state.collections[id]);
       const firstChildCollectionIndex = collections.findIndex(
-        (collection) => collection?.parent === parentId,
+        (collection) => collection?.parentId === parentId,
       );
 
-      const temporaryCollectionApi: CollectionApi = {
-        id: temporaryId,
+      state.collections[TEMPORARY_COLLECTION_ID] = {
+        id: TEMPORARY_COLLECTION_ID,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         title,
@@ -81,37 +90,37 @@ const collectionsSlice = createSlice({
         deleted: false,
         view: 'LIST',
         public: false,
-        expanded: false,
+        collapsed: false,
         authorId: 1,
         parentId,
         bookmarkOrder: [],
       };
-      state.collections[temporaryId] = toCollection(
-        temporaryCollectionApi,
-        parentId,
-      );
 
+      if (firstChildCollectionIndex === -1) {
+        state.ids = [TEMPORARY_COLLECTION_ID, ...state.ids];
+        return;
+      }
       state.ids = [
         ...state.ids.slice(0, firstChildCollectionIndex),
-        temporaryId,
+        TEMPORARY_COLLECTION_ID,
         ...state.ids.slice(firstChildCollectionIndex),
       ];
     });
     builder.addCase(createCollection.fulfilled, (state, action) => {
       const newCollection = action.payload;
-      const collection = state.collections[action.meta.arg.temporaryId];
+      const collection = state.collections[TEMPORARY_COLLECTION_ID];
 
-      state.ids = state.ids.map((collectionId) => {
-        if (collectionId === action.meta.arg.temporaryId) {
+      state.ids = state.ids.map((id) => {
+        if (id === TEMPORARY_COLLECTION_ID) {
           return newCollection.id;
         }
-        return collectionId;
+        return id;
       });
-      state.collections[newCollection.id] = toCollection(
-        newCollection,
-        collection?.parent ?? 0,
-      );
-      delete state.collections[action.meta.arg.temporaryId];
+      state.collections[newCollection.id] = {
+        ...collection,
+        ...newCollection,
+      };
+      delete state.collections[TEMPORARY_COLLECTION_ID];
 
       state.previousIds = null;
       state.previousCollections = null;
@@ -123,6 +132,7 @@ const collectionsSlice = createSlice({
       }
       state.previousIds = null;
       state.previousCollections = null;
+      apiErrorNotification();
     });
     // Edit collection
     builder.addCase(editCollection.pending, (state, action) => {
@@ -131,12 +141,10 @@ const collectionsSlice = createSlice({
       const id = action.meta.arg.collectionId;
       const { title } = action.meta.arg.body;
 
-      const collection = {
-        ...state.collections[id],
-        text: title,
-      };
+      const collection = state.collections[id];
+      if (!collection) return;
 
-      state.collections[id] = collection;
+      collection.title = title;
     });
     builder.addCase(editCollection.fulfilled, (state) => {
       state.previousCollections = null;
@@ -146,77 +154,78 @@ const collectionsSlice = createSlice({
         state.collections = state.previousCollections;
       }
       state.previousCollections = null;
+      apiErrorNotification();
     });
     // Move collections
-    builder.addCase(moveCollections.pending, (state, action) => {
+    builder.addCase(moveCollection.pending, (state, action) => {
       state.previousIds = copy(state.ids);
       state.previousCollections = copy(state.collections);
-      const {
-        parentId: newParentId,
-        index,
-        collectionIds,
-      } = action.meta.arg.body;
 
-      collectionIds.forEach((collectionId) => {
-        const collection = state.collections[collectionId];
-        if (collection) {
-          collection.parent = newParentId;
-        }
-      });
+      const { parentId, index, collectionId } = action.meta.arg.body;
+      const collection = state.collections[collectionId];
+      if (!collection) return;
+      collection.parentId = parentId === 0 ? null : parentId;
 
-      const collections = state.ids.map((id) => state.collections[id]);
-      const firstChildCollectionIndex = collections.findIndex(
-        (collection) => collection?.parent === newParentId,
-      );
-
-      state.ids = [
-        ...state.ids
-          .slice(0, firstChildCollectionIndex + index)
-          .filter((id) => !collectionIds.includes(id)),
-        ...collectionIds,
-        ...state.ids
-          .slice(firstChildCollectionIndex + index)
-          .filter((id) => !collectionIds.includes(id)),
-      ];
+      const activeIndex = state.ids.findIndex((id) => id === collectionId);
+      state.ids = arrayMove(state.ids, activeIndex, index);
     });
-    builder.addCase(moveCollections.fulfilled, (state) => {
+    builder.addCase(moveCollection.fulfilled, (state) => {
       state.previousIds = null;
       state.previousCollections = null;
     });
-    builder.addCase(moveCollections.rejected, (state) => {
+    builder.addCase(moveCollection.rejected, (state) => {
       if (state.previousIds && state.previousCollections) {
         state.ids = state.previousIds;
         state.collections = state.previousCollections;
       }
       state.previousIds = null;
       state.previousCollections = null;
+      apiErrorNotification();
     });
-    // Expand collections
-    builder.addCase(expandCollections.pending, (state, action) => {
+    // Toggle collection collapsed
+    builder.addCase(toggleCollectionCollapsed.pending, (state, action) => {
       state.previousIds = copy(state.ids);
       state.previousCollections = copy(state.collections);
-
-      const expandedCollectionsIds = action.meta.arg;
-      const setOfExpandedCollectionsIds = new Set(expandedCollectionsIds);
-      const setOfAllCollectionsIds = new Set(state.ids);
-      setOfAllCollectionsIds.forEach((id) => {
-        const collection = state.collections[id];
-        if (collection?.data) {
-          collection.data.expanded = setOfExpandedCollectionsIds.has(id);
-        }
-      });
+      const collectionId = action.meta.arg;
+      const collection = state.collections[collectionId];
+      if (!collection) return;
+      collection.collapsed = !collection.collapsed;
     });
-    builder.addCase(expandCollections.fulfilled, (state) => {
+    builder.addCase(toggleCollectionCollapsed.fulfilled, (state) => {
       state.previousIds = null;
       state.previousCollections = null;
     });
-    builder.addCase(expandCollections.rejected, (state) => {
+    builder.addCase(toggleCollectionCollapsed.rejected, (state) => {
       if (state.previousCollections && state.previousIds) {
         state.ids = state.previousIds;
         state.collections = state.previousCollections;
       }
       state.previousIds = null;
       state.previousCollections = null;
+      apiErrorNotification();
+    });
+    // Collapse all collections
+    builder.addCase(collapseAllCollections.pending, (state) => {
+      state.previousIds = copy(state.ids);
+      state.previousCollections = copy(state.collections);
+      state.ids.forEach((collectionId) => {
+        const collection = state.collections[collectionId];
+        if (!collection) return;
+        collection.collapsed = true;
+      });
+    });
+    builder.addCase(collapseAllCollections.fulfilled, (state) => {
+      state.previousIds = null;
+      state.previousCollections = null;
+    });
+    builder.addCase(collapseAllCollections.rejected, (state) => {
+      if (state.previousCollections && state.previousIds) {
+        state.ids = state.previousIds;
+        state.collections = state.previousCollections;
+      }
+      state.previousIds = null;
+      state.previousCollections = null;
+      apiErrorNotification();
     });
     // Move bookmarks to collection
     builder.addCase(moveBookmarksToCollection.pending, (state, action) => {
@@ -230,9 +239,9 @@ const collectionsSlice = createSlice({
       } = action.meta.arg.body;
 
       const collection = state.collections[collectionId];
-      if (newCollectionId === collectionId && collection?.data) {
-        collection.data.bookmarkOrder = insertValuesOnIndex(
-          collection.data.bookmarkOrder,
+      if (collection && newCollectionId === collectionId) {
+        collection.bookmarkOrder = insertValuesOnIndex(
+          collection.bookmarkOrder,
           bookmarkIds,
           index,
           true,
@@ -240,15 +249,15 @@ const collectionsSlice = createSlice({
       } else if (collection) {
         const newCollection = state.collections[newCollectionId];
 
-        if (collection.data?.bookmarkOrder) {
-          collection.data.bookmarkOrder = collection.data?.bookmarkOrder.filter(
+        if (collection.bookmarkOrder) {
+          collection.bookmarkOrder = collection.bookmarkOrder.filter(
             (id) => !bookmarkIds.includes(id),
           );
         }
 
-        if (newCollection?.data?.bookmarkOrder) {
-          newCollection.data.bookmarkOrder = insertValuesOnIndex(
-            newCollection.data.bookmarkOrder,
+        if (newCollection?.bookmarkOrder) {
+          newCollection.bookmarkOrder = insertValuesOnIndex(
+            newCollection.bookmarkOrder,
             bookmarkIds,
             index,
           );
@@ -264,18 +273,16 @@ const collectionsSlice = createSlice({
         state.ids = state.previousIds;
         state.collections = state.previousCollections;
       }
+      apiErrorNotification();
     });
     // Add bookmark
     builder.addCase(createBookmark.fulfilled, (state, action) => {
       const bookmark = action.payload;
       const collection = state.collections[bookmark.collectionId];
-      if (collection.data) {
-        const order = collection.data.bookmarkOrder;
-        const newOrder = [bookmark.id, ...order];
-        collection.data.bookmarkOrder = newOrder;
-      }
+      if (!collection) return;
+      const order = collection.bookmarkOrder;
+      collection.bookmarkOrder = [bookmark.id, ...order];
     });
   },
 });
-
 export default collectionsSlice;

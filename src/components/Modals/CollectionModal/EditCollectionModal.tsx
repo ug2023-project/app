@@ -1,24 +1,27 @@
 import { Modal, Text } from '@mantine/core';
-import TreeCollection from '@/types/TreeCollection';
 import CollectionForm from './CollectionForm';
 import { editCollection } from '@/containers/Dashboard/ducks/collections/collections.actions';
 import useTypedDispatch from '@/hooks/useTypedDispatch';
+import { UniqueIdentifier } from '@dnd-kit/core';
+import { selectCollectionById } from '@/redux/selectors';
+import useTypedSelector from '@/hooks/useTypedSelector';
 
 type EditCollectionModalProps = {
-  node: TreeCollection;
+  id: UniqueIdentifier;
   isModalOpen: boolean;
   setIsModalOpen: (value: boolean) => void;
 };
 
-const EditColletionModal = ({
+const EditCollectionModal = ({
+  id,
   isModalOpen,
-  node,
   setIsModalOpen,
 }: EditCollectionModalProps) => {
+  const collection = useTypedSelector(selectCollectionById(id));
   const dispatch = useTypedDispatch();
 
   const handleEditCollection = async ({ title }: { title: string }) => {
-    dispatch(editCollection({ body: { title }, collectionId: node.id }));
+    dispatch(editCollection({ body: { title }, collectionId: id }));
     setIsModalOpen(false);
   };
 
@@ -29,10 +32,10 @@ const EditColletionModal = ({
       </Text>
       <CollectionForm
         onSubmit={(values) => handleEditCollection(values)}
-        node={node}
+        collection={collection}
       />
     </Modal>
   );
 };
 
-export default EditColletionModal;
+export default EditCollectionModal;

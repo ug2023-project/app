@@ -1,4 +1,4 @@
-module.exports = {
+const config = {
   env: {
     browser: true,
     es2021: true,
@@ -8,6 +8,7 @@ module.exports = {
     'plugin:react/recommended',
     'plugin:react/jsx-runtime',
     'plugin:react-hooks/recommended',
+    'prettier',
   ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
@@ -15,16 +16,13 @@ module.exports = {
     sourceType: 'module',
   },
   plugins: [
-    'react-hooks',
     'prettier',
+    'react-hooks',
     'jsx-a11y',
     'import',
     '@typescript-eslint',
   ],
   rules: {
-    indent: ['error', 2],
-    quotes: ['error', 'single'],
-    semi: ['error', 'always'],
     'comma-dangle': 'off',
     'multiline-ternary': 'off',
     'no-use-before-define': 'off',
@@ -60,3 +58,5 @@ module.exports = {
     'prettier/prettier': 'error',
   },
 };
+
+module.exports = config;

@@ -3,8 +3,8 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from '@/utils/axios/axiosConfig';
 import type CollectionApiResponse from '@/types/CollectionApiResponse';
 import { CreateCollection, MoveCollection } from '../types';
-import { CollectionId } from '@/types/TreeCollection';
-import CollectionApi from '@/types/CollectionApi';
+import Collection from '@/types/Collection';
+import { UniqueIdentifier } from '@dnd-kit/core';
 
 export const fetchAllCollections = createAsyncThunk(
   'collection/fetchAllCollections',
@@ -17,29 +17,36 @@ export const fetchAllCollections = createAsyncThunk(
 export const createCollection = createAsyncThunk(
   'collection/createCollection',
   async ({ body }: CreateCollection) => {
-    const { data } = await axios.post<CollectionApi>('collections', body);
+    const { data } = await axios.post<Collection>('collections', body);
     return data;
   },
 );
 
-export const moveCollections = createAsyncThunk(
-  'collection/moveCollections',
+export const moveCollection = createAsyncThunk(
+  'collection/moveCollection',
   async ({ body }: MoveCollection) => {
     await axios.put('collections/children-order', body);
   },
 );
 
-export const expandCollections = createAsyncThunk(
-  'collection/expandCollections',
-  async (collectionIds: CollectionId[]) => {
-    await axios.put('collections/expand', { collectionIds });
+export const toggleCollectionCollapsed = createAsyncThunk(
+  'collection/toggleCollectionCollapsed',
+  async (collectionId: UniqueIdentifier) => {
+    await axios.put(`collections/toggle-collapsed/${collectionId}`);
+  },
+);
+
+export const collapseAllCollections = createAsyncThunk(
+  'collection/collapseAllCollections',
+  async () => {
+    await axios.put(`collections/collapse-all`);
   },
 );
 
 export const editCollection = createAsyncThunk(
   'collection/editCollection',
   async (body: EditCollection) => {
-    const { data } = await axios.put<CollectionApi>(
+    const { data } = await axios.put<Collection>(
       `collections/${body.collectionId}`,
       body.body,
     );

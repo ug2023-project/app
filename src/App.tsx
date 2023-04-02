@@ -10,14 +10,10 @@ import router from './router';
 import { Suspense } from 'react';
 import { PersistGate } from 'redux-persist/integration/react';
 import { persistStore } from 'redux-persist';
-import {
-  DndProvider,
-  getBackendOptions,
-  MultiBackend,
-} from '@minoru/react-dnd-treeview';
 import AuthProvider from './router/AuthProvider';
 
 import styles from './App.module.css';
+import { Notifications } from '@mantine/notifications';
 
 const persistor = persistStore(store);
 
@@ -30,7 +26,7 @@ const App = () => {
         <ReduxProvider store={store}>
           <PersistGate loading={null} persistor={persistor}>
             <AuthProvider>
-                <ColorSchemeProvider
+              <ColorSchemeProvider
                 colorScheme={colorScheme}
                 toggleColorScheme={toggleColorScheme}
               >
@@ -40,10 +36,11 @@ const App = () => {
                   withNormalizeCSS
                   theme={{ colorScheme }}
                 >
+                  <Notifications />
                   <RouterProvider router={router} />
                 </MantineProvider>
               </ColorSchemeProvider>
-              </AuthProvider>
+            </AuthProvider>
           </PersistGate>
         </ReduxProvider>
       </I18nextProvider>

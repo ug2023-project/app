@@ -1,4 +1,3 @@
-import { Draggable } from 'react-beautiful-dnd';
 import { createStyles, Text } from '@mantine/core';
 import Bookmark from '@/types/Bookmark';
 import { useSearchParams } from 'react-router-dom';
@@ -9,6 +8,7 @@ import styles from './BookmarkItem.module.css';
 const useStyles = createStyles((theme) => ({
   item: {
     ...theme.fn.focusStyles(),
+    width: '90%',
     display: 'flex',
     alignItems: 'center',
     borderRadius: theme.radius.md,
@@ -24,6 +24,7 @@ const useStyles = createStyles((theme) => ({
   itemDragging: {
     boxShadow: theme.shadows.sm,
     opacity: 0.5,
+    height: '20px',
   },
 
   symbol: {
@@ -33,7 +34,7 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-const BookmarkItem = ({ index, item }: Props) => {
+const BookmarkItem = ({ item }: Props) => {
   const { classes, cx } = useStyles();
   const [searchParams] = useSearchParams();
   const isSearchResult = useMemo(
@@ -42,43 +43,29 @@ const BookmarkItem = ({ index, item }: Props) => {
   );
 
   return (
-    <Draggable
-      index={index}
-      draggableId={`${item.id}-${item.collectionId}`}
-      isDragDisabled={isSearchResult}
-    >
-      {(provided, snapshot) => (
-        <div
-          className={cx(classes.item, {
-            [classes.itemDragging]: snapshot.isDragging,
-          })}
-          {...provided.draggableProps}
-          {...provided.dragHandleProps}
-          ref={provided.innerRef}
-        >
-          <Text className={classes.symbol}>{item.id}</Text>
-          <div>
-            {emphasizeText(item.title).map((entry, index) =>
-              entry.bold ? (
-                <span key={index} className={styles.titleBold}>
-                  {entry.text}
-                </span>
-              ) : (
-                entry.text
-              ),
-            )}
-            <Text color="dimmed" size="sm">
-              {item.link}
-            </Text>
-          </div>
-        </div>
-      )}
-    </Draggable>
+    <>
+      <Text className={classes.symbol}>{item.id}</Text>
+      <div>
+        {emphasizeText(item.title).map((entry, index) =>
+          entry.bold ? (
+            <span key={index} className={styles.titleBold}>
+              {entry.text}
+            </span>
+          ) : (
+            entry.text
+          ),
+        )}
+        <a href={item.link} target="_blank" rel="noreferrer">
+          <Text color="dimmed" size="sm">
+            {item.link}
+          </Text>
+        </a>
+      </div>
+    </>
   );
 };
 
 type Props = {
-  index: number;
   item: Bookmark;
 };
 
