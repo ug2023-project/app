@@ -1,21 +1,15 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragStartEvent,
-  DragOverlay,
-  DragMoveEvent,
-  DragEndEvent,
-  DragOverEvent,
-  MeasuringStrategy,
-  DropAnimation,
   defaultDropAnimation,
+  DragEndEvent,
+  DragMoveEvent,
+  DragOverEvent,
+  DragOverlay,
+  DragStartEvent,
+  DropAnimation,
   UniqueIdentifier,
+  useDndMonitor,
 } from '@dnd-kit/core';
 import {
   SortableContext,
@@ -24,25 +18,18 @@ import {
 
 import {
   flattenTree,
-  getProjection,
   getChildCount,
+  getProjection,
   removeChildrenOf,
 } from './utilities';
-import type { FlattenedItem, SensorContext, TreeItems } from './types';
-import { sortableTreeKeyboardCoordinates } from './keyboardCoordinates';
+import type { FlattenedItem, TreeItems } from './types';
 import { TreeItem } from './TreeItem';
 import { CSS } from '@dnd-kit/utilities';
 import useTypedDispatch from '@/hooks/useTypedDispatch';
 import {
-  toggleCollectionCollapsed,
   moveCollection,
+  toggleCollectionCollapsed,
 } from '@/containers/Dashboard/ducks/collections/collections.actions';
-
-const measuring = {
-  droppable: {
-    strategy: MeasuringStrategy.Always,
-  },
-};
 
 const dropAnimationConfig: DropAnimation = {
   keyframes({ transform }) {
@@ -68,14 +55,12 @@ const dropAnimationConfig: DropAnimation = {
 };
 
 interface Props {
-  collapsible?: boolean;
   defaultItems?: TreeItems;
   indentationWidth?: number;
   removable?: boolean;
 }
 
 export function SortableTree({
-  collapsible,
   defaultItems = [],
   indentationWidth = 50,
 }: Props) {
@@ -104,6 +89,7 @@ export function SortableTree({
       activeId ? [activeId, ...collapsedItems] : collapsedItems,
     );
   }, [activeId, items]);
+
   const projected =
     activeId && overId
       ? getProjection(
@@ -114,19 +100,21 @@ export function SortableTree({
           indentationWidth,
         )
       : null;
-  const sensorContext: SensorContext = useRef({
-    items: flattenedItems,
-    offset: offsetLeft,
-  });
-  const [coordinateGetter] = useState(() =>
-    sortableTreeKeyboardCoordinates(sensorContext, indentationWidth),
-  );
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter,
-    }),
-  );
+
+  // const sensorContext: SensorContext = useRef({
+  //   items: flattenedItems,
+  //   offset: offsetLeft,
+  // });
+  // const [coordinateGetter] = useState(() =>
+  //   sortableTreeKeyboardCoordinates(sensorContext, indentationWidth),
+  // );
+  //
+  // const sensors = useSensors(
+  //   useSensor(PointerSensor),
+  //   useSensor(KeyboardSensor, {
+  //     coordinateGetter,
+  //   }),
+  // );
 
   const sortedIds = useMemo(
     () => flattenedItems.map(({ id }) => id),
@@ -137,74 +125,81 @@ export function SortableTree({
     : null;
 
   useEffect(() => {
-    sensorContext.current = {
-      items: flattenedItems,
-      offset: offsetLeft,
-    };
+    // sensorContext.current = {
+    //   items: flattenedItems,
+    //   offset: offsetLeft,
+    // };
   }, [flattenedItems, offsetLeft]);
 
+  useDndMonitor({
+    onDragStart(event) {
+      handleDragStart(event);
+    },
+    onDragMove(event) {
+      handleDragMove(event);
+    },
+    onDragOver(event) {
+      handleDragOver(event);
+    },
+    onDragEnd(event) {
+      handleDragEnd(event);
+    },
+    onDragCancel() {
+      handleDragCancel();
+    },
+  });
+
   return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCenter}
-      measuring={measuring}
-      onDragStart={handleDragStart}
-      onDragMove={handleDragMove}
-      onDragOver={handleDragOver}
-      onDragEnd={handleDragEnd}
-      onDragCancel={handleDragCancel}
-    >
-      <SortableContext items={sortedIds} strategy={verticalListSortingStrategy}>
-        {flattenedItems.map(({ id, title, children, collapsed, depth }) => (
-          <TreeItem
-            key={id}
-            id={id}
-            value={title}
-            depth={id === activeId && projected ? projected.depth : depth}
-            indentationWidth={indentationWidth}
-            collapsed={Boolean(collapsed && children.length)}
-            onCollapse={
-              collapsible && children.length
-                ? () => handleCollapse(id)
-                : undefined
-            }
-          />
-        ))}
-        {createPortal(
-          <DragOverlay dropAnimation={dropAnimationConfig}>
-            {activeId && activeItem ? (
-              <TreeItem
-                id={activeId}
-                depth={activeItem.depth}
-                clone
-                childCount={getChildCount(items, activeId) + 1}
-                value={activeItem.title}
-                indentationWidth={indentationWidth}
-              />
-            ) : null}
-          </DragOverlay>,
-          document.body,
-        )}
-      </SortableContext>
-    </DndContext>
+    <SortableContext items={sortedIds} strategy={verticalListSortingStrategy}>
+      {flattenedItems.map(({ id, title, children, collapsed, depth }) => (
+        <TreeItem
+          key={id}
+          id={id}
+          value={title}
+          depth={id === activeId && projected ? projected.depth : depth}
+          indentationWidth={indentationWidth}
+          collapsed={Boolean(collapsed && children.length)}
+          onCollapse={children.length ? () => handleCollapse(id) : undefined}
+        />
+      ))}
+      {createPortal(
+        <DragOverlay dropAnimation={dropAnimationConfig}>
+          {activeId && activeItem ? (
+            <TreeItem
+              id={activeId}
+              depth={activeItem.depth}
+              clone
+              childCount={getChildCount(items, activeId) + 1}
+              value={activeItem.title}
+              indentationWidth={indentationWidth}
+            />
+          ) : null}
+        </DragOverlay>,
+        document.body,
+      )}
+    </SortableContext>
   );
 
-  function handleDragStart({ active: { id: activeId } }: DragStartEvent) {
+  function handleDragStart({ active: { id: activeId, data } }: DragStartEvent) {
+    if (data.current?.type !== 'tree-item') return;
     setActiveId(activeId);
     setOverId(activeId);
 
     document.body.style.setProperty('cursor', 'grabbing');
   }
 
-  function handleDragMove({ delta }: DragMoveEvent) {
+  function handleDragMove({ delta, active: { data } }: DragMoveEvent) {
+    if (data.current?.type !== 'tree-item') return;
     setOffsetLeft(delta.x);
   }
 
-  function handleDragOver({ over }: DragOverEvent) {
+  function handleDragOver({ over, active: { data } }: DragOverEvent) {
+    if (data.current?.type !== 'tree-item') return;
     setOverId(over?.id ?? null);
   }
 
-  function handleDragEnd({ active, over }: DragEndEvent) {
+  function handleDragEnd({ active, over, active: { data } }: DragEndEvent) {
+    if (data.current?.type !== 'tree-item') return;
     resetState();
 
     if (projected && over) {

@@ -7,6 +7,10 @@ const collectionsInitialState: CollectionState = {
   previousCollections: {},
   loading: false,
   error: null,
+  dndOptions: {
+    activeId: null,
+    offsetLeft: 0,
+  },
 };
 
 export default collectionsInitialState;

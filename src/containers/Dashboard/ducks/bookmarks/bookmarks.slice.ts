@@ -3,7 +3,7 @@ import {
   createBookmark,
   fetchCollectionBookmarksSearch,
   moveBookmarksToCollection,
-  updateSelectedBookmarks,
+  updateDndOptions,
 } from './bookmarks.actions';
 import bookmarkInitialState from './bookmarks.state';
 import { copy } from 'copy-anything';
@@ -41,8 +41,11 @@ const bookmarkSlice = createSlice({
       },
     );
     // Update dragging bookmarks
-    builder.addCase(updateSelectedBookmarks, (state, action) => {
-      state.draggingIds = action.payload;
+    builder.addCase(updateDndOptions, (state, action) => {
+      state.dndOptions = {
+        ...state.dndOptions,
+        ...action.payload,
+      };
     });
     // Move bookmarks to collection
     builder.addCase(moveBookmarksToCollection.pending, (state, action) => {

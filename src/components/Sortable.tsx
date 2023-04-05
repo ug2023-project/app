@@ -3,31 +3,21 @@ import { createPortal } from 'react-dom';
 
 import {
   Active,
-  closestCenter,
-  CollisionDetection,
-  DragOverlay,
-  DndContext,
-  DropAnimation,
-  KeyboardSensor,
-  KeyboardCoordinateGetter,
-  Modifiers,
-  MouseSensor,
-  MeasuringConfiguration,
-  PointerActivationConstraint,
-  TouchSensor,
-  UniqueIdentifier,
-  useSensor,
-  useSensors,
   defaultDropAnimationSideEffects,
+  DragEndEvent,
+  DragOverlay,
+  DragStartEvent,
+  DropAnimation,
+  UniqueIdentifier,
+  useDndMonitor,
 } from '@dnd-kit/core';
 import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  SortingStrategy,
-  rectSortingStrategy,
   AnimateLayoutChanges,
+  arrayMove,
   NewIndexGetter,
+  rectSortingStrategy,
+  SortableContext,
+  SortingStrategy,
 } from '@dnd-kit/sortable';
 
 import { Item, List, Wrapper } from '@/components/dnd-kit';
@@ -35,18 +25,12 @@ import { SortableItem } from './SortableItem';
 import Bookmark from '@/types/Bookmark';
 
 export interface SortableProps {
-  activationConstraint?: PointerActivationConstraint;
   animateLayoutChanges?: AnimateLayoutChanges;
   adjustScale?: boolean;
-  collisionDetection?: CollisionDetection;
-  coordinateGetter?: KeyboardCoordinateGetter;
   Container?: any; // To-do: Fix me
   dropAnimation?: DropAnimation | null;
   getNewIndex?: NewIndexGetter;
   bookmarks: Bookmark[];
-  measuring?: MeasuringConfiguration;
-  modifiers?: Modifiers;
-  removable?: boolean;
   strategy?: SortingStrategy;
   style?: React.CSSProperties;
   useDragOverlay?: boolean;
@@ -77,17 +61,12 @@ const dropAnimationConfig: DropAnimation = {
 };
 
 export function Sortable({
-  activationConstraint,
   animateLayoutChanges,
   adjustScale = false,
   Container = List,
-  collisionDetection = closestCenter,
-  coordinateGetter = sortableKeyboardCoordinates,
   dropAnimation = dropAnimationConfig,
   getNewIndex,
   bookmarks: initialBookmarks = [],
-  measuring,
-  modifiers,
   strategy = rectSortingStrategy,
   style,
   useDragOverlay = true,
@@ -102,19 +81,6 @@ export function Sortable({
   }, [initialBookmarks]);
 
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
-  const sensors = useSensors(
-    useSensor(MouseSensor, {
-      activationConstraint,
-    }),
-    useSensor(TouchSensor, {
-      activationConstraint,
-    }),
-    useSensor(KeyboardSensor, {
-      // Disable smooth scrolling in Cypress automated tests
-      scrollBehavior: 'Cypress' in window ? 'auto' : undefined,
-      coordinateGetter,
-    }),
-  );
   const isFirstAnnouncement = useRef(true);
   const getIndex = (id: UniqueIdentifier) =>
     bookmarks.findIndex((b) => b.id === id);
@@ -130,31 +96,51 @@ export function Sortable({
     }
   }, [activeId]);
 
+  function handleDragStart({ active }: DragStartEvent) {
+    if (!active || active.data.current?.type !== 'list-item') {
+      return;
+    }
+
+    setActiveId(active.id);
+  }
+
+  function handleDragEnd({ over, active }: DragEndEvent) {
+    if (active.data.current?.type !== 'list-item') {
+      return;
+    }
+    setActiveId(null);
+
+    if (over) {
+      const overIndex = getIndex(over.id);
+      if (activeIndex !== overIndex) {
+        setBookmarks((items) => arrayMove(items, activeIndex, overIndex));
+      }
+    }
+  }
+
+  function handleDragCancel() {
+    setActiveId(null);
+  }
+
+  useDndMonitor({
+    onDragStart(event) {
+      handleDragStart(event);
+    },
+    // onDragMove(event) {},
+    // onDragOver(event) {},
+    onDragEnd(event) {
+      handleDragEnd(event);
+    },
+    onDragCancel() {
+      handleDragCancel();
+    },
+  });
+
+  // sensors={sensors}
+  // modifiers={modifiers}
+
   return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={collisionDetection}
-      onDragStart={({ active }) => {
-        if (!active) {
-          return;
-        }
-
-        setActiveId(active.id);
-      }}
-      onDragEnd={({ over }) => {
-        setActiveId(null);
-
-        if (over) {
-          const overIndex = getIndex(over.id);
-          if (activeIndex !== overIndex) {
-            setBookmarks((items) => arrayMove(items, activeIndex, overIndex));
-          }
-        }
-      }}
-      onDragCancel={() => setActiveId(null)}
-      measuring={measuring}
-      modifiers={modifiers}
-    >
+    <>
       <Wrapper style={style} center>
         <SortableContext items={bookmarks} strategy={strategy}>
           <Container>
@@ -197,6 +183,6 @@ export function Sortable({
             document.body,
           )
         : null}
-    </DndContext>
+    </>
   );
 }

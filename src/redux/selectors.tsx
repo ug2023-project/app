@@ -4,6 +4,7 @@ import Bookmark from '@/types/Bookmark';
 import { TreeItems } from '@/components/Tree/types';
 import Collection from '@/types/Collection';
 import { UniqueIdentifier } from '@dnd-kit/core';
+import { flattenTree, removeChildrenOf } from '@/components/Tree/utilities';
 
 const selectSelf = (state: AppState) => state;
 const selectCollectionIds = createSelector(
@@ -74,12 +75,41 @@ export const selectCurrentSearchBookmarks = createSelector(
   selectSelf,
   (state) => state.bookmarks.currentSearch,
 );
+
 export const selectDraggingBookmarkIds = createSelector(
   selectSelf,
-  (state) => state.bookmarks.draggingIds,
+  (state) => state.bookmarks.dndOptions.draggingIds,
 );
 
-export const selectDropDisabled = createSelector(
+export const selectActiveBookmarkId = createSelector(
   selectSelf,
-  (state) => state.bookmarks.dropDisabled,
+  (state) => state.bookmarks.dndOptions.activeId,
+);
+
+export const selectActiveId = createSelector(
+  selectSelf,
+  (state) => state.collections.dndOptions.activeId,
+);
+
+export const selectOffsetLeft = createSelector(
+  selectSelf,
+  (state) => state.collections.dndOptions.offsetLeft,
+);
+
+export const selectFlattenedItems = createSelector(
+  selectCollections,
+  selectActiveId,
+  (items, activeId) => {
+    const flattenedTree = flattenTree(items);
+    const collapsedItems = flattenedTree.reduce<UniqueIdentifier[]>(
+      (acc, { children, collapsed, id }) =>
+        collapsed && children.length ? [...acc, id] : acc,
+      [],
+    );
+
+    return removeChildrenOf(
+      flattenedTree,
+      activeId ? [activeId, ...collapsedItems] : collapsedItems,
+    );
+  },
 );

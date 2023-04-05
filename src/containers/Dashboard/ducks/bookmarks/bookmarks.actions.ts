@@ -1,4 +1,4 @@
-import { CreateBookmark } from './../types';
+import { CreateBookmark, DndOptions } from './../types';
 import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from '@/utils/axios/axiosConfig';
 import { FetchCollectionBookmarksParams, MoveBookmarks } from '../types';
@@ -21,10 +21,10 @@ export const fetchCollectionBookmarksSearch = createAsyncThunk(
   },
 );
 
-export const updateSelectedBookmarks = createAction(
-  'bookmarks/updateSelectedBookmarks',
-  (selected: number[]) => ({
-    payload: selected,
+export const updateDndOptions = createAction(
+  'bookmarks/updateDndOptions',
+  (options: Partial<DndOptions>) => ({
+    payload: options,
   }),
 );
 

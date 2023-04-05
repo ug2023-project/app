@@ -45,6 +45,9 @@ export function SortableItem({
     animateLayoutChanges,
     disabled,
     getNewIndex,
+    data: {
+      type: 'list-item',
+    },
   });
 
   return (

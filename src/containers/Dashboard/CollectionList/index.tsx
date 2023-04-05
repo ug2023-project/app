@@ -38,7 +38,7 @@ const CollectionList = () => {
       >
         <Divider size="xs" />
         <CollectionListMenu />
-        <SortableTree defaultItems={treeData} collapsible />
+        <SortableTree defaultItems={treeData} />
         <Divider size="xs" />
         {/*<SortableTree defaultItems={...} collapsible />*/}
       </Resizable>

@@ -7,6 +7,7 @@ import {
   editCollection,
   fetchAllCollections,
   moveCollection,
+  updateDndOptions,
 } from './collections.actions';
 import collectionInitialState from './collections.state';
 import { normalizeCollectionsApi } from '@/utils/collectionMapper';
@@ -282,6 +283,13 @@ const collectionsSlice = createSlice({
       if (!collection) return;
       const order = collection.bookmarkOrder;
       collection.bookmarkOrder = [bookmark.id, ...order];
+    });
+    // Update dnd options
+    builder.addCase(updateDndOptions, (state, action) => {
+      state.dndOptions = {
+        ...state.dndOptions,
+        ...action.payload,
+      };
     });
   },
 });

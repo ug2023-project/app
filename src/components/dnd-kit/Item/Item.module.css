@@ -47,7 +47,7 @@ $focused-outline-color: #4c9ffe;
       -1px 0 15px 0 rgba(34, 33, 81, 0.01),
       0px 15px 15px 0 rgba(34, 33, 81, 0.25);
     z-index: 999;
-    opacity: 0.75;
+    opacity: 0.2;
   }
 }
 

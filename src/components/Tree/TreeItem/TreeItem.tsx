@@ -5,7 +5,7 @@ import { iOS } from '../utilities';
 import classNames from 'classnames';
 import styles from '@/components/Tree/TreeItem/TreeItem.module.scss';
 import { Action, Handle } from '@/components/dnd-kit';
-import { UniqueIdentifier } from '@dnd-kit/core';
+import { UniqueIdentifier, useDndMonitor } from '@dnd-kit/core';
 import { Button, Menu } from '@mantine/core';
 import { BsThreeDots } from 'react-icons/bs';
 import CreateCollectionModal from '@/components/Modals/CollectionModal/CreateCollectionModal';
@@ -43,6 +43,7 @@ export function TreeItem({ id, depth, ...props }: Props) {
     attributes,
     isDragging,
     isSorting,
+    isOver,
     listeners,
     setDraggableNodeRef,
     setDroppableNodeRef,
@@ -51,6 +52,9 @@ export function TreeItem({ id, depth, ...props }: Props) {
   } = useSortable({
     id,
     animateLayoutChanges,
+    data: {
+      type: 'tree-item',
+    },
   });
   const style: CSSProperties = {
     transform: CSS.Translate.toString(transform),
@@ -62,6 +66,24 @@ export function TreeItem({ id, depth, ...props }: Props) {
     ...attributes,
     ...listeners,
   };
+
+  const [isDraggingBookmark, setIsDraggingBookmark] = useState(false);
+
+  useDndMonitor({
+    onDragOver({ active: { data } }) {
+      if (data.current?.type === 'list-item') {
+        setIsDraggingBookmark(true);
+        return;
+      }
+    },
+    onDragEnd() {
+      if (isOver && isDraggingBookmark) {
+        console.log('Trying to drop bookmark on collection');
+      }
+      setIsDraggingBookmark(false);
+      // handleDragEnd(event);
+    },
+  });
 
   return (
     <li
@@ -84,11 +106,15 @@ export function TreeItem({ id, depth, ...props }: Props) {
           styles.TreeItem,
           isHover && styles.hover,
           active && styles.active,
+          isOver && isDraggingBookmark && styles.dropTarget,
         )}
         ref={setDraggableNodeRef}
         style={style}
         onClick={() => navigate(`/collections/${id}`)}
-        onMouseEnter={() => setIsHover(true)}
+        draggable={true}
+        onMouseEnter={() => {
+          setIsHover(true);
+        }}
         onMouseLeave={() => setIsHover(false)}
       >
         <Handle {...handleProps} />
