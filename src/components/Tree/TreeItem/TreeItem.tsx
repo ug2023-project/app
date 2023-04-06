@@ -11,6 +11,9 @@ import { BsThreeDots } from 'react-icons/bs';
 import CreateCollectionModal from '@/components/Modals/CollectionModal/CreateCollectionModal';
 import EditCollectionModal from '@/components/Modals/CollectionModal/EditCollectionModal';
 import { useNavigate, useParams } from 'react-router-dom';
+import DraggableType from '@/components/DraggableType';
+import useTypedDispatch from '@/hooks/useTypedDispatch';
+import { moveBookmarksToCollection } from '@/containers/Dashboard/ducks/bookmarks/bookmarks.actions';
 
 interface Props extends Omit<HTMLAttributes<HTMLLIElement>, 'id'> {
   id: UniqueIdentifier;
@@ -37,13 +40,16 @@ const animateLayoutChanges: AnimateLayoutChanges = ({
 export function TreeItem({ id, depth, ...props }: Props) {
   const collectionId = useParams().collectionId;
   const navigate = useNavigate();
-  const active = parseInt(collectionId ?? '') === id;
+  const isActive = parseInt(collectionId ?? '') === id;
+
+  const dispatch = useTypedDispatch();
 
   const {
     attributes,
     isDragging,
     isSorting,
-    isOver,
+    over,
+    active,
     listeners,
     setDraggableNodeRef,
     setDroppableNodeRef,
@@ -53,7 +59,7 @@ export function TreeItem({ id, depth, ...props }: Props) {
     id,
     animateLayoutChanges,
     data: {
-      type: 'tree-item',
+      type: DraggableType.TREE_ITEM,
     },
   });
   const style: CSSProperties = {
@@ -67,21 +73,25 @@ export function TreeItem({ id, depth, ...props }: Props) {
     ...listeners,
   };
 
-  const [isDraggingBookmark, setIsDraggingBookmark] = useState(false);
+  const dropAtempt =
+    over?.id === id && active?.data.current?.type === DraggableType.LIST_ITEM;
 
   useDndMonitor({
-    onDragOver({ active: { data } }) {
-      if (data.current?.type === 'list-item') {
-        setIsDraggingBookmark(true);
-        return;
-      }
-    },
     onDragEnd() {
-      if (isOver && isDraggingBookmark) {
-        console.log('Trying to drop bookmark on collection');
+      if (dropAtempt) {
+        dispatch(
+          moveBookmarksToCollection({
+            params: {
+              collectionId: parseInt(collectionId ?? ''),
+            },
+            body: {
+              bookmarkIds: [parseInt(active?.id.toString())],
+              collectionId: id,
+              index: 0,
+            },
+          }),
+        );
       }
-      setIsDraggingBookmark(false);
-      // handleDragEnd(event);
     },
   });
 
@@ -105,8 +115,8 @@ export function TreeItem({ id, depth, ...props }: Props) {
         className={classNames(
           styles.TreeItem,
           isHover && styles.hover,
-          active && styles.active,
-          isOver && isDraggingBookmark && styles.dropTarget,
+          isActive && styles.active,
+          dropAtempt && styles.dropTarget,
         )}
         ref={setDraggableNodeRef}
         style={style}

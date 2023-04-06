@@ -23,6 +23,7 @@ import {
 import { Item, List, Wrapper } from '@/components/dnd-kit';
 import { SortableItem } from './SortableItem';
 import Bookmark from '@/types/Bookmark';
+import DraggableType from '@/components/DraggableType';
 
 export interface SortableProps {
   animateLayoutChanges?: AnimateLayoutChanges;
@@ -97,7 +98,7 @@ export function Sortable({
   }, [activeId]);
 
   function handleDragStart({ active }: DragStartEvent) {
-    if (!active || active.data.current?.type !== 'list-item') {
+    if (!active || active.data.current?.type !== DraggableType.LIST_ITEM) {
       return;
     }
 
@@ -105,7 +106,7 @@ export function Sortable({
   }
 
   function handleDragEnd({ over, active }: DragEndEvent) {
-    if (active.data.current?.type !== 'list-item') {
+    if (active.data.current?.type !== DraggableType.LIST_ITEM) {
       return;
     }
     setActiveId(null);

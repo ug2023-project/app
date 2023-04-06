@@ -30,6 +30,7 @@ import {
   moveCollection,
   toggleCollectionCollapsed,
 } from '@/containers/Dashboard/ducks/collections/collections.actions';
+import DraggableType from '@/components/DraggableType';
 
 const dropAnimationConfig: DropAnimation = {
   keyframes({ transform }) {
@@ -181,7 +182,7 @@ export function SortableTree({
   );
 
   function handleDragStart({ active: { id: activeId, data } }: DragStartEvent) {
-    if (data.current?.type !== 'tree-item') return;
+    if (data.current?.type !== DraggableType.TREE_ITEM) return;
     setActiveId(activeId);
     setOverId(activeId);
 
@@ -189,17 +190,17 @@ export function SortableTree({
   }
 
   function handleDragMove({ delta, active: { data } }: DragMoveEvent) {
-    if (data.current?.type !== 'tree-item') return;
+    if (data.current?.type !== DraggableType.TREE_ITEM) return;
     setOffsetLeft(delta.x);
   }
 
   function handleDragOver({ over, active: { data } }: DragOverEvent) {
-    if (data.current?.type !== 'tree-item') return;
+    if (data.current?.type !== DraggableType.TREE_ITEM) return;
     setOverId(over?.id ?? null);
   }
 
   function handleDragEnd({ active, over, active: { data } }: DragEndEvent) {
-    if (data.current?.type !== 'tree-item') return;
+    if (data.current?.type !== DraggableType.TREE_ITEM) return;
     resetState();
 
     if (projected && over) {

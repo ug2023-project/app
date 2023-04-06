@@ -15,7 +15,6 @@ const CollectionList = () => {
   console.time('selectCollections');
   const treeData = useTypedSelector(selectCollections);
   console.timeEnd('selectCollections');
-  console.log('=================================================');
 
   useEffect(() => {
     dispatch(fetchAllCollections());

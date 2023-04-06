@@ -7,6 +7,7 @@ import {
 import { Item } from './dnd-kit';
 import { SortableProps } from './Sortable';
 import Bookmark from '@/types/Bookmark';
+import DraggableType from '@/components/DraggableType';
 
 interface SortableItemProps {
   item: Bookmark;
@@ -46,7 +47,7 @@ export function SortableItem({
     disabled,
     getNewIndex,
     data: {
-      type: 'list-item',
+      type: DraggableType.LIST_ITEM,
     },
   });
 
