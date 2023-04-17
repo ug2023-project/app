@@ -49,6 +49,15 @@ $focused-outline-color: #4c9ffe;
     z-index: 999;
     opacity: 0.2;
   }
+
+  &:hover {
+    .Remove {
+      visibility: visible;
+    }
+  }
+  background-color: $background-color;
+  border-radius: calc(4px / var(--scale-x, 1));
+  box-shadow: $box-shadow;
 }
 
 .Item {
@@ -58,7 +67,6 @@ $focused-outline-color: #4c9ffe;
   align-items: center;
   padding: 18px 20px;
   background-color: $background-color;
-  box-shadow: $box-shadow;
   outline: none;
   border-radius: calc(4px / var(--scale-x, 1));
   box-sizing: border-box;
@@ -125,11 +133,7 @@ $focused-outline-color: #4c9ffe;
     background-color: var(--color);
   }
 
-  &:hover {
-    .Remove {
-      visibility: visible;
-    }
-  }
+
 }
 
 .Remove {

@@ -4,16 +4,40 @@ import { Fragment, useEffect } from 'react';
 import { fetchAllCollections } from '../ducks/collections/collections.actions';
 import useTypedSelector from '@/hooks/useTypedSelector';
 import { Resizable } from 're-resizable';
-import { selectCollections } from '@/redux/selectors';
+import {
+  selectCustomCollections,
+  selectDefaultCollections,
+} from '@/redux/selectors';
 import CollectionListMenu from './CollectionListMenu';
 import { SortableTree } from '@/components/Tree/SortableTree';
 import { Divider } from '@mantine/core';
+import { TreeItems } from '@/components/Tree/types';
+import { UniqueIdentifier } from '@dnd-kit/core';
+
+const defaultCollections: TreeItems = [
+  {
+    id: 0,
+    title: 'All bookmarks',
+    children: [],
+  },
+  {
+    id: -1,
+    title: 'Unsorted',
+    children: [],
+  },
+  {
+    id: -99,
+    title: 'Trash',
+    children: [],
+  },
+];
 
 const CollectionList = () => {
   const dispatch = useTypedDispatch();
 
   console.time('selectCollections');
-  const treeData = useTypedSelector(selectCollections);
+  const defaultCollections = useTypedSelector(selectDefaultCollections);
+  const customCollections = useTypedSelector(selectCustomCollections);
   console.timeEnd('selectCollections');
 
   useEffect(() => {
@@ -35,11 +59,12 @@ const CollectionList = () => {
           right: true,
         }}
       >
+        <div>--- Some user panel ---</div>
+        <SortableTree items={defaultCollections} dragDisabled={true} />
         <Divider size="xs" />
         <CollectionListMenu />
-        <SortableTree defaultItems={treeData} />
+        <SortableTree items={customCollections} />
         <Divider size="xs" />
-        {/*<SortableTree defaultItems={...} collapsible />*/}
       </Resizable>
     </Fragment>
   );

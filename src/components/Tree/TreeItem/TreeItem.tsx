@@ -37,7 +37,7 @@ const animateLayoutChanges: AnimateLayoutChanges = ({
   wasDragging,
 }) => !(isSorting || wasDragging);
 
-export function TreeItem({ id, depth, ...props }: Props) {
+export function TreeItem({ id, depth, draggable = true, ...props }: Props) {
   const collectionId = useParams().collectionId;
   const navigate = useNavigate();
   const isActive = parseInt(collectionId ?? '') === id;
@@ -57,6 +57,7 @@ export function TreeItem({ id, depth, ...props }: Props) {
     transition,
   } = useSortable({
     id,
+    disabled: draggable === false,
     animateLayoutChanges,
     data: {
       type: DraggableType.TREE_ITEM,
@@ -67,18 +68,17 @@ export function TreeItem({ id, depth, ...props }: Props) {
     transition,
   };
 
-  const [isHover, setIsHover] = useState(false);
   const handleProps = {
     ...attributes,
     ...listeners,
   };
 
-  const dropAtempt =
-    over?.id === id && active?.data.current?.type === DraggableType.LIST_ITEM;
+  const dropAttempt =
+    over?.id === id && active?.data.current?.type === DraggableType.BOOKMARK;
 
   useDndMonitor({
     onDragEnd() {
-      if (dropAtempt) {
+      if (dropAttempt) {
         dispatch(
           moveBookmarksToCollection({
             params: {
@@ -87,7 +87,6 @@ export function TreeItem({ id, depth, ...props }: Props) {
             body: {
               bookmarkIds: [parseInt(active?.id.toString())],
               collectionId: id,
-              index: 0,
             },
           }),
         );
@@ -114,20 +113,13 @@ export function TreeItem({ id, depth, ...props }: Props) {
       <div
         className={classNames(
           styles.TreeItem,
-          isHover && styles.hover,
           isActive && styles.active,
-          dropAtempt && styles.dropTarget,
+          dropAttempt && styles.dropTarget,
         )}
         ref={setDraggableNodeRef}
         style={style}
-        onClick={() => navigate(`/collections/${id}`)}
-        draggable={true}
-        onMouseEnter={() => {
-          setIsHover(true);
-        }}
-        onMouseLeave={() => setIsHover(false)}
       >
-        <Handle {...handleProps} />
+        {draggable ? <Handle {...handleProps} /> : null}
         {props.onCollapse && (
           <Action
             onClick={props.onCollapse}
@@ -139,8 +131,12 @@ export function TreeItem({ id, depth, ...props }: Props) {
             {collapseIcon}
           </Action>
         )}
-        <span className={styles.Text}>{props.value}</span>
-        {/* {!clone && onRemove && <Remove onClick={onRemove} />} */}
+        <span
+          className={styles.Text}
+          onClick={() => navigate(`/collections/${id}`)}
+        >
+          {props.value}
+        </span>
         <MenuButton id={id} />
         {props.clone && props.childCount && props.childCount > 1 ? (
           <span className={styles.Count}>{props.childCount}</span>
@@ -185,8 +181,8 @@ const MenuButton = ({ id }: MenuButtonProps) => {
           <Menu.Item onClick={() => setIsEditModalOpen(true)}>
             Edit collection
           </Menu.Item>
-          <Menu.Divider />
-          <Menu.Item>Rename</Menu.Item>
+          {/*<Menu.Divider />*/}
+          {/*<Menu.Item>Rename</Menu.Item>*/}
         </Menu.Dropdown>
       </Menu>
       <CreateCollectionModal

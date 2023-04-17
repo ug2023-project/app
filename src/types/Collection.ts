@@ -1,3 +1,5 @@
+import { UniqueIdentifier } from '@dnd-kit/core';
+
 type Collection = {
   id: number | string;
   createdAt: string;
@@ -11,7 +13,7 @@ type Collection = {
   collapsed: boolean;
   authorId: number;
   parentId: number | string | null;
-  bookmarkOrder: (number | string)[];
+  bookmarks: UniqueIdentifier[];
 };
 
 export default Collection;

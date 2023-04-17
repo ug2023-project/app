@@ -7,10 +7,10 @@ type Bookmark = {
   title: string;
   description: string;
   favorite: boolean;
-  deleted: boolean;
+  // deleted: boolean;
   cacheUrl: string | null;
-  authorId: number;
-  collectionId: number | string;
+  // authorId: number;
+  collectionId: UniqueIdentifier | null;
   tags: string[];
   image: string;
   icon: string;

@@ -4,7 +4,6 @@ import Bookmark from '@/types/Bookmark';
 import { TreeItems } from '@/components/Tree/types';
 import Collection from '@/types/Collection';
 import { UniqueIdentifier } from '@dnd-kit/core';
-import { flattenTree, removeChildrenOf } from '@/components/Tree/utilities';
 
 const selectSelf = (state: AppState) => state;
 const selectCollectionIds = createSelector(
@@ -16,11 +15,23 @@ const selectNormalizedCollections = createSelector(
   (state) => state.collections.collections,
 );
 
-export const selectCollections = createSelector(
+export const selectDefaultCollections = createSelector(
+  selectNormalizedCollections,
+  (collections): TreeItems => {
+    const collectionList = [0, -1, -99]
+      .map((id) => collections[id])
+      .filter(Boolean) as Collection[];
+    return buildTree(collectionList);
+  },
+);
+
+export const selectCustomCollections = createSelector(
   selectCollectionIds,
   selectNormalizedCollections,
   (ids, collections): TreeItems => {
-    const collectionList = ids.map((id) => collections[id]) as Collection[];
+    const collectionList = ids
+      .map((id) => collections[id])
+      .filter(Boolean) as Collection[];
     return buildTree(collectionList);
   },
 );
@@ -60,56 +71,19 @@ const selectNormalizedBookmarks = createSelector(
 
 export const selectCollectionBookmarks = (collectionId: number) =>
   createSelector(
+    selectSelf,
     selectNormalizedCollections,
     selectNormalizedBookmarks,
-    (collections, bookmarks) => {
+    (state, collections, bookmarks) => {
+      if (collectionId === 0) return state.bookmarks.currentSearch;
       const collection = collections[collectionId];
       if (!collection) return [];
-      return (collection.bookmarkOrder
-        .map((id) => bookmarks[id])
-        .filter(Boolean) ?? []) as Bookmark[];
+      return (collection.bookmarks.map((id) => bookmarks[id]).filter(Boolean) ??
+        []) as Bookmark[];
     },
   );
 
 export const selectCurrentSearchBookmarks = createSelector(
   selectSelf,
   (state) => state.bookmarks.currentSearch,
-);
-
-export const selectDraggingBookmarkIds = createSelector(
-  selectSelf,
-  (state) => state.bookmarks.dndOptions.draggingIds,
-);
-
-export const selectActiveBookmarkId = createSelector(
-  selectSelf,
-  (state) => state.bookmarks.dndOptions.activeId,
-);
-
-export const selectActiveId = createSelector(
-  selectSelf,
-  (state) => state.collections.dndOptions.activeId,
-);
-
-export const selectOffsetLeft = createSelector(
-  selectSelf,
-  (state) => state.collections.dndOptions.offsetLeft,
-);
-
-export const selectFlattenedItems = createSelector(
-  selectCollections,
-  selectActiveId,
-  (items, activeId) => {
-    const flattenedTree = flattenTree(items);
-    const collapsedItems = flattenedTree.reduce<UniqueIdentifier[]>(
-      (acc, { children, collapsed, id }) =>
-        collapsed && children.length ? [...acc, id] : acc,
-      [],
-    );
-
-    return removeChildrenOf(
-      flattenedTree,
-      activeId ? [activeId, ...collapsedItems] : collapsedItems,
-    );
-  },
 );

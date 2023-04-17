@@ -132,10 +132,10 @@ export const Item = React.memo(
                 </Text>
               </a>
             </div>
-            <span className={styles.Actions}>
-              <Remove className={styles.Remove} onClick={onRemove} />
-            </span>
           </div>
+          <span className={styles.Actions}>
+            <Remove className={styles.Remove} onClick={onRemove} />
+          </span>
         </div>
       );
     },

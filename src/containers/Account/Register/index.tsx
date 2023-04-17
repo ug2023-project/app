@@ -2,15 +2,19 @@ import { Button, TextInput } from '@mantine/core';
 import { useForm, isEmail } from '@mantine/form';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import axios from '@/utils/axios/axiosConfig';
 
 import styles from '../Common/Actions.module.css';
 import PasswordInputWithHints from './PasswordInputWithHints';
 import RegisterFormValues from './RegisterFormValues';
+import useTypedSelector from '@/hooks/useTypedSelector';
+import { isUserLoggedIn } from '@/redux/auth/auth.selectors';
 
 const Register = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const loggedIn = useTypedSelector(isUserLoggedIn);
   const { t } = useTranslation();
   const form = useForm<RegisterFormValues>({
     initialValues: { email: '', password: '' },
@@ -51,6 +55,10 @@ const Register = () => {
       .catch(() => setError(true));
     form.reset();
   };
+
+  if (loggedIn) {
+    return <Navigate to="/collections" state={{ from: location }} replace />;
+  }
 
   return (
     <div className={styles.formWrapper}>

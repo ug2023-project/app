@@ -32,19 +32,28 @@
   --vertical-padding: 0px;
 
   position: relative;
+  height: 38px;
   display: flex;
   align-items: center;
   padding: var(--vertical-padding) 10px;
   background-color: #232325;
   border: 1px solid transparent;
   margin-bottom: 2px;
-  box-shadow: 0 1px 1px 0 black;
+  margin-top: 1px;
   color: #e5e5e6;
   box-sizing: border-box;
+
+  &:hover {
+    cursor: pointer;
+    background-color: #333334;
+  }
 }
 
 .Text {
+  display: flex;
+  align-items: center;
   flex-grow: 1;
+  height: 100%;
   padding-left: 0.5rem;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -76,12 +85,7 @@
 }
 
 .active {
-  background-color: #36373A;
-}
-
-.hover {
-  cursor: pointer;
-  background-color: #333334;
+  background-color: #36373a;
 }
 
 .disableSelection,

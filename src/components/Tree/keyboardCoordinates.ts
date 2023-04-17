@@ -48,13 +48,15 @@ export const sortableTreeKeyboardCoordinates: (
       } = context;
 
       if (horizontal.includes(event.code) && over?.id) {
-        const { depth, maxDepth, minDepth } = getProjection(
+        const projection = getProjection(
           items,
           active.id,
           over.id,
           offset,
           indentationWidth,
         );
+        if (!projection) return;
+        const { depth, maxDepth, minDepth } = projection;
 
         switch (event.code) {
           case KeyboardCode.Left:
@@ -130,13 +132,15 @@ export const sortableTreeKeyboardCoordinates: (
           const activeItem = items[activeIndex];
 
           if (newItem && activeItem) {
-            const { depth } = getProjection(
+            const projection = getProjection(
               items,
               active.id,
               closestId,
               (newItem.depth - activeItem.depth) * indentationWidth,
               indentationWidth,
             );
+            if (!projection) return;
+            const { depth } = projection;
             const isBelow = newIndex > activeIndex;
             const modifier = isBelow ? 1 : -1;
             const offset = 0;

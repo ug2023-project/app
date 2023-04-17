@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import {
   defaultDropAnimation,
@@ -56,21 +56,16 @@ const dropAnimationConfig: DropAnimation = {
 };
 
 interface Props {
-  defaultItems?: TreeItems;
+  items?: TreeItems;
+  dragDisabled?: boolean;
   indentationWidth?: number;
-  removable?: boolean;
 }
 
 export function SortableTree({
-  defaultItems = [],
+  items = [],
+  dragDisabled = false,
   indentationWidth = 50,
 }: Props) {
-  const [items, setItems] = useState(() => defaultItems);
-
-  useEffect(() => {
-    setItems(defaultItems);
-  }, [defaultItems]);
-
   const dispatch = useTypedDispatch();
 
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
@@ -92,7 +87,7 @@ export function SortableTree({
   }, [activeId, items]);
 
   const projected =
-    activeId && overId
+    activeId && overId && !dragDisabled
       ? getProjection(
           flattenedItems,
           activeId,
@@ -102,21 +97,6 @@ export function SortableTree({
         )
       : null;
 
-  // const sensorContext: SensorContext = useRef({
-  //   items: flattenedItems,
-  //   offset: offsetLeft,
-  // });
-  // const [coordinateGetter] = useState(() =>
-  //   sortableTreeKeyboardCoordinates(sensorContext, indentationWidth),
-  // );
-  //
-  // const sensors = useSensors(
-  //   useSensor(PointerSensor),
-  //   useSensor(KeyboardSensor, {
-  //     coordinateGetter,
-  //   }),
-  // );
-
   const sortedIds = useMemo(
     () => flattenedItems.map(({ id }) => id),
     [flattenedItems],
@@ -124,13 +104,6 @@ export function SortableTree({
   const activeItem = activeId
     ? flattenedItems.find(({ id }) => id === activeId)
     : null;
-
-  useEffect(() => {
-    // sensorContext.current = {
-    //   items: flattenedItems,
-    //   offset: offsetLeft,
-    // };
-  }, [flattenedItems, offsetLeft]);
 
   useDndMonitor({
     onDragStart(event) {
@@ -161,6 +134,7 @@ export function SortableTree({
           indentationWidth={indentationWidth}
           collapsed={Boolean(collapsed && children.length)}
           onCollapse={children.length ? () => handleCollapse(id) : undefined}
+          draggable={!dragDisabled}
         />
       ))}
       {createPortal(
@@ -233,10 +207,6 @@ export function SortableTree({
 
     document.body.style.setProperty('cursor', '');
   }
-
-  // function handleRemove(id: UniqueIdentifier) {
-  //   setItems((items) => removeItem(items, id));
-  // }
 
   function handleCollapse(id: UniqueIdentifier) {
     dispatch(toggleCollectionCollapsed(id));

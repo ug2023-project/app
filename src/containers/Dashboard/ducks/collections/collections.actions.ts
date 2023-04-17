@@ -1,5 +1,5 @@
-import { DndOptions, EditCollection, TreeDndOptions } from './../types';
-import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
+import { EditCollection } from './../types';
+import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from '@/utils/axios/axiosConfig';
 import type CollectionApiResponse from '@/types/CollectionApiResponse';
 import { CreateCollection, MoveCollection } from '../types';
@@ -25,21 +25,21 @@ export const createCollection = createAsyncThunk(
 export const moveCollection = createAsyncThunk(
   'collection/moveCollection',
   async ({ body }: MoveCollection) => {
-    await axios.put('collections/children-order', body);
+    await axios.post('collections/move', body);
   },
 );
 
 export const toggleCollectionCollapsed = createAsyncThunk(
   'collection/toggleCollectionCollapsed',
   async (collectionId: UniqueIdentifier) => {
-    await axios.put(`collections/toggle-collapsed/${collectionId}`);
+    await axios.post(`collections/${collectionId}/toggle-collapsed`);
   },
 );
 
 export const collapseAllCollections = createAsyncThunk(
   'collection/collapseAllCollections',
   async () => {
-    await axios.put(`collections/collapse-all`);
+    await axios.post(`collections/collapse-all`);
   },
 );
 
@@ -52,11 +52,4 @@ export const editCollection = createAsyncThunk(
     );
     return data;
   },
-);
-
-export const updateDndOptions = createAction(
-  'collection/updateDndOptions',
-  (options: Partial<TreeDndOptions>) => ({
-    payload: options,
-  }),
 );

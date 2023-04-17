@@ -8,6 +8,6 @@ export type User = {
 };
 
 export type AuthState = {
-  data: User | null;
+  user: User | null;
   loading: boolean;
 };

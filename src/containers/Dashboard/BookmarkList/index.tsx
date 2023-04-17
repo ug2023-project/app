@@ -39,7 +39,7 @@ const BookmarkList = () => {
     [searchParams],
   );
   const params = useParams();
-  const collectionId = parseInt(params.collectionId as unknown as string);
+  const collectionId = parseInt(params.collectionId as string);
   const dispatch = useTypedDispatch();
   const [isList, setIsList] = useState(true);
   const [props, setProps] = useState<Partial<SortableProps>>(listProps);
@@ -57,12 +57,7 @@ const BookmarkList = () => {
         searchQuery: searchParams.get('search') ?? '',
       }),
     );
-  }, [collectionId, dispatch, searchParams]);
-
-  // const items =
-  //   bookmarks?.map((item, index) => (
-  //     <BookmarkItem key={`${item.id}-${item.collectionId}`} item={item} />
-  //   )) ?? [];
+  }, [collectionId, searchParams]);
 
   const animateLayoutChanges: AnimateLayoutChanges = (args) =>
     defaultAnimateLayoutChanges({ ...args, wasDragging: true });
@@ -70,8 +65,6 @@ const BookmarkList = () => {
   return (
     <main className={styles.bookmarkList}>
       <div>
-        {JSON.stringify(isSearchResult)}
-        <br />
         <br />
         <Button
           onClick={() => {
@@ -86,6 +79,7 @@ const BookmarkList = () => {
           {...props}
           bookmarks={bookmarks}
           animateLayoutChanges={animateLayoutChanges}
+          disableSorting={collectionId === 0}
         />
       </div>
     </main>

@@ -13,8 +13,6 @@ import {
 } from '@dnd-kit/core';
 import {
   AnimateLayoutChanges,
-  arrayMove,
-  NewIndexGetter,
   rectSortingStrategy,
   SortableContext,
   SortingStrategy,
@@ -24,31 +22,29 @@ import { Item, List, Wrapper } from '@/components/dnd-kit';
 import { SortableItem } from './SortableItem';
 import Bookmark from '@/types/Bookmark';
 import DraggableType from '@/components/DraggableType';
+import { useParams } from 'react-router-dom';
+import useTypedDispatch from '@/hooks/useTypedDispatch';
+import {
+  changeBookmarksOrder,
+  removeBookmark,
+} from '@/containers/Dashboard/ducks/bookmarks/bookmarks.actions';
 
 export interface SortableProps {
   animateLayoutChanges?: AnimateLayoutChanges;
   adjustScale?: boolean;
   Container?: any; // To-do: Fix me
   dropAnimation?: DropAnimation | null;
-  getNewIndex?: NewIndexGetter;
   bookmarks: Bookmark[];
   strategy?: SortingStrategy;
   style?: React.CSSProperties;
   useDragOverlay?: boolean;
-  getItemStyles?(args: {
-    id: UniqueIdentifier;
-    index: number;
-    isSorting: boolean;
-    isDragOverlay: boolean;
-    overIndex: number;
-    isDragging: boolean;
-  }): React.CSSProperties;
   wrapperStyle?(args: {
     active: Pick<Active, 'id'> | null;
     index: number;
     isDragging: boolean;
     id: UniqueIdentifier;
   }): React.CSSProperties;
+  disableSorting?: boolean;
 }
 
 const dropAnimationConfig: DropAnimation = {
@@ -66,30 +62,30 @@ export function Sortable({
   adjustScale = false,
   Container = List,
   dropAnimation = dropAnimationConfig,
-  getNewIndex,
-  bookmarks: initialBookmarks = [],
+  bookmarks = [],
   strategy = rectSortingStrategy,
   style,
   useDragOverlay = true,
   wrapperStyle = () => ({}),
+  disableSorting = false,
 }: SortableProps) {
-  const [bookmarks, setBookmarks] = useState<Bookmark[]>(
-    () => initialBookmarks,
-  );
-
-  useEffect(() => {
-    setBookmarks(initialBookmarks);
-  }, [initialBookmarks]);
+  const dispatch = useTypedDispatch();
+  const params = useParams();
+  const collectionId = parseInt(params.collectionId as string);
 
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
   const isFirstAnnouncement = useRef(true);
   const getIndex = (id: UniqueIdentifier) =>
     bookmarks.findIndex((b) => b.id === id);
   const activeIndex = activeId ? getIndex(activeId) : -1;
-  const handleRemove = (id: UniqueIdentifier) =>
-    setBookmarks((bookmarks) =>
-      bookmarks.filter((bookmark) => bookmark.id !== id),
+  const handleRemove = (id: UniqueIdentifier) => {
+    dispatch(
+      removeBookmark({
+        collectionId,
+        bookmarkId: parseInt(id.toString()),
+      }),
     );
+  };
 
   useEffect(() => {
     if (!activeId) {
@@ -98,7 +94,7 @@ export function Sortable({
   }, [activeId]);
 
   function handleDragStart({ active }: DragStartEvent) {
-    if (!active || active.data.current?.type !== DraggableType.LIST_ITEM) {
+    if (!active || active.data.current?.type !== DraggableType.BOOKMARK) {
       return;
     }
 
@@ -106,7 +102,10 @@ export function Sortable({
   }
 
   function handleDragEnd({ over, active }: DragEndEvent) {
-    if (active.data.current?.type !== DraggableType.LIST_ITEM) {
+    if (
+      disableSorting ||
+      active.data.current?.type !== DraggableType.BOOKMARK
+    ) {
       return;
     }
     setActiveId(null);
@@ -114,7 +113,17 @@ export function Sortable({
     if (over) {
       const overIndex = getIndex(over.id);
       if (activeIndex !== overIndex) {
-        setBookmarks((items) => arrayMove(items, activeIndex, overIndex));
+        dispatch(
+          changeBookmarksOrder({
+            params: {
+              collectionId,
+            },
+            body: {
+              bookmarkIds: [parseInt(active.id.toString())],
+              index: overIndex,
+            },
+          }),
+        );
       }
     }
   }
@@ -127,8 +136,6 @@ export function Sortable({
     onDragStart(event) {
       handleDragStart(event);
     },
-    // onDragMove(event) {},
-    // onDragOver(event) {},
     onDragEnd(event) {
       handleDragEnd(event);
     },
@@ -136,9 +143,6 @@ export function Sortable({
       handleDragCancel();
     },
   });
-
-  // sensors={sensors}
-  // modifiers={modifiers}
 
   return (
     <>
@@ -152,11 +156,10 @@ export function Sortable({
                 item={value}
                 index={index}
                 wrapperStyle={wrapperStyle}
-                disabled={false}
                 onRemove={handleRemove}
                 animateLayoutChanges={animateLayoutChanges}
                 useDragOverlay={useDragOverlay}
-                getNewIndex={getNewIndex}
+                disableSorting={disableSorting}
               />
             ))}
           </Container>

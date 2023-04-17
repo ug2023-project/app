@@ -9,27 +9,14 @@ export type CollectionState = {
   previousCollections: Partial<Record<number, Collection>> | null;
   loading: boolean;
   error: string | null;
-  dndOptions: TreeDndOptions;
-};
-
-export type TreeDndOptions = {
-  offsetLeft: number;
-  activeId: UniqueIdentifier | null;
 };
 
 export type BookmarkState = {
   bookmarks: Partial<Record<UniqueIdentifier, Bookmark>>;
   previousBookmarks: Partial<Record<UniqueIdentifier, Bookmark>> | null;
   currentSearch: Bookmark[];
-  dropDisabled: boolean;
   loading: boolean;
   error: string | null;
-  dndOptions: DndOptions;
-};
-
-export type DndOptions = {
-  draggingIds: UniqueIdentifier[];
-  activeId: UniqueIdentifier | null;
 };
 
 export type FetchCollectionBookmarksParams = {
@@ -52,13 +39,22 @@ export type MoveCollection = {
   };
 };
 
+export type ChangeBookmarksOrder = {
+  params: {
+    collectionId: UniqueIdentifier;
+  };
+  body: {
+    index: number;
+    bookmarkIds: UniqueIdentifier[];
+  };
+};
+
 export type MoveBookmarks = {
   params: {
     collectionId: UniqueIdentifier;
   };
   body: {
     collectionId: UniqueIdentifier;
-    index: number;
     bookmarkIds: UniqueIdentifier[];
   };
 };
@@ -73,4 +69,9 @@ export type EditCollection = {
 export type CreateBookmark = {
   collectionId: UniqueIdentifier;
   bookmark: Partial<Bookmark>;
+};
+
+export type RemoveBookmarkParams = {
+  collectionId: UniqueIdentifier;
+  bookmarkId: UniqueIdentifier;
 };
