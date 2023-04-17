@@ -15,11 +15,23 @@ const selectNormalizedCollections = createSelector(
   (state) => state.collections.collections,
 );
 
-export const selectCollections = createSelector(
+export const selectDefaultCollections = createSelector(
+  selectNormalizedCollections,
+  (collections): TreeItems => {
+    const collectionList = [0, -1, -99]
+      .map((id) => collections[id])
+      .filter(Boolean) as Collection[];
+    return buildTree(collectionList);
+  },
+);
+
+export const selectCustomCollections = createSelector(
   selectCollectionIds,
   selectNormalizedCollections,
   (ids, collections): TreeItems => {
-    const collectionList = ids.map((id) => collections[id]) as Collection[];
+    const collectionList = ids
+      .map((id) => collections[id])
+      .filter(Boolean) as Collection[];
     return buildTree(collectionList);
   },
 );
@@ -59,27 +71,19 @@ const selectNormalizedBookmarks = createSelector(
 
 export const selectCollectionBookmarks = (collectionId: number) =>
   createSelector(
+    selectSelf,
     selectNormalizedCollections,
     selectNormalizedBookmarks,
-    (collections, bookmarks) => {
+    (state, collections, bookmarks) => {
+      if (collectionId === 0) return state.bookmarks.currentSearch;
       const collection = collections[collectionId];
       if (!collection) return [];
-      return (collection.bookmarkOrder
-        .map((id) => bookmarks[id])
-        .filter(Boolean) ?? []) as Bookmark[];
+      return (collection.bookmarks.map((id) => bookmarks[id]).filter(Boolean) ??
+        []) as Bookmark[];
     },
   );
 
 export const selectCurrentSearchBookmarks = createSelector(
   selectSelf,
   (state) => state.bookmarks.currentSearch,
-);
-export const selectDraggingBookmarkIds = createSelector(
-  selectSelf,
-  (state) => state.bookmarks.draggingIds,
-);
-
-export const selectDropDisabled = createSelector(
-  selectSelf,
-  (state) => state.bookmarks.dropDisabled,
 );

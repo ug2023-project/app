@@ -1,6 +1,6 @@
 import useTypedDispatch from '@/hooks/useTypedDispatch';
 import { fetchUser } from '@/redux/auth/auth.actions';
-import { useEffect } from 'react';
+import { ReactNode, useEffect } from 'react';
 
 const AuthProvider = ({ children }: AuthProviderProps) => {
   const dispatch = useTypedDispatch();
@@ -14,7 +14,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 };
 
 type AuthProviderProps = {
-  children: React.ReactNode;
+  children: ReactNode;
 };
 
 export default AuthProvider;

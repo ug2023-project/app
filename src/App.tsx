@@ -6,7 +6,6 @@ import { Provider as ReduxProvider } from 'react-redux';
 import store from '@/redux/store';
 import '@/utils/axios/axiosConfig';
 import { RouterProvider } from 'react-router-dom';
-import router from './router';
 import { Suspense } from 'react';
 import { PersistGate } from 'redux-persist/integration/react';
 import { persistStore } from 'redux-persist';
@@ -14,6 +13,7 @@ import AuthProvider from './router/AuthProvider';
 
 import styles from './App.module.css';
 import { Notifications } from '@mantine/notifications';
+import router from '@/router/index';
 
 const persistor = persistStore(store);
 
@@ -24,7 +24,7 @@ const App = () => {
     <Suspense fallback={<div className={styles.loader}></div>}>
       <I18nextProvider i18n={i18n}>
         <ReduxProvider store={store}>
-          <PersistGate loading={null} persistor={persistor}>
+          <PersistGate persistor={persistor}>
             <AuthProvider>
               <ColorSchemeProvider
                 colorScheme={colorScheme}

@@ -1,24 +1,19 @@
 import useTypedSelector from '@/hooks/useTypedSelector';
-import { isFetchingUser, isUserLoggedIn } from '@/redux/auth/auth.selectors';
-import { Navigate, Outlet } from 'react-router-dom';
-
-import styles from './PrivateRoute.module.css';
-import React from 'react';
+import { isUserLoggedIn } from '@/redux/auth/auth.selectors';
+import { Navigate, useLocation } from 'react-router-dom';
 
 const PrivateRoute = ({ children }: PrivateRouteProps) => {
+  const location = useLocation();
   const loggedIn = useTypedSelector(isUserLoggedIn);
-  const isLoading = useTypedSelector(isFetchingUser);
-
-  if (isLoading) return <div className={styles.loader}></div>;
 
   if (!loggedIn) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
-  return children ? <>{children}</> : <Outlet />;
+  return children;
 };
 
 type PrivateRouteProps = {
-  children: React.ReactNode;
+  children: JSX.Element;
 };
 
 export default PrivateRoute;

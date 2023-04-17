@@ -17,7 +17,9 @@ export function getProjection(
   indentationWidth: number,
 ) {
   const overItemIndex = items.findIndex(({ id }) => id === overId);
+  if (overItemIndex === -1) return null;
   const activeItemIndex = items.findIndex(({ id }) => id === activeId);
+  if (activeItemIndex === -1) return null;
   const activeItem = items[activeItemIndex];
   const newItems = arrayMove(items, activeItemIndex, overItemIndex);
   const previousItem = newItems[overItemIndex - 1];
@@ -95,7 +97,7 @@ export function flattenTree(items: TreeItems): FlattenedItem[] {
   return flatten(items);
 }
 
-export function findItemDeep(
+function findItemDeep(
   items: TreeItems,
   itemId: UniqueIdentifier,
 ): TreeItem | undefined {

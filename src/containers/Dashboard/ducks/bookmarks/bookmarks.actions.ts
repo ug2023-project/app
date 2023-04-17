@@ -1,4 +1,8 @@
-import { CreateBookmark } from './../types';
+import {
+  ChangeBookmarksOrder,
+  CreateBookmark,
+  RemoveBookmarkParams,
+} from './../types';
 import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from '@/utils/axios/axiosConfig';
 import { FetchCollectionBookmarksParams, MoveBookmarks } from '../types';
@@ -21,17 +25,23 @@ export const fetchCollectionBookmarksSearch = createAsyncThunk(
   },
 );
 
-export const updateSelectedBookmarks = createAction(
-  'bookmarks/updateSelectedBookmarks',
-  (selected: number[]) => ({
-    payload: selected,
-  }),
+export const changeBookmarksOrder = createAsyncThunk(
+  'bookmarks/changeBookmarksOrder',
+  async ({ params, body }: ChangeBookmarksOrder) => {
+    await axios.post(
+      `/collections/${params.collectionId}/change-bookmarks-order`,
+      body,
+    );
+  },
 );
 
 export const moveBookmarksToCollection = createAsyncThunk(
-  'bookmarks/moveBookmarksToCollection',
+  'bookmarks/moveBookmarks',
   async ({ params, body }: MoveBookmarks) => {
-    await axios.put(`/collections/${params.collectionId}/bookmarks`, body);
+    await axios.post(
+      `/collections/${params.collectionId}/move-bookmarks`,
+      body,
+    );
   },
 );
 
@@ -43,5 +53,12 @@ export const createBookmark = createAsyncThunk(
       bookmark,
     );
     return data;
+  },
+);
+
+export const removeBookmark = createAsyncThunk(
+  'bookmarks/removeBookmark',
+  async ({ collectionId, bookmarkId }: RemoveBookmarkParams) => {
+    await axios.delete(`/collections/${collectionId}/bookmarks/${bookmarkId}`);
   },
 );

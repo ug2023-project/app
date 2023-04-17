@@ -12,5 +12,5 @@ export const isFetchingUser = createSelector(
 
 export const isUserLoggedIn = createSelector(
   selectAuth,
-  (state) => state.data !== null,
+  (state) => state.user !== null,
 );

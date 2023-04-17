@@ -1,4 +1,8 @@
-import { createBookmark } from './../bookmarks/bookmarks.actions';
+import {
+  changeBookmarksOrder,
+  createBookmark,
+  removeBookmark,
+} from './../bookmarks/bookmarks.actions';
 import { createSlice } from '@reduxjs/toolkit';
 import {
   collapseAllCollections,
@@ -9,7 +13,7 @@ import {
   moveCollection,
 } from './collections.actions';
 import collectionInitialState from './collections.state';
-import { normalizeCollectionsApi } from '@/utils/collectionMapper';
+import { normalizeCollections } from '@/utils/collectionMapper';
 import { copy } from 'copy-anything';
 import { moveBookmarksToCollection } from '@/containers/Dashboard/ducks/bookmarks/bookmarks.actions';
 import { arrayMove } from '@dnd-kit/sortable';
@@ -17,12 +21,17 @@ import { notifications } from '@mantine/notifications';
 
 const TEMPORARY_COLLECTION_ID = -1000;
 
-function insertValuesOnIndex<T>(
-  array: T[],
-  values: T[],
-  index: number,
+function insertValues<T>({
+  array,
+  values,
+  index = 0,
   removeDuplicates = false,
-): T[] {
+}: {
+  array: T[];
+  values: T[];
+  index?: number;
+  removeDuplicates?: boolean;
+}): T[] {
   if (removeDuplicates) {
     const result = [
       ...array.filter((item) => !values.includes(item)),
@@ -55,10 +64,10 @@ const collectionsSlice = createSlice({
       state.loading = true;
     });
     builder.addCase(fetchAllCollections.fulfilled, (state, action) => {
-      const { collections, collectionOrder } = action.payload;
-      const normalizedCollections = normalizeCollectionsApi(collections);
+      const { collections, collectionsOrder } = action.payload;
+      const normalizedCollections = normalizeCollections(collections);
 
-      state.ids = collectionOrder;
+      state.ids = collectionsOrder;
       state.collections = normalizedCollections;
       state.loading = false;
       state.error = null;
@@ -93,7 +102,7 @@ const collectionsSlice = createSlice({
         collapsed: false,
         authorId: 1,
         parentId,
-        bookmarkOrder: [],
+        bookmarks: [],
       };
 
       if (firstChildCollectionIndex === -1) {
@@ -227,41 +236,60 @@ const collectionsSlice = createSlice({
       state.previousCollections = null;
       apiErrorNotification();
     });
+    // Change bookmark order
+    builder.addCase(changeBookmarksOrder.pending, (state, action) => {
+      state.previousIds = copy(state.ids);
+      state.previousCollections = copy(state.collections);
+
+      const { collectionId } = action.meta.arg.params;
+      const { index, bookmarkIds } = action.meta.arg.body;
+
+      const collection = state.collections[collectionId];
+      if (!collection) return;
+      collection.bookmarks = insertValues({
+        array: collection.bookmarks,
+        values: bookmarkIds,
+        index,
+        removeDuplicates: true,
+      });
+    });
+    builder.addCase(changeBookmarksOrder.fulfilled, (state) => {
+      state.previousIds = null;
+      state.previousCollections = null;
+    });
+    builder.addCase(changeBookmarksOrder.rejected, (state) => {
+      if (state.previousIds && state.previousCollections) {
+        state.ids = state.previousIds;
+        state.collections = state.previousCollections;
+      }
+      apiErrorNotification();
+    });
     // Move bookmarks to collection
     builder.addCase(moveBookmarksToCollection.pending, (state, action) => {
       state.previousIds = copy(state.ids);
       state.previousCollections = copy(state.collections);
+
       const { collectionId } = action.meta.arg.params;
-      const {
-        collectionId: newCollectionId,
-        index,
-        bookmarkIds,
-      } = action.meta.arg.body;
+      const { collectionId: newCollectionId, bookmarkIds } =
+        action.meta.arg.body;
+      if (collectionId === newCollectionId) return;
+      if (collectionId === -1 && newCollectionId === 0) return;
 
       const collection = state.collections[collectionId];
-      if (collection && newCollectionId === collectionId) {
-        collection.bookmarkOrder = insertValuesOnIndex(
-          collection.bookmarkOrder,
-          bookmarkIds,
-          index,
-          true,
+      if (!collection) return;
+
+      const newCollection =
+        state.collections[newCollectionId === 0 ? -1 : newCollectionId];
+      if (collection) {
+        collection.bookmarks = collection.bookmarks.filter(
+          (id) => !bookmarkIds.includes(id),
         );
-      } else if (collection) {
-        const newCollection = state.collections[newCollectionId];
-
-        if (collection.bookmarkOrder) {
-          collection.bookmarkOrder = collection.bookmarkOrder.filter(
-            (id) => !bookmarkIds.includes(id),
-          );
-        }
-
-        if (newCollection?.bookmarkOrder) {
-          newCollection.bookmarkOrder = insertValuesOnIndex(
-            newCollection.bookmarkOrder,
-            bookmarkIds,
-            index,
-          );
-        }
+      }
+      if (newCollectionId !== 0 && newCollection?.bookmarks) {
+        newCollection.bookmarks = insertValues({
+          array: newCollection.bookmarks,
+          values: bookmarkIds,
+        });
       }
     });
     builder.addCase(moveBookmarksToCollection.fulfilled, (state) => {
@@ -278,10 +306,36 @@ const collectionsSlice = createSlice({
     // Add bookmark
     builder.addCase(createBookmark.fulfilled, (state, action) => {
       const bookmark = action.payload;
+      if (!bookmark.collectionId) return;
       const collection = state.collections[bookmark.collectionId];
       if (!collection) return;
-      const order = collection.bookmarkOrder;
-      collection.bookmarkOrder = [bookmark.id, ...order];
+      const order = collection.bookmarks;
+      collection.bookmarks = [bookmark.id, ...order];
+    });
+    // Remove bookmark
+    builder.addCase(removeBookmark.pending, (state, action) => {
+      console.log('removeBookmark.pending');
+      state.previousCollections = copy(state.collections);
+      const { collectionId, bookmarkId } = action.meta.arg;
+      const collection = state.collections[collectionId];
+      if (!collection) return;
+      const trashCollection = state.collections[-99];
+      if (!trashCollection) return;
+      collection.bookmarks = collection.bookmarks.filter(
+        (id) => id !== bookmarkId,
+      );
+      if (collectionId !== -99) {
+        trashCollection.bookmarks = [bookmarkId, ...trashCollection.bookmarks];
+      }
+    });
+    builder.addCase(removeBookmark.fulfilled, (state) => {
+      state.previousCollections = null;
+    });
+    builder.addCase(removeBookmark.rejected, (state) => {
+      if (state.previousCollections) {
+        state.collections = state.previousCollections;
+      }
+      apiErrorNotification();
     });
   },
 });

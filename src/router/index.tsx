@@ -9,16 +9,16 @@ import MainLayout from '@/layouts/MainLayout';
 import {
   Outlet,
   Route,
-  createBrowserRouter,
   createRoutesFromElements,
   Navigate,
+  createBrowserRouter,
 } from 'react-router-dom';
 import PrivateRoute from './PrivateRoute';
 
 const routes = createRoutesFromElements(
   // main to implement later
   <Route path="/" element={<Outlet />}>
-    <Route index element={<Navigate to="collections/5" />} />
+    <Route index element={<Navigate to="collections" />} />
     <Route
       path="login"
       element={
@@ -48,7 +48,7 @@ const routes = createRoutesFromElements(
     >
       <Route
         index
-        element={<Navigate to="5" />}
+        element={<Navigate to="0" />}
         errorElement={<BookmarkError />}
       />
 

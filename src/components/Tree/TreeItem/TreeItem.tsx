@@ -5,12 +5,15 @@ import { iOS } from '../utilities';
 import classNames from 'classnames';
 import styles from '@/components/Tree/TreeItem/TreeItem.module.scss';
 import { Action, Handle } from '@/components/dnd-kit';
-import { UniqueIdentifier } from '@dnd-kit/core';
+import { UniqueIdentifier, useDndMonitor } from '@dnd-kit/core';
 import { Button, Menu } from '@mantine/core';
 import { BsThreeDots } from 'react-icons/bs';
 import CreateCollectionModal from '@/components/Modals/CollectionModal/CreateCollectionModal';
 import EditCollectionModal from '@/components/Modals/CollectionModal/EditCollectionModal';
 import { useNavigate, useParams } from 'react-router-dom';
+import DraggableType from '@/components/DraggableType';
+import useTypedDispatch from '@/hooks/useTypedDispatch';
+import { moveBookmarksToCollection } from '@/containers/Dashboard/ducks/bookmarks/bookmarks.actions';
 
 interface Props extends Omit<HTMLAttributes<HTMLLIElement>, 'id'> {
   id: UniqueIdentifier;
@@ -34,15 +37,19 @@ const animateLayoutChanges: AnimateLayoutChanges = ({
   wasDragging,
 }) => !(isSorting || wasDragging);
 
-export function TreeItem({ id, depth, ...props }: Props) {
+export function TreeItem({ id, depth, draggable = true, ...props }: Props) {
   const collectionId = useParams().collectionId;
   const navigate = useNavigate();
-  const active = parseInt(collectionId ?? '') === id;
+  const isActive = parseInt(collectionId ?? '') === id;
+
+  const dispatch = useTypedDispatch();
 
   const {
     attributes,
     isDragging,
     isSorting,
+    over,
+    active,
     listeners,
     setDraggableNodeRef,
     setDroppableNodeRef,
@@ -50,18 +57,42 @@ export function TreeItem({ id, depth, ...props }: Props) {
     transition,
   } = useSortable({
     id,
+    disabled: draggable === false,
     animateLayoutChanges,
+    data: {
+      type: DraggableType.TREE_ITEM,
+    },
   });
   const style: CSSProperties = {
     transform: CSS.Translate.toString(transform),
     transition,
   };
 
-  const [isHover, setIsHover] = useState(false);
   const handleProps = {
     ...attributes,
     ...listeners,
   };
+
+  const dropAttempt =
+    over?.id === id && active?.data.current?.type === DraggableType.BOOKMARK;
+
+  useDndMonitor({
+    onDragEnd() {
+      if (dropAttempt) {
+        dispatch(
+          moveBookmarksToCollection({
+            params: {
+              collectionId: parseInt(collectionId ?? ''),
+            },
+            body: {
+              bookmarkIds: [parseInt(active?.id.toString())],
+              collectionId: id,
+            },
+          }),
+        );
+      }
+    },
+  });
 
   return (
     <li
@@ -82,16 +113,13 @@ export function TreeItem({ id, depth, ...props }: Props) {
       <div
         className={classNames(
           styles.TreeItem,
-          isHover && styles.hover,
-          active && styles.active,
+          isActive && styles.active,
+          dropAttempt && styles.dropTarget,
         )}
         ref={setDraggableNodeRef}
         style={style}
-        onClick={() => navigate(`/collections/${id}`)}
-        onMouseEnter={() => setIsHover(true)}
-        onMouseLeave={() => setIsHover(false)}
       >
-        <Handle {...handleProps} />
+        {draggable ? <Handle {...handleProps} /> : null}
         {props.onCollapse && (
           <Action
             onClick={props.onCollapse}
@@ -103,8 +131,12 @@ export function TreeItem({ id, depth, ...props }: Props) {
             {collapseIcon}
           </Action>
         )}
-        <span className={styles.Text}>{props.value}</span>
-        {/* {!clone && onRemove && <Remove onClick={onRemove} />} */}
+        <span
+          className={styles.Text}
+          onClick={() => navigate(`/collections/${id}`)}
+        >
+          {props.value}
+        </span>
         <MenuButton id={id} />
         {props.clone && props.childCount && props.childCount > 1 ? (
           <span className={styles.Count}>{props.childCount}</span>
@@ -149,8 +181,8 @@ const MenuButton = ({ id }: MenuButtonProps) => {
           <Menu.Item onClick={() => setIsEditModalOpen(true)}>
             Edit collection
           </Menu.Item>
-          <Menu.Divider />
-          <Menu.Item>Rename</Menu.Item>
+          {/*<Menu.Divider />*/}
+          {/*<Menu.Item>Rename</Menu.Item>*/}
         </Menu.Dropdown>
       </Menu>
       <CreateCollectionModal

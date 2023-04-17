@@ -2,13 +2,10 @@ import React, { useEffect } from 'react';
 import classNames from 'classnames';
 import type { DraggableSyntheticListeners } from '@dnd-kit/core';
 import type { Transform } from '@dnd-kit/utilities';
-
 import { Remove } from './components';
-
 import styles from './Item.module.css';
 import Bookmark from '@/types/Bookmark';
 import { Image, Text } from '@mantine/core';
-import bookmark from '@/types/Bookmark';
 import { emphasizeText } from '@/utils/emphasizeText';
 
 export interface Props {
@@ -135,10 +132,10 @@ export const Item = React.memo(
                 </Text>
               </a>
             </div>
-            <span className={styles.Actions}>
-              <Remove className={styles.Remove} onClick={onRemove} />
-            </span>
           </div>
+          <span className={styles.Actions}>
+            <Remove className={styles.Remove} onClick={onRemove} />
+          </span>
         </div>
       );
     },

@@ -10,7 +10,7 @@ axios.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
     if (error?.response?.status === 401) {
-      console.log('Unauthorized');
+      console.log('axios interceptors response 401');
     }
     return Promise.reject(error);
   },

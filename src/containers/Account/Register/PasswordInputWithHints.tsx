@@ -54,7 +54,7 @@ const PasswordInputWithHints = <T extends PasswordForm>({
         opened={popoverOpened}
         position="bottom"
         width="target"
-        transition="pop"
+        // transition="pop"
       >
         <Popover.Target>
           <div

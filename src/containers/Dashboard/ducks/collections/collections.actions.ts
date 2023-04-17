@@ -25,21 +25,21 @@ export const createCollection = createAsyncThunk(
 export const moveCollection = createAsyncThunk(
   'collection/moveCollection',
   async ({ body }: MoveCollection) => {
-    await axios.put('collections/children-order', body);
+    await axios.post('collections/move', body);
   },
 );
 
 export const toggleCollectionCollapsed = createAsyncThunk(
   'collection/toggleCollectionCollapsed',
   async (collectionId: UniqueIdentifier) => {
-    await axios.put(`collections/toggle-collapsed/${collectionId}`);
+    await axios.post(`collections/${collectionId}/toggle-collapsed`);
   },
 );
 
 export const collapseAllCollections = createAsyncThunk(
   'collection/collapseAllCollections',
   async () => {
-    await axios.put(`collections/collapse-all`);
+    await axios.post(`collections/collapse-all`);
   },
 );
 

@@ -1,7 +1,7 @@
 import { AuthState } from './types';
 
 const authInitialState: AuthState = {
-  data: null,
+  user: null,
   loading: false,
 };
 

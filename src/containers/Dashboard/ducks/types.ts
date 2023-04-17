@@ -4,7 +4,6 @@ import { UniqueIdentifier } from '@dnd-kit/core';
 
 export type CollectionState = {
   ids: UniqueIdentifier[];
-
   collections: Partial<Record<UniqueIdentifier, Collection>>;
   previousIds: UniqueIdentifier[] | null;
   previousCollections: Partial<Record<number, Collection>> | null;
@@ -16,8 +15,6 @@ export type BookmarkState = {
   bookmarks: Partial<Record<UniqueIdentifier, Bookmark>>;
   previousBookmarks: Partial<Record<UniqueIdentifier, Bookmark>> | null;
   currentSearch: Bookmark[];
-  draggingIds: UniqueIdentifier[];
-  dropDisabled: boolean;
   loading: boolean;
   error: string | null;
 };
@@ -42,13 +39,22 @@ export type MoveCollection = {
   };
 };
 
+export type ChangeBookmarksOrder = {
+  params: {
+    collectionId: UniqueIdentifier;
+  };
+  body: {
+    index: number;
+    bookmarkIds: UniqueIdentifier[];
+  };
+};
+
 export type MoveBookmarks = {
   params: {
     collectionId: UniqueIdentifier;
   };
   body: {
     collectionId: UniqueIdentifier;
-    index: number;
     bookmarkIds: UniqueIdentifier[];
   };
 };
@@ -63,4 +69,9 @@ export type EditCollection = {
 export type CreateBookmark = {
   collectionId: UniqueIdentifier;
   bookmark: Partial<Bookmark>;
+};
+
+export type RemoveBookmarkParams = {
+  collectionId: UniqueIdentifier;
+  bookmarkId: UniqueIdentifier;
 };

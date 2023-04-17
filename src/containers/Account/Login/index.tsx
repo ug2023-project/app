@@ -2,15 +2,21 @@ import { Button, TextInput } from '@mantine/core';
 import { isEmail, useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/solid';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import axios from '@/utils/axios/axiosConfig';
 import { useState } from 'react';
-
 import styles from '../Common/Actions.module.css';
 import { useTranslation } from 'react-i18next';
+import { fetchUser } from '@/redux/auth/auth.actions';
+import useTypedDispatch from '@/hooks/useTypedDispatch';
+import useTypedSelector from '@/hooks/useTypedSelector';
+import { isUserLoggedIn } from '@/redux/auth/auth.selectors';
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const loggedIn = useTypedSelector(isUserLoggedIn);
+  const dispatch = useTypedDispatch();
   const { t } = useTranslation();
   const form = useForm<LoginFormValues>({
     initialValues: { email: '', password: '' },
@@ -29,11 +35,16 @@ const Login = () => {
         password: values.password,
       })
       .then(() => {
+        dispatch(fetchUser());
         navigate('/collections');
       })
       .catch(() => setError(true));
     form.reset();
   };
+
+  if (loggedIn) {
+    return <Navigate to="/collections" state={{ from: location }} replace />;
+  }
 
   return (
     <div className={styles.formWrapper}>

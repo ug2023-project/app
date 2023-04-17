@@ -7,29 +7,30 @@ import {
 import { Item } from './dnd-kit';
 import { SortableProps } from './Sortable';
 import Bookmark from '@/types/Bookmark';
+import DraggableType from '@/components/DraggableType';
 
 interface SortableItemProps {
   item: Bookmark;
   animateLayoutChanges?: AnimateLayoutChanges;
   disabled?: boolean;
-  getNewIndex?: NewIndexGetter;
   id: UniqueIdentifier;
   index: number;
   useDragOverlay?: boolean;
-  onRemove?(id: UniqueIdentifier): void;
+  onRemove(id: UniqueIdentifier): void;
   wrapperStyle: SortableProps['wrapperStyle'];
+  disableSorting?: boolean;
 }
 
 export function SortableItem({
   item,
   disabled,
   animateLayoutChanges,
-  getNewIndex,
   id,
   index,
   onRemove,
   useDragOverlay,
   wrapperStyle,
+  disableSorting = false,
 }: SortableItemProps) {
   const {
     active,
@@ -44,7 +45,9 @@ export function SortableItem({
     id,
     animateLayoutChanges,
     disabled,
-    getNewIndex,
+    data: {
+      type: DraggableType.BOOKMARK,
+    },
   });
 
   return (
@@ -55,8 +58,8 @@ export function SortableItem({
       dragging={isDragging}
       sorting={isSorting}
       index={index}
-      onRemove={onRemove ? () => onRemove(id) : undefined}
-      transform={transform}
+      onRemove={() => onRemove(id)}
+      transform={disableSorting ? null : transform}
       transition={transition}
       wrapperStyle={wrapperStyle?.({ index, isDragging, active, id })}
       listeners={listeners}
