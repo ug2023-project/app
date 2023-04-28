@@ -23,14 +23,11 @@ import {
   removeChildrenOf,
 } from './utilities';
 import type { FlattenedItem, TreeItems } from './types';
-import { TreeItem } from './TreeItem';
 import { CSS } from '@dnd-kit/utilities';
 import useTypedDispatch from '@/hooks/useTypedDispatch';
-import {
-  moveCollection,
-  toggleCollectionCollapsed,
-} from '@/containers/Dashboard/ducks/collections/collections.actions';
-import DraggableType from '@/components/DraggableType';
+import moveCollection from '@/containers/Dashboard/ducks/collections/actions/moveCollection';
+import toggleCollectionCollapsed from '@/containers/Dashboard/ducks/collections/actions/toggleCollectionCollapsed';
+import TreeItem from './TreeItem';
 
 const dropAnimationConfig: DropAnimation = {
   keyframes({ transform }) {
@@ -55,17 +52,17 @@ const dropAnimationConfig: DropAnimation = {
   },
 };
 
-interface Props {
+type SortableTreeProps = {
   items?: TreeItems;
   dragDisabled?: boolean;
   indentationWidth?: number;
-}
+};
 
 export function SortableTree({
   items = [],
   dragDisabled = false,
   indentationWidth = 50,
-}: Props) {
+}: SortableTreeProps) {
   const dispatch = useTypedDispatch();
 
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
@@ -104,6 +101,65 @@ export function SortableTree({
   const activeItem = activeId
     ? flattenedItems.find(({ id }) => id === activeId)
     : null;
+
+  const handleDragStart = ({
+    active: { id: activeId, data },
+  }: DragStartEvent) => {
+    if (data.current?.type !== 'tree-item') return;
+    setActiveId(activeId);
+    setOverId(activeId);
+
+    document.body.style.setProperty('cursor', 'grabbing');
+  };
+
+  const handleDragMove = ({ delta, active: { data } }: DragMoveEvent) => {
+    if (data.current?.type !== 'tree-item') return;
+    setOffsetLeft(delta.x);
+  };
+
+  function handleDragOver({ over, active: { data } }: DragOverEvent) {
+    if (data.current?.type !== 'tree-item') return;
+    setOverId(over?.id ?? null);
+  }
+
+  function handleDragEnd({ active, over, active: { data } }: DragEndEvent) {
+    if (data.current?.type !== 'tree-item') return;
+    resetState();
+
+    if (projected && over) {
+      const { parentId } = projected;
+      const clonedItems = JSON.parse(
+        JSON.stringify(flattenTree(items)),
+      ) as FlattenedItem[];
+      const overIndex = clonedItems.findIndex(({ id }) => id === over.id);
+
+      dispatch(
+        moveCollection({
+          body: {
+            parentId: parentId === null ? 0 : parentId,
+            collectionId: active.id,
+            index: overIndex,
+          },
+        }),
+      );
+    }
+  }
+
+  function handleDragCancel() {
+    resetState();
+  }
+
+  function resetState() {
+    setOverId(null);
+    setActiveId(null);
+    setOffsetLeft(0);
+
+    document.body.style.setProperty('cursor', '');
+  }
+
+  function handleCollapse(id: UniqueIdentifier) {
+    dispatch(toggleCollectionCollapsed(id));
+  }
 
   useDndMonitor({
     onDragStart(event) {
@@ -154,61 +210,4 @@ export function SortableTree({
       )}
     </SortableContext>
   );
-
-  function handleDragStart({ active: { id: activeId, data } }: DragStartEvent) {
-    if (data.current?.type !== DraggableType.TREE_ITEM) return;
-    setActiveId(activeId);
-    setOverId(activeId);
-
-    document.body.style.setProperty('cursor', 'grabbing');
-  }
-
-  function handleDragMove({ delta, active: { data } }: DragMoveEvent) {
-    if (data.current?.type !== DraggableType.TREE_ITEM) return;
-    setOffsetLeft(delta.x);
-  }
-
-  function handleDragOver({ over, active: { data } }: DragOverEvent) {
-    if (data.current?.type !== DraggableType.TREE_ITEM) return;
-    setOverId(over?.id ?? null);
-  }
-
-  function handleDragEnd({ active, over, active: { data } }: DragEndEvent) {
-    if (data.current?.type !== DraggableType.TREE_ITEM) return;
-    resetState();
-
-    if (projected && over) {
-      const { parentId } = projected;
-      const clonedItems = JSON.parse(
-        JSON.stringify(flattenTree(items)),
-      ) as FlattenedItem[];
-      const overIndex = clonedItems.findIndex(({ id }) => id === over.id);
-
-      dispatch(
-        moveCollection({
-          body: {
-            parentId: parentId === null ? 0 : parentId,
-            collectionId: active.id,
-            index: overIndex,
-          },
-        }),
-      );
-    }
-  }
-
-  function handleDragCancel() {
-    resetState();
-  }
-
-  function resetState() {
-    setOverId(null);
-    setActiveId(null);
-    setOffsetLeft(0);
-
-    document.body.style.setProperty('cursor', '');
-  }
-
-  function handleCollapse(id: UniqueIdentifier) {
-    dispatch(toggleCollectionCollapsed(id));
-  }
 }

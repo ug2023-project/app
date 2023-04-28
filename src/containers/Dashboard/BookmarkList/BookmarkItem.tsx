@@ -1,9 +1,7 @@
 import { createStyles, Text } from '@mantine/core';
 import Bookmark from '@/types/Bookmark';
-import { useSearchParams } from 'react-router-dom';
-import { useMemo } from 'react';
-import { emphasizeText } from '@/utils/emphasizeText';
 import styles from './BookmarkItem.module.css';
+import emphasizeText from '@/utils/emphasizeText';
 
 const useStyles = createStyles((theme) => ({
   item: {
@@ -34,13 +32,8 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-const BookmarkItem = ({ item }: Props) => {
-  const { classes, cx } = useStyles();
-  const [searchParams] = useSearchParams();
-  const isSearchResult = useMemo(
-    () => [...searchParams.keys()].length > 0,
-    [searchParams],
-  );
+const BookmarkItem = ({ item }: BookmarkItemProps) => {
+  const { classes } = useStyles();
 
   return (
     <>
@@ -65,7 +58,7 @@ const BookmarkItem = ({ item }: Props) => {
   );
 };
 
-type Props = {
+type BookmarkItemProps = {
   item: Bookmark;
 };
 

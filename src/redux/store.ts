@@ -1,5 +1,5 @@
-import bookmarkSlice from '@/containers/Dashboard/ducks/bookmarks/bookmarks.slice';
-import collectionsSlice from '@/containers/Dashboard/ducks/collections/collections.slice';
+import bookmarkSlice from '@/containers/Dashboard/ducks/bookmarks/bookmarkSlice';
+import collectionsSlice from '@/containers/Dashboard/ducks/collections/collectionSlice';
 import authSlice from './auth/auth.slice';
 import { combineReducers, configureStore, ThunkAction } from '@reduxjs/toolkit';
 import { Action } from 'redux';

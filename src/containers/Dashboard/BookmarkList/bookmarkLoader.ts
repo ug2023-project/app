@@ -1,6 +1,6 @@
 import store from '@/redux/store';
 import { LoaderFunctionArgs } from 'react-router-dom';
-import { fetchCollectionBookmarksSearch } from '../ducks/bookmarks/bookmarks.actions';
+import fetchCollectionBookmarksSearch from '../ducks/bookmarks/actions/fetchCollectionBookmarkSearch';
 
 const bookmarkLoader = async ({ params, request }: LoaderFunctionArgs) => {
   const { collectionId } = params;

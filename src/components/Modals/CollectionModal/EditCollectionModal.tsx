@@ -1,16 +1,10 @@
 import { Modal, Text } from '@mantine/core';
 import CollectionForm from './CollectionForm';
-import { editCollection } from '@/containers/Dashboard/ducks/collections/collections.actions';
 import useTypedDispatch from '@/hooks/useTypedDispatch';
 import { UniqueIdentifier } from '@dnd-kit/core';
 import { selectCollectionById } from '@/redux/selectors';
 import useTypedSelector from '@/hooks/useTypedSelector';
-
-type EditCollectionModalProps = {
-  id: UniqueIdentifier;
-  isModalOpen: boolean;
-  setIsModalOpen: (value: boolean) => void;
-};
+import editCollection from '@/containers/Dashboard/ducks/collections/actions/editCollection';
 
 const EditCollectionModal = ({
   id,
@@ -36,6 +30,12 @@ const EditCollectionModal = ({
       />
     </Modal>
   );
+};
+
+type EditCollectionModalProps = {
+  id: UniqueIdentifier;
+  isModalOpen: boolean;
+  setIsModalOpen: (value: boolean) => void;
 };
 
 export default EditCollectionModal;

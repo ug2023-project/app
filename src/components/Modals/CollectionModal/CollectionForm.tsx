@@ -2,11 +2,6 @@ import { Button, Group, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import Collection from '@/types/Collection';
 
-interface CollectionFormProps {
-  onSubmit: ({ title }: { title: string }) => void;
-  collection?: Collection;
-}
-
 const CollectionForm = ({ onSubmit, collection }: CollectionFormProps) => {
   const collectionForm = useForm({
     initialValues: {
@@ -31,6 +26,11 @@ const CollectionForm = ({ onSubmit, collection }: CollectionFormProps) => {
       </Group>
     </form>
   );
+};
+
+type CollectionFormProps = {
+  onSubmit: ({ title }: { title: string }) => void;
+  collection?: Collection;
 };
 
 export default CollectionForm;

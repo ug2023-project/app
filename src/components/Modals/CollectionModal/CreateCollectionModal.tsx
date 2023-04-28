@@ -1,5 +1,5 @@
 import { Modal, Text } from '@mantine/core';
-import { createCollection } from '@/containers/Dashboard/ducks/collections/collections.actions';
+import createCollection from '@/containers/Dashboard/ducks/collections/actions/createCollection';
 import useTypedDispatch from '@/hooks/useTypedDispatch';
 import CollectionForm from './CollectionForm';
 import { UniqueIdentifier } from '@dnd-kit/core';

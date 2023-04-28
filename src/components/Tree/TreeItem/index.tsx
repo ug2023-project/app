@@ -4,40 +4,23 @@ import { CSS } from '@dnd-kit/utilities';
 import { iOS } from '../utilities';
 import classNames from 'classnames';
 import styles from '@/components/Tree/TreeItem/TreeItem.module.scss';
-import { Action, Handle } from '@/components/dnd-kit';
+import Handle from '@/components/dnd-kit/Item/components/Handle';
 import { UniqueIdentifier, useDndMonitor } from '@dnd-kit/core';
 import { Button, Menu } from '@mantine/core';
 import { BsThreeDots } from 'react-icons/bs';
 import CreateCollectionModal from '@/components/Modals/CollectionModal/CreateCollectionModal';
 import EditCollectionModal from '@/components/Modals/CollectionModal/EditCollectionModal';
 import { useNavigate, useParams } from 'react-router-dom';
-import DraggableType from '@/components/DraggableType';
 import useTypedDispatch from '@/hooks/useTypedDispatch';
-import { moveBookmarksToCollection } from '@/containers/Dashboard/ducks/bookmarks/bookmarks.actions';
-
-interface Props extends Omit<HTMLAttributes<HTMLLIElement>, 'id'> {
-  id: UniqueIdentifier;
-  childCount?: number;
-  clone?: boolean;
-  collapsed?: boolean;
-  depth: number;
-  disableInteraction?: boolean;
-  disableSelection?: boolean;
-  ghost?: boolean;
-  handleProps?: any;
-  indentationWidth: number;
-  value: string | number;
-  onCollapse?(): void;
-  onRemove?(): void;
-  wrapperRef?(node: HTMLLIElement): void;
-}
+import moveBookmarksToCollection from '@/containers/Dashboard/ducks/bookmarks/actions/moveBookmarksToCollection';
+import Action from '@/components/dnd-kit/Item/components/Action';
 
 const animateLayoutChanges: AnimateLayoutChanges = ({
   isSorting,
   wasDragging,
 }) => !(isSorting || wasDragging);
 
-export function TreeItem({ id, depth, draggable = true, ...props }: Props) {
+const TreeItem = ({ id, depth, draggable = true, ...props }: TreeItemProps) => {
   const collectionId = useParams().collectionId;
   const navigate = useNavigate();
   const isActive = parseInt(collectionId ?? '') === id;
@@ -60,7 +43,7 @@ export function TreeItem({ id, depth, draggable = true, ...props }: Props) {
     disabled: draggable === false,
     animateLayoutChanges,
     data: {
-      type: DraggableType.TREE_ITEM,
+      type: 'tree-item',
     },
   });
   const style: CSSProperties = {
@@ -74,7 +57,7 @@ export function TreeItem({ id, depth, draggable = true, ...props }: Props) {
   };
 
   const dropAttempt =
-    over?.id === id && active?.data.current?.type === DraggableType.BOOKMARK;
+    over?.id === id && active?.data.current?.type === 'bookmark';
 
   useDndMonitor({
     onDragEnd() {
@@ -144,7 +127,7 @@ export function TreeItem({ id, depth, draggable = true, ...props }: Props) {
       </div>
     </li>
   );
-}
+};
 
 const collapseIcon = (
   <svg width="10" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 70 41">
@@ -152,9 +135,9 @@ const collapseIcon = (
   </svg>
 );
 
-interface MenuButtonProps {
+type MenuButtonProps = {
   id: UniqueIdentifier;
-}
+};
 
 const MenuButton = ({ id }: MenuButtonProps) => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -181,8 +164,6 @@ const MenuButton = ({ id }: MenuButtonProps) => {
           <Menu.Item onClick={() => setIsEditModalOpen(true)}>
             Edit collection
           </Menu.Item>
-          {/*<Menu.Divider />*/}
-          {/*<Menu.Item>Rename</Menu.Item>*/}
         </Menu.Dropdown>
       </Menu>
       <CreateCollectionModal
@@ -198,3 +179,22 @@ const MenuButton = ({ id }: MenuButtonProps) => {
     </>
   );
 };
+
+type TreeItemProps = Omit<HTMLAttributes<HTMLLIElement>, 'id'> & {
+  id: UniqueIdentifier;
+  childCount?: number;
+  clone?: boolean;
+  collapsed?: boolean;
+  depth: number;
+  disableInteraction?: boolean;
+  disableSelection?: boolean;
+  ghost?: boolean;
+  handleProps?: any;
+  indentationWidth: number;
+  value: string | number;
+  onCollapse?(): void;
+  onRemove?(): void;
+  wrapperRef?(node: HTMLLIElement): void;
+};
+
+export default TreeItem;

@@ -16,6 +16,8 @@ const Register = () => {
   const location = useLocation();
   const loggedIn = useTypedSelector(isUserLoggedIn);
   const { t } = useTranslation();
+  const [error, setError] = useState(false);
+
   const form = useForm<RegisterFormValues>({
     initialValues: { email: '', password: '' },
     validateInputOnBlur: true,
@@ -41,7 +43,6 @@ const Register = () => {
       },
     },
   });
-  const [error, setError] = useState(false);
 
   const handleRegister = (values: typeof form.values) => {
     axios

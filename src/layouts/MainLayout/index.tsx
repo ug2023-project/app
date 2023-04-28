@@ -7,7 +7,6 @@ import {
   KeyboardSensor,
   MeasuringStrategy,
   MouseSensor,
-  PointerSensor,
   TouchSensor,
   useSensor,
 } from '@dnd-kit/core';
@@ -22,29 +21,10 @@ const measuring = {
 export const indentationWidth = 30;
 
 const MainLayout = ({ asideContent, searchBarContent }: MainLayoutProps) => {
-  // const flattenedItems = [] as FlattenedItem[];
-  // const offsetLeft = 0;
-  // const sensorContext: SensorContext = useRef({
-  //   items: flattenedItems,
-  //   offset: offsetLeft,
-  // });
-  // const [coordinateGetter] = useState(() =>
-  //   sortableTreeKeyboardCoordinates(sensorContext, indentationWidth),
-  // );
-
-  const sortableTreeSensors = [
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    }),
-  ];
-
   const sortableSensors = [
     useSensor(MouseSensor, {}),
     useSensor(TouchSensor, {}),
     useSensor(KeyboardSensor, {
-      // Disable smooth scrolling in Cypress automated tests
-      scrollBehavior: 'Cypress' in window ? 'auto' : undefined,
       coordinateGetter: sortableKeyboardCoordinates,
     }),
   ];

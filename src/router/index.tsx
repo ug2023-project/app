@@ -4,7 +4,7 @@ import BookmarkList from '@/containers/Dashboard/BookmarkList';
 import BookmarkError from '@/containers/Dashboard/BookmarkList/BookmarkError';
 import CollectionList from '@/containers/Dashboard/CollectionList';
 import SearchBar from '@/containers/Dashboard/SearchBar';
-import FormLayout from '@/layouts/AccountLayouts/FormLayout';
+import FormLayout from '@/containers/Account/Common';
 import MainLayout from '@/layouts/MainLayout';
 import {
   Outlet,

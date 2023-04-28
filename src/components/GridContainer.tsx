@@ -1,23 +1,25 @@
-import React from 'react';
+import React, { PropsWithChildren } from 'react';
 
 import styles from './GridContainer.module.scss';
 
-export interface Props {
-  children: React.ReactNode;
+type GridContainerProps = {
   columns: number;
-}
+};
 
-export function GridContainer({ children, columns }: Props) {
-  return (
-    <ul
-      className={styles.GridContainer}
-      style={
-        {
-          '--col-count': columns,
-        } as React.CSSProperties
-      }
-    >
-      {children}
-    </ul>
-  );
-}
+const GridContainer = ({
+  children,
+  columns,
+}: PropsWithChildren<GridContainerProps>) => (
+  <ul
+    className={styles.GridContainer}
+    style={
+      {
+        '--col-count': columns,
+      } as React.CSSProperties
+    }
+  >
+    {children}
+  </ul>
+);
+
+export default GridContainer;

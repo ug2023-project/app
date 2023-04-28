@@ -1,7 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import authInitialState from './auth.state';
 import { fetchUser } from './auth.actions';
-import { AxiosError } from 'axios';
 
 const authSlice = createSlice({
   name: 'auth',
