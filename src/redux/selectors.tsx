@@ -1,11 +1,11 @@
 import { AppState } from '@/redux/store';
 import { createSelector } from '@reduxjs/toolkit';
-import Bookmark from '@/types/Bookmark';
 import { TreeItems } from '@/components/Tree/types';
 import Collection from '@/types/Collection';
 import { UniqueIdentifier } from '@dnd-kit/core';
 
 const selectSelf = (state: AppState) => state;
+
 const selectCollectionIds = createSelector(
   selectSelf,
   (state) => state.collections.ids,
@@ -20,7 +20,7 @@ export const selectDefaultCollections = createSelector(
   (collections): TreeItems => {
     const collectionList = [0, -1, -99]
       .map((id) => collections[id])
-      .filter(Boolean) as Collection[];
+      .filter(Boolean);
     return buildTree(collectionList);
   },
 );
@@ -29,9 +29,7 @@ export const selectCustomCollections = createSelector(
   selectCollectionIds,
   selectNormalizedCollections,
   (ids, collections): TreeItems => {
-    const collectionList = ids
-      .map((id) => collections[id])
-      .filter(Boolean) as Collection[];
+    const collectionList = ids.map((id) => collections[id]).filter(Boolean);
     return buildTree(collectionList);
   },
 );
@@ -75,11 +73,19 @@ export const selectCollectionBookmarks = (collectionId: number) =>
     selectNormalizedCollections,
     selectNormalizedBookmarks,
     (state, collections, bookmarks) => {
-      if (collectionId === 0) return state.bookmarks.currentSearch;
+      if (collectionId === 0) {
+        return state.bookmarks.currentSearch;
+      }
+
       const collection = collections[collectionId];
-      if (!collection) return [];
-      return (collection.bookmarks.map((id) => bookmarks[id]).filter(Boolean) ??
-        []) as Bookmark[];
+      if (!collection) {
+        return [];
+      }
+
+      const collectionBookmarks =
+        collection.bookmarks.map((id) => bookmarks[id]).filter(Boolean) ?? [];
+
+      return collectionBookmarks;
     },
   );
 

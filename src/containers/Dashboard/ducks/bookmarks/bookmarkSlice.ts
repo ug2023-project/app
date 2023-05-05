@@ -1,12 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit';
-import {
-  createBookmark,
-  fetchCollectionBookmarksSearch,
-  moveBookmarksToCollection,
-  removeBookmark,
-} from './bookmarks.actions';
-import bookmarkInitialState from './bookmarks.state';
+import bookmarkInitialState from './bookmarkInitialState';
 import { copy } from 'copy-anything';
+import fetchCollectionBookmarksSearch from './actions/fetchCollectionBookmarkSearch';
+import moveBookmarksToCollection from './actions/moveBookmarksToCollection';
+import createBookmark from './actions/createBookmark';
+import removeBookmark from './actions/removeBookmark';
 
 const bookmarkSlice = createSlice({
   name: 'bookmarks',

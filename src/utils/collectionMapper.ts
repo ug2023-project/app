@@ -1,7 +1,7 @@
 import Collection from '@/types/Collection';
 import { UniqueIdentifier } from '@dnd-kit/core';
 
-export const normalizeCollections = (
+const normalizeCollections = (
   collections: Collection[],
 ): Record<number, Collection> =>
   collections.reduce<Record<UniqueIdentifier, Collection>>(
@@ -11,3 +11,5 @@ export const normalizeCollections = (
     },
     {},
   );
+
+export default normalizeCollections;

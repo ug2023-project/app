@@ -1,9 +1,4 @@
-interface EmphasizeText {
-  text: string;
-  bold: boolean;
-}
-
-function emphasizeText(inputString: string): EmphasizeText[] {
+const emphasizeText = (inputString: string): EmphasizeText[] => {
   const parts = inputString.split(/(<em>|<\/em>)/);
   const filtered = parts.filter((part) => part !== '');
   const result: EmphasizeText[] = [];
@@ -18,6 +13,11 @@ function emphasizeText(inputString: string): EmphasizeText[] {
     }
   });
   return result;
-}
+};
 
-export { emphasizeText };
+type EmphasizeText = {
+  text: string;
+  bold: boolean;
+};
+
+export default emphasizeText;

@@ -1,15 +1,12 @@
-// import ThemeSwitcher from '@/components/ThemeSwitcher';
-// import LanguageSelect from '@/components/LanguageSelect';
 import { Popover, Button, TextInput } from '@mantine/core';
-
 import styles from './SearchBar.module.css';
 import AutocompleteCollection from '../AutocompleteCollection';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { BsFillStarFill } from 'react-icons/bs';
 import useTypedDispatch from '@/hooks/useTypedDispatch';
-import { createBookmark } from '../ducks/bookmarks/bookmarks.actions';
 import { useParams } from 'react-router-dom';
 import { useValidatedState } from '@mantine/hooks';
+import createBookmark from '../ducks/bookmarks/actions/createBookmark';
 
 const handleDefaultValue = async () => {
   const clipboard = await navigator.clipboard.readText();
@@ -34,7 +31,9 @@ const SearchBar = () => {
   const { collectionId } = useParams();
 
   const createBookmarkHandler = (url: string) => {
-    if (collectionId === undefined) return;
+    if (collectionId === undefined) {
+      return;
+    }
     dispatch(createBookmark({ collectionId, bookmark: { link: url } }));
     setValue('');
   };
@@ -52,16 +51,6 @@ const SearchBar = () => {
           </li>
         </ul>
       </nav>
-      {/*<nav>*/}
-      {/*  <ul className={styles.settingsList}>*/}
-      {/*    <li>*/}
-      {/*      <LanguageSelect />*/}
-      {/*    </li>*/}
-      {/*    <li>*/}
-      {/*      <ThemeSwitcher />*/}
-      {/*    </li>*/}
-      {/*  </ul>*/}
-      {/*</nav>*/}
       <nav className={styles.mainNav}>
         <Popover width={300} trapFocus position="bottom" withArrow shadow="md">
           <Popover.Target>

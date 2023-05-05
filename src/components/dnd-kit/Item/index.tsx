@@ -1,32 +1,15 @@
-import React, { useEffect } from 'react';
+import React, { forwardRef, memo, useEffect } from 'react';
 import classNames from 'classnames';
 import type { DraggableSyntheticListeners } from '@dnd-kit/core';
 import type { Transform } from '@dnd-kit/utilities';
-import { Remove } from './components';
 import styles from './Item.module.css';
 import Bookmark from '@/types/Bookmark';
 import { Image, Text } from '@mantine/core';
-import { emphasizeText } from '@/utils/emphasizeText';
+import emphasizeText from '@/utils/emphasizeText';
+import Remove from './components/Remove';
 
-export interface Props {
-  item: Bookmark;
-  dragOverlay?: boolean;
-  color?: string;
-  disabled?: boolean;
-  dragging?: boolean;
-  height?: number;
-  index?: number;
-  fadeIn?: boolean;
-  transform?: Transform | null;
-  listeners?: DraggableSyntheticListeners;
-  sorting?: boolean;
-  transition?: string | null;
-  wrapperStyle?: React.CSSProperties;
-  onRemove?(): void;
-}
-
-export const Item = React.memo(
-  React.forwardRef<HTMLDivElement, Props>(
+const Item = memo(
+  forwardRef<HTMLDivElement, ItemProps>(
     (
       {
         item,
@@ -141,3 +124,22 @@ export const Item = React.memo(
     },
   ),
 );
+
+type ItemProps = {
+  item: Bookmark;
+  dragOverlay?: boolean;
+  color?: string;
+  disabled?: boolean;
+  dragging?: boolean;
+  height?: number;
+  index?: number;
+  fadeIn?: boolean;
+  transform?: Transform | null;
+  listeners?: DraggableSyntheticListeners;
+  sorting?: boolean;
+  transition?: string | null;
+  wrapperStyle?: React.CSSProperties;
+  onRemove?(): void;
+};
+
+export default Item;

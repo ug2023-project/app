@@ -1,6 +1,3 @@
-enum DraggableType {
-  TREE_ITEM = 'TREE_ITEM',
-  BOOKMARK = 'BOOKMARK',
-}
+type DraggableType = 'tree-item' | 'bookmark';
 
 export default DraggableType;

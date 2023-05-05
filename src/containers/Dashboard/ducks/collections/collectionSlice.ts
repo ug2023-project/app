@@ -1,23 +1,19 @@
-import {
-  changeBookmarksOrder,
-  createBookmark,
-  removeBookmark,
-} from './../bookmarks/bookmarks.actions';
 import { createSlice } from '@reduxjs/toolkit';
-import {
-  collapseAllCollections,
-  toggleCollectionCollapsed,
-  createCollection,
-  editCollection,
-  fetchAllCollections,
-  moveCollection,
-} from './collections.actions';
-import collectionInitialState from './collections.state';
-import { normalizeCollections } from '@/utils/collectionMapper';
+import collectionInitialState from './collectionInitialState';
 import { copy } from 'copy-anything';
-import { moveBookmarksToCollection } from '@/containers/Dashboard/ducks/bookmarks/bookmarks.actions';
 import { arrayMove } from '@dnd-kit/sortable';
 import { notifications } from '@mantine/notifications';
+import fetchAllCollections from './actions/fetchAllCollections';
+import createCollection from './actions/createCollection';
+import moveCollection from './actions/moveCollection';
+import toggleCollectionCollapsed from './actions/toggleCollectionCollapsed';
+import collapseAllCollections from './actions/collapseAllCollection';
+import editCollection from './actions/editCollection';
+import changeBookmarksOrder from '../bookmarks/actions/changeBookmarkOrder';
+import moveBookmarksToCollection from '../bookmarks/actions/moveBookmarksToCollection';
+import createBookmark from '../bookmarks/actions/createBookmark';
+import removeBookmark from '../bookmarks/actions/removeBookmark';
+import normalizeCollections from '@/utils/collectionMapper';
 
 const TEMPORARY_COLLECTION_ID = -1000;
 
@@ -314,7 +310,6 @@ const collectionsSlice = createSlice({
     });
     // Remove bookmark
     builder.addCase(removeBookmark.pending, (state, action) => {
-      console.log('removeBookmark.pending');
       state.previousCollections = copy(state.collections);
       const { collectionId, bookmarkId } = action.meta.arg;
       const collection = state.collections[collectionId];

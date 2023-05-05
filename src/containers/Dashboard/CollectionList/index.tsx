@@ -1,7 +1,6 @@
 import styles from './CollectionList.module.css';
 import useTypedDispatch from '@/hooks/useTypedDispatch';
 import { Fragment, useEffect } from 'react';
-import { fetchAllCollections } from '../ducks/collections/collections.actions';
 import useTypedSelector from '@/hooks/useTypedSelector';
 import { Resizable } from 're-resizable';
 import {
@@ -11,34 +10,13 @@ import {
 import CollectionListMenu from './CollectionListMenu';
 import { SortableTree } from '@/components/Tree/SortableTree';
 import { Divider } from '@mantine/core';
-import { TreeItems } from '@/components/Tree/types';
-import { UniqueIdentifier } from '@dnd-kit/core';
-
-const defaultCollections: TreeItems = [
-  {
-    id: 0,
-    title: 'All bookmarks',
-    children: [],
-  },
-  {
-    id: -1,
-    title: 'Unsorted',
-    children: [],
-  },
-  {
-    id: -99,
-    title: 'Trash',
-    children: [],
-  },
-];
+import fetchAllCollections from '../ducks/collections/actions/fetchAllCollections';
 
 const CollectionList = () => {
   const dispatch = useTypedDispatch();
 
-  console.time('selectCollections');
   const defaultCollections = useTypedSelector(selectDefaultCollections);
   const customCollections = useTypedSelector(selectCustomCollections);
-  console.timeEnd('selectCollections');
 
   useEffect(() => {
     dispatch(fetchAllCollections());

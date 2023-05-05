@@ -18,34 +18,15 @@ import {
   SortingStrategy,
 } from '@dnd-kit/sortable';
 
-import { Item, List, Wrapper } from '@/components/dnd-kit';
-import { SortableItem } from './SortableItem';
+import Item from './dnd-kit/Item';
 import Bookmark from '@/types/Bookmark';
-import DraggableType from '@/components/DraggableType';
 import { useParams } from 'react-router-dom';
 import useTypedDispatch from '@/hooks/useTypedDispatch';
-import {
-  changeBookmarksOrder,
-  removeBookmark,
-} from '@/containers/Dashboard/ducks/bookmarks/bookmarks.actions';
-
-export interface SortableProps {
-  animateLayoutChanges?: AnimateLayoutChanges;
-  adjustScale?: boolean;
-  Container?: any; // To-do: Fix me
-  dropAnimation?: DropAnimation | null;
-  bookmarks: Bookmark[];
-  strategy?: SortingStrategy;
-  style?: React.CSSProperties;
-  useDragOverlay?: boolean;
-  wrapperStyle?(args: {
-    active: Pick<Active, 'id'> | null;
-    index: number;
-    isDragging: boolean;
-    id: UniqueIdentifier;
-  }): React.CSSProperties;
-  disableSorting?: boolean;
-}
+import removeBookmark from '@/containers/Dashboard/ducks/bookmarks/actions/removeBookmark';
+import changeBookmarksOrder from '@/containers/Dashboard/ducks/bookmarks/actions/changeBookmarkOrder';
+import List from './dnd-kit/List';
+import Wrapper from './dnd-kit/Wrapper';
+import SortableItem from './SortableItem';
 
 const dropAnimationConfig: DropAnimation = {
   sideEffects: defaultDropAnimationSideEffects({
@@ -57,7 +38,7 @@ const dropAnimationConfig: DropAnimation = {
   }),
 };
 
-export function Sortable({
+const Sortable = ({
   animateLayoutChanges,
   adjustScale = false,
   Container = List,
@@ -68,7 +49,7 @@ export function Sortable({
   useDragOverlay = true,
   wrapperStyle = () => ({}),
   disableSorting = false,
-}: SortableProps) {
+}: SortableProps) => {
   const dispatch = useTypedDispatch();
   const params = useParams();
   const collectionId = parseInt(params.collectionId as string);
@@ -93,44 +74,43 @@ export function Sortable({
     }
   }, [activeId]);
 
-  function handleDragStart({ active }: DragStartEvent) {
-    if (!active || active.data.current?.type !== DraggableType.BOOKMARK) {
+  const handleDragStart = ({ active }: DragStartEvent) => {
+    if (!active || active.data.current?.type !== 'bookmark') {
       return;
     }
 
     setActiveId(active.id);
-  }
+  };
 
-  function handleDragEnd({ over, active }: DragEndEvent) {
-    if (
-      disableSorting ||
-      active.data.current?.type !== DraggableType.BOOKMARK
-    ) {
+  const handleDragEnd = ({ over, active }: DragEndEvent) => {
+    if (disableSorting || active.data.current?.type !== 'bookmark') {
       return;
     }
     setActiveId(null);
 
-    if (over) {
-      const overIndex = getIndex(over.id);
-      if (activeIndex !== overIndex) {
-        dispatch(
-          changeBookmarksOrder({
-            params: {
-              collectionId,
-            },
-            body: {
-              bookmarkIds: [parseInt(active.id.toString())],
-              index: overIndex,
-            },
-          }),
-        );
-      }
+    if (!over) {
+      return;
     }
-  }
 
-  function handleDragCancel() {
+    const overIndex = getIndex(over.id);
+    if (activeIndex !== overIndex) {
+      dispatch(
+        changeBookmarksOrder({
+          params: {
+            collectionId,
+          },
+          body: {
+            bookmarkIds: [parseInt(active.id.toString())],
+            index: overIndex,
+          },
+        }),
+      );
+    }
+  };
+
+  const handleDragCancel = () => {
     setActiveId(null);
-  }
+  };
 
   useDndMonitor({
     onDragStart(event) {
@@ -189,4 +169,24 @@ export function Sortable({
         : null}
     </>
   );
-}
+};
+
+export type SortableProps = {
+  animateLayoutChanges?: AnimateLayoutChanges;
+  adjustScale?: boolean;
+  Container?: any; // To-do: Fix me
+  dropAnimation?: DropAnimation | null;
+  bookmarks: Bookmark[];
+  strategy?: SortingStrategy;
+  style?: React.CSSProperties;
+  useDragOverlay?: boolean;
+  wrapperStyle?(args: {
+    active: Pick<Active, 'id'> | null;
+    index: number;
+    isDragging: boolean;
+    id: UniqueIdentifier;
+  }): React.CSSProperties;
+  disableSorting?: boolean;
+};
+
+export default Sortable;

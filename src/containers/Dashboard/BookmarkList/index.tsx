@@ -7,16 +7,17 @@ import {
   selectCurrentSearchBookmarks,
 } from '@/redux/selectors';
 import useTypedDispatch from '@/hooks/useTypedDispatch';
-import { fetchCollectionBookmarksSearch } from '@/containers/Dashboard/ducks/bookmarks/bookmarks.actions';
-import { Sortable, SortableProps } from '@/components/Sortable';
+import { SortableProps } from '@/components/Sortable';
 import {
   AnimateLayoutChanges,
   defaultAnimateLayoutChanges,
   rectSortingStrategy,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { GridContainer } from '@/components/GridContainer';
 import { Button } from '@mantine/core';
+import fetchCollectionBookmarksSearch from '../ducks/bookmarks/actions/fetchCollectionBookmarkSearch';
+import Sortable from '@/components/Sortable';
+import GridContainer from '@/components/GridContainer';
 
 const listProps: Partial<SortableProps> = {
   strategy: verticalListSortingStrategy,
@@ -65,7 +66,6 @@ const BookmarkList = () => {
   return (
     <main className={styles.bookmarkList}>
       <div>
-        <br />
         <Button
           onClick={() => {
             setIsList(!isList);

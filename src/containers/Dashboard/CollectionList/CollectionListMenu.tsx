@@ -3,14 +3,14 @@ import useTypedDispatch from '@/hooks/useTypedDispatch';
 import { Button, Menu } from '@mantine/core';
 import { useState } from 'react';
 import { BsThreeDots } from 'react-icons/bs';
-import { collapseAllCollections } from '../ducks/collections/collections.actions';
+import collapseAllCollections from '../ducks/collections/actions/collapseAllCollection';
 
 const CollectionListMenu = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   const dispatch = useTypedDispatch();
 
-  const collapseAll = () => {
+  const handleCollapseAll = () => {
     dispatch(collapseAllCollections());
   };
 
@@ -40,7 +40,7 @@ const CollectionListMenu = () => {
           Create new collection
         </Menu.Item>
         <Menu.Divider />
-        <Menu.Item onClick={() => collapseAll()}>Collapse all</Menu.Item>
+        <Menu.Item onClick={handleCollapseAll}>Collapse all</Menu.Item>
       </Menu.Dropdown>
       <CreateCollectionModal
         parentId={0}

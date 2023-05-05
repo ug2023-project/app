@@ -1,27 +1,10 @@
 import { UniqueIdentifier } from '@dnd-kit/core';
-import {
-  AnimateLayoutChanges,
-  NewIndexGetter,
-  useSortable,
-} from '@dnd-kit/sortable';
-import { Item } from './dnd-kit';
+import { AnimateLayoutChanges, useSortable } from '@dnd-kit/sortable';
 import { SortableProps } from './Sortable';
 import Bookmark from '@/types/Bookmark';
-import DraggableType from '@/components/DraggableType';
+import Item from './dnd-kit/Item';
 
-interface SortableItemProps {
-  item: Bookmark;
-  animateLayoutChanges?: AnimateLayoutChanges;
-  disabled?: boolean;
-  id: UniqueIdentifier;
-  index: number;
-  useDragOverlay?: boolean;
-  onRemove(id: UniqueIdentifier): void;
-  wrapperStyle: SortableProps['wrapperStyle'];
-  disableSorting?: boolean;
-}
-
-export function SortableItem({
+const SortableItem = ({
   item,
   disabled,
   animateLayoutChanges,
@@ -31,7 +14,7 @@ export function SortableItem({
   useDragOverlay,
   wrapperStyle,
   disableSorting = false,
-}: SortableItemProps) {
+}: SortableItemProps) => {
   const {
     active,
     attributes,
@@ -46,7 +29,7 @@ export function SortableItem({
     animateLayoutChanges,
     disabled,
     data: {
-      type: DraggableType.BOOKMARK,
+      type: 'bookmark',
     },
   });
 
@@ -69,4 +52,18 @@ export function SortableItem({
       {...attributes}
     />
   );
-}
+};
+
+type SortableItemProps = {
+  item: Bookmark;
+  animateLayoutChanges?: AnimateLayoutChanges;
+  disabled?: boolean;
+  id: UniqueIdentifier;
+  index: number;
+  useDragOverlay?: boolean;
+  onRemove(id: UniqueIdentifier): void;
+  wrapperStyle: SortableProps['wrapperStyle'];
+  disableSorting?: boolean;
+};
+
+export default SortableItem;

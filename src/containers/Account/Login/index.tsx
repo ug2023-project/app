@@ -28,7 +28,7 @@ const Login = () => {
   const [passwordVisible, { toggle }] = useDisclosure(false);
   const [error, setError] = useState(false);
 
-  const handleLogin = (values: typeof form.values) => {
+  const handleLogin = (values: LoginFormValues) => {
     axios
       .post('/auth/login', {
         email: values.email,

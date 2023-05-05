@@ -5,17 +5,16 @@ import type { FlattenedItem, TreeItem, TreeItems } from './types';
 
 export const iOS = /iPad|iPhone|iPod/.test(navigator.platform);
 
-function getDragDepth(offset: number, indentationWidth: number) {
-  return Math.round(offset / indentationWidth);
-}
+const getDragDepth = (offset: number, indentationWidth: number) =>
+  Math.round(offset / indentationWidth);
 
-export function getProjection(
+export const getProjection = (
   items: FlattenedItem[],
   activeId: UniqueIdentifier,
   overId: UniqueIdentifier,
   dragOffset: number,
   indentationWidth: number,
-) {
+) => {
   const overItemIndex = items.findIndex(({ id }) => id === overId);
   if (overItemIndex === -1) return null;
   const activeItemIndex = items.findIndex(({ id }) => id === activeId);
@@ -60,30 +59,30 @@ export function getProjection(
 
     return newParent ?? null;
   }
-}
+};
 
-function getMaxDepth({ previousItem }: { previousItem: FlattenedItem }) {
+const getMaxDepth = ({ previousItem }: { previousItem: FlattenedItem }) => {
   if (previousItem) {
     return previousItem.depth + 1;
   }
 
   return 0;
-}
+};
 
-function getMinDepth({ nextItem }: { nextItem: FlattenedItem }) {
+const getMinDepth = ({ nextItem }: { nextItem: FlattenedItem }) => {
   if (nextItem) {
     return nextItem.depth;
   }
 
   return 0;
-}
+};
 
-function flatten(
+const flatten = (
   items: TreeItems,
   parentId: UniqueIdentifier | null = null,
   depth = 0,
-): FlattenedItem[] {
-  return items.reduce<FlattenedItem[]>(
+): FlattenedItem[] =>
+  items.reduce<FlattenedItem[]>(
     (acc, item, index) => [
       ...acc,
       { ...item, parentId, depth, index },
@@ -91,16 +90,13 @@ function flatten(
     ],
     [],
   );
-}
 
-export function flattenTree(items: TreeItems): FlattenedItem[] {
-  return flatten(items);
-}
+export const flattenTree = (items: TreeItems) => flatten(items);
 
-function findItemDeep(
+const findItemDeep = (
   items: TreeItems,
   itemId: UniqueIdentifier,
-): TreeItem | undefined {
+): TreeItem | undefined => {
   for (const item of items) {
     const { id, children } = item;
 
@@ -118,9 +114,9 @@ function findItemDeep(
   }
 
   return undefined;
-}
+};
 
-export function removeItem(items: TreeItems, id: UniqueIdentifier) {
+export const removeItem = (items: TreeItems, id: UniqueIdentifier) => {
   const newItems = [];
 
   for (const item of items) {
@@ -136,27 +132,27 @@ export function removeItem(items: TreeItems, id: UniqueIdentifier) {
   }
 
   return newItems;
-}
-function countChildren(items: TreeItem[], count = 0): number {
-  return items.reduce((acc, { children }) => {
+};
+
+const countChildren = (items: TreeItem[], count = 0): number =>
+  items.reduce((acc, { children }) => {
     if (children.length) {
       return countChildren(children, acc + 1);
     }
 
     return acc + 1;
   }, count);
-}
 
-export function getChildCount(items: TreeItems, id: UniqueIdentifier) {
+export const getChildCount = (items: TreeItems, id: UniqueIdentifier) => {
   const item = findItemDeep(items, id);
 
   return item ? countChildren(item.children) : 0;
-}
+};
 
-export function removeChildrenOf(
+export const removeChildrenOf = (
   items: FlattenedItem[],
   ids: UniqueIdentifier[],
-) {
+) => {
   const excludeParentIds = [...ids];
 
   return items.filter((item) => {
@@ -169,4 +165,4 @@ export function removeChildrenOf(
 
     return true;
   });
-}
+};
