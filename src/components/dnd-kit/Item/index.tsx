@@ -7,6 +7,7 @@ import Bookmark from '@/types/Bookmark';
 import { Image, Text } from '@mantine/core';
 import emphasizeText from '@/utils/emphasizeText';
 import Remove from './components/Remove';
+import Edit from './components/Edit';
 
 const Item = memo(
   forwardRef<HTMLDivElement, ItemProps>(
@@ -116,9 +117,10 @@ const Item = memo(
               </a>
             </div>
           </div>
-          <span className={styles.Actions}>
-            <Remove className={styles.Remove} onClick={onRemove} />
-          </span>
+          <div className={styles.Actions}>
+            <Edit bookmark={item} className={styles.action} />
+            <Remove className={styles.action} onClick={onRemove} />
+          </div>
         </div>
       );
     },

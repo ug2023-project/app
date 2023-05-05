@@ -19,7 +19,7 @@ const SortMenu = () => {
       <Menu.Dropdown>
         {sortOptions.map((option) => (
           <Menu.Item
-            key={option.text}
+            key={option.option}
             icon={option.icon}
             rightSection={option.indicator}
           >
