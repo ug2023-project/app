@@ -1,3 +1,7 @@
+.controlPanel {
+  @apply mt-3 flex items-center justify-between px-6;
+}
+
 .bookmarkList {
   @apply flex h-full flex-col bg-main-500;
 }

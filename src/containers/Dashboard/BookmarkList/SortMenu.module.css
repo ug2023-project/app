@@ -1,0 +1,11 @@
+.icon {
+  @apply h-4 w-4;
+}
+
+.menuRight {
+  @apply ml-[0.625rem] h-4 w-4;
+}
+
+.button {
+  @apply border border-blue-300;
+}

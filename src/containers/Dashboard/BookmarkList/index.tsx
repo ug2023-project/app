@@ -18,6 +18,7 @@ import { Button } from '@mantine/core';
 import fetchCollectionBookmarksSearch from '../ducks/bookmarks/actions/fetchCollectionBookmarkSearch';
 import Sortable from '@/components/Sortable';
 import GridContainer from '@/components/GridContainer';
+import SortMenu from './SortMenu';
 
 const listProps: Partial<SortableProps> = {
   strategy: verticalListSortingStrategy,
@@ -65,7 +66,7 @@ const BookmarkList = () => {
 
   return (
     <main className={styles.bookmarkList}>
-      <div>
+      <div className={styles.controlPanel}>
         <Button
           onClick={() => {
             setIsList(!isList);
@@ -75,13 +76,14 @@ const BookmarkList = () => {
         >
           Change view
         </Button>
-        <Sortable
-          {...props}
-          bookmarks={bookmarks}
-          animateLayoutChanges={animateLayoutChanges}
-          disableSorting={collectionId === 0}
-        />
+        <SortMenu />
       </div>
+      <Sortable
+        {...props}
+        bookmarks={bookmarks}
+        animateLayoutChanges={animateLayoutChanges}
+        disableSorting={collectionId === 0}
+      />
     </main>
   );
 };
