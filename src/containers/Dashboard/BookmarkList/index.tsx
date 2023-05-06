@@ -19,6 +19,8 @@ import fetchCollectionBookmarksSearch from '../ducks/bookmarks/actions/fetchColl
 import Sortable from '@/components/Sortable';
 import GridContainer from '@/components/GridContainer';
 import SortMenu from './SortMenu';
+import FileUpload from '@/components/FileUpload';
+import { Accept } from 'react-dropzone';
 
 const listProps: Partial<SortableProps> = {
   strategy: verticalListSortingStrategy,
@@ -64,8 +66,26 @@ const BookmarkList = () => {
   const animateLayoutChanges: AnimateLayoutChanges = (args) =>
     defaultAnimateLayoutChanges({ ...args, wasDragging: true });
 
+  const handleFileDrop = (file: File) => {
+    console.log(file);
+  };
+
+  const handleFileUploadError = (error: string) => {
+    console.log(error);
+  };
+
+  const acceptedFiles: Accept = {
+    text: ['.txt', '.pdf', '.doc', '.docx', '.odt', '.rtf', '.tex'],
+  };
+
   return (
-    <main className={styles.bookmarkList}>
+    <FileUpload
+      onFileDrop={handleFileDrop}
+      onDropError={handleFileUploadError}
+      fileTypes={acceptedFiles}
+      className={styles.bookmarkList}
+      onDropStyles="before:top-0 before:left-0 before:absolute before:w-full before:h-full before:bg-amber-400 before:z-10 before:bg-amber-400/10 before:border-2 before:border-amber-400"
+    >
       <div className={styles.controlPanel}>
         <Button
           onClick={() => {
@@ -84,7 +104,7 @@ const BookmarkList = () => {
         animateLayoutChanges={animateLayoutChanges}
         disableSorting={collectionId === 0}
       />
-    </main>
+    </FileUpload>
   );
 };
 
