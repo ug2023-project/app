@@ -37,37 +37,14 @@ export const selectCustomCollections = createSelector(
 export const selectCollectionById = (id: UniqueIdentifier) =>
   createSelector(selectNormalizedCollections, (collections) => collections[id]);
 
-function buildTree(collections: Collection[]): TreeItems {
-  const treeItemsWithChildren = collections.map((c) => ({
-    id: c.id,
-    title: c.title,
-    children: getChildren(collections, c.id),
-    collapsed: c.collapsed,
-    parentId: c.parentId,
-  }));
-  return treeItemsWithChildren.filter((c) => c.parentId === null);
-}
 
-function getChildren(
-  collections: Collection[],
-  parentId: UniqueIdentifier,
-): TreeItems {
-  return collections
-    .filter((c) => c.parentId === parentId)
-    .map((c) => ({
-      id: c.id,
-      title: c.title,
-      children: getChildren(collections, c.id),
-      collapsed: c.collapsed,
-    }));
-}
 
 const selectNormalizedBookmarks = createSelector(
   selectSelf,
   (state) => state.bookmarks.bookmarks,
 );
 
-export const selectCollectionBookmarks = (collectionId: number) =>
+export const selectCollectionBookmarks = (collectionId: UniqueIdentifier) =>
   createSelector(
     selectSelf,
     selectNormalizedCollections,

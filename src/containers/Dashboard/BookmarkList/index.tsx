@@ -43,7 +43,7 @@ const BookmarkList = () => {
     [searchParams],
   );
   const params = useParams();
-  const collectionId = parseInt(params.collectionId as string);
+  const collectionId = params.collectionId ?? '';
   const dispatch = useTypedDispatch();
   const [isList, setIsList] = useState(true);
   const [props, setProps] = useState<Partial<SortableProps>>(listProps);

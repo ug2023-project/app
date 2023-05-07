@@ -48,7 +48,7 @@ const routes = createRoutesFromElements(
     >
       <Route
         index
-        element={<Navigate to="0" />}
+        element={<Navigate to="all" />}
         errorElement={<BookmarkError />}
       />
 

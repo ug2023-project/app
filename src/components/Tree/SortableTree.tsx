@@ -24,10 +24,11 @@ import {
 } from './utilities';
 import type { FlattenedItem, TreeItems } from './types';
 import { CSS } from '@dnd-kit/utilities';
-import useTypedDispatch from '@/hooks/useTypedDispatch';
-import moveCollection from '@/containers/Dashboard/ducks/collections/actions/moveCollection';
-import toggleCollectionCollapsed from '@/containers/Dashboard/ducks/collections/actions/toggleCollectionCollapsed';
 import TreeItem from './TreeItem';
+import {
+  useMoveCollectionMutation,
+  useToggleCollectionCollapsedMutation,
+} from '../../services/bookmarks';
 
 const dropAnimationConfig: DropAnimation = {
   keyframes({ transform }) {
@@ -63,7 +64,8 @@ export function SortableTree({
   dragDisabled = false,
   indentationWidth = 50,
 }: SortableTreeProps) {
-  const dispatch = useTypedDispatch();
+  const [moveCollection] = useMoveCollectionMutation();
+  const [toggleCollectionCollapsed] = useToggleCollectionCollapsedMutation();
 
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
   const [overId, setOverId] = useState<UniqueIdentifier | null>(null);
@@ -133,15 +135,17 @@ export function SortableTree({
       ) as FlattenedItem[];
       const overIndex = clonedItems.findIndex(({ id }) => id === over.id);
 
-      dispatch(
-        moveCollection({
-          body: {
-            parentId: parentId === null ? 0 : parentId,
-            collectionId: active.id,
-            index: overIndex,
-          },
-        }),
-      );
+      console.log({
+        parentId: parentId,
+        collectionId: active.id,
+        index: overIndex,
+      });
+
+      moveCollection({
+        parentId: parentId,
+        collectionId: active.id,
+        index: overIndex,
+      });
     }
   }
 
@@ -158,7 +162,7 @@ export function SortableTree({
   }
 
   function handleCollapse(id: UniqueIdentifier) {
-    dispatch(toggleCollectionCollapsed(id));
+    toggleCollectionCollapsed(id);
   }
 
   useDndMonitor({

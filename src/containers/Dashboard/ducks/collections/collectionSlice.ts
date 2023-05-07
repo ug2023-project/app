@@ -4,9 +4,7 @@ import { copy } from 'copy-anything';
 import { arrayMove } from '@dnd-kit/sortable';
 import { notifications } from '@mantine/notifications';
 import fetchAllCollections from './actions/fetchAllCollections';
-import createCollection from './actions/createCollection';
 import moveCollection from './actions/moveCollection';
-import toggleCollectionCollapsed from './actions/toggleCollectionCollapsed';
 import collapseAllCollections from './actions/collapseAllCollection';
 import editCollection from './actions/editCollection';
 import changeBookmarksOrder from '../bookmarks/actions/changeBookmarkOrder';
@@ -73,72 +71,6 @@ const collectionsSlice = createSlice({
       state.error = action.error.message || 'Something went wrong';
       apiErrorNotification();
     });
-    // Create collection
-    builder.addCase(createCollection.pending, (state, action) => {
-      state.previousIds = copy(state.ids);
-      state.previousCollections = copy(state.collections);
-
-      const { title, parentId } = action.meta.arg.body;
-
-      const collections = state.ids.map((id) => state.collections[id]);
-      const firstChildCollectionIndex = collections.findIndex(
-        (collection) => collection?.parentId === parentId,
-      );
-
-      state.collections[TEMPORARY_COLLECTION_ID] = {
-        id: TEMPORARY_COLLECTION_ID,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        title,
-        cover: null,
-        color: null,
-        deleted: false,
-        view: 'LIST',
-        public: false,
-        collapsed: false,
-        authorId: 1,
-        parentId,
-        bookmarks: [],
-      };
-
-      if (firstChildCollectionIndex === -1) {
-        state.ids = [TEMPORARY_COLLECTION_ID, ...state.ids];
-        return;
-      }
-      state.ids = [
-        ...state.ids.slice(0, firstChildCollectionIndex),
-        TEMPORARY_COLLECTION_ID,
-        ...state.ids.slice(firstChildCollectionIndex),
-      ];
-    });
-    builder.addCase(createCollection.fulfilled, (state, action) => {
-      const newCollection = action.payload;
-      const collection = state.collections[TEMPORARY_COLLECTION_ID];
-
-      state.ids = state.ids.map((id) => {
-        if (id === TEMPORARY_COLLECTION_ID) {
-          return newCollection.id;
-        }
-        return id;
-      });
-      state.collections[newCollection.id] = {
-        ...collection,
-        ...newCollection,
-      };
-      delete state.collections[TEMPORARY_COLLECTION_ID];
-
-      state.previousIds = null;
-      state.previousCollections = null;
-    });
-    builder.addCase(createCollection.rejected, (state) => {
-      if (state.previousIds && state.previousCollections) {
-        state.ids = state.previousIds;
-        state.collections = state.previousCollections;
-      }
-      state.previousIds = null;
-      state.previousCollections = null;
-      apiErrorNotification();
-    });
     // Edit collection
     builder.addCase(editCollection.pending, (state, action) => {
       state.previousCollections = copy(state.collections);
@@ -180,28 +112,6 @@ const collectionsSlice = createSlice({
     });
     builder.addCase(moveCollection.rejected, (state) => {
       if (state.previousIds && state.previousCollections) {
-        state.ids = state.previousIds;
-        state.collections = state.previousCollections;
-      }
-      state.previousIds = null;
-      state.previousCollections = null;
-      apiErrorNotification();
-    });
-    // Toggle collection collapsed
-    builder.addCase(toggleCollectionCollapsed.pending, (state, action) => {
-      state.previousIds = copy(state.ids);
-      state.previousCollections = copy(state.collections);
-      const collectionId = action.meta.arg;
-      const collection = state.collections[collectionId];
-      if (!collection) return;
-      collection.collapsed = !collection.collapsed;
-    });
-    builder.addCase(toggleCollectionCollapsed.fulfilled, (state) => {
-      state.previousIds = null;
-      state.previousCollections = null;
-    });
-    builder.addCase(toggleCollectionCollapsed.rejected, (state) => {
-      if (state.previousCollections && state.previousIds) {
         state.ids = state.previousIds;
         state.collections = state.previousCollections;
       }

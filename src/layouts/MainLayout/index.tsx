@@ -18,8 +18,6 @@ const measuring = {
   },
 };
 
-export const indentationWidth = 30;
-
 const MainLayout = ({ asideContent, searchBarContent }: MainLayoutProps) => {
   const sortableSensors = [
     useSensor(MouseSensor, {}),
