@@ -11,9 +11,8 @@ import { BsThreeDots } from 'react-icons/bs';
 import CreateCollectionModal from '@/components/Modals/CollectionModal/CreateCollectionModal';
 import EditCollectionModal from '@/components/Modals/CollectionModal/EditCollectionModal';
 import { useNavigate, useParams } from 'react-router-dom';
-import useTypedDispatch from '@/hooks/useTypedDispatch';
-import moveBookmarksToCollection from '@/containers/Dashboard/ducks/bookmarks/actions/moveBookmarksToCollection';
 import Action from '@/components/dnd-kit/Item/components/Action';
+import { useMoveBookmarkMutation } from '../../../services/bookmarks';
 
 const animateLayoutChanges: AnimateLayoutChanges = ({
   isSorting,
@@ -21,11 +20,10 @@ const animateLayoutChanges: AnimateLayoutChanges = ({
 }) => !(isSorting || wasDragging);
 
 const TreeItem = ({ id, depth, draggable = true, ...props }: TreeItemProps) => {
-  const collectionId = useParams().collectionId;
+  const collectionId = useParams().collectionId ?? '';
   const navigate = useNavigate();
-  const isActive = parseInt(collectionId ?? '') === id;
-
-  const dispatch = useTypedDispatch();
+  const isActive = collectionId === id;
+  const [moveBookmark] = useMoveBookmarkMutation();
 
   const {
     attributes,
@@ -62,17 +60,11 @@ const TreeItem = ({ id, depth, draggable = true, ...props }: TreeItemProps) => {
   useDndMonitor({
     onDragEnd() {
       if (dropAttempt) {
-        dispatch(
-          moveBookmarksToCollection({
-            params: {
-              collectionId: parseInt(collectionId ?? ''),
-            },
-            body: {
-              bookmarkIds: [parseInt(active?.id.toString())],
-              collectionId: id,
-            },
-          }),
-        );
+        moveBookmark({
+          collectionId,
+          bookmarkId: active.id,
+          newCollectionId: id,
+        });
       }
     },
   });
@@ -120,6 +112,7 @@ const TreeItem = ({ id, depth, draggable = true, ...props }: TreeItemProps) => {
         >
           {props.value}
         </span>
+        <div>{props.bookmarks}</div>
         <MenuButton id={id} />
         {props.clone && props.childCount && props.childCount > 1 ? (
           <span className={styles.Count}>{props.childCount}</span>
@@ -195,6 +188,7 @@ type TreeItemProps = Omit<HTMLAttributes<HTMLLIElement>, 'id'> & {
   onCollapse?(): void;
   onRemove?(): void;
   wrapperRef?(node: HTMLLIElement): void;
+  bookmarks: number;
 };
 
 export default TreeItem;

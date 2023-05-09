@@ -6,7 +6,12 @@ const useAutocompleteCollection = () => {
 
   const handleChange = useCallback(
     (value: string) => {
-      setSearchParams(value ? { search: value } : {});
+      if (!value) {
+        searchParams.delete('search');
+      } else {
+        searchParams.set('search', value);
+      }
+      setSearchParams(searchParams);
     },
     [setSearchParams],
   );

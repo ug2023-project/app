@@ -5,7 +5,7 @@ import styles from './SortMenu.module.css';
 import useGetSortOptions from './useGetSortOptions';
 
 const SortMenu = () => {
-  const sortOptions = useGetSortOptions();
+  const { sortOptions, handleSortChange } = useGetSortOptions();
   return (
     <Menu withArrow>
       <Menu.Target>
@@ -17,13 +17,14 @@ const SortMenu = () => {
         </Button>
       </Menu.Target>
       <Menu.Dropdown>
-        {sortOptions.map((option) => (
+        {sortOptions.map(({ option, icon, indicator, text }) => (
           <Menu.Item
-            key={option.option}
-            icon={option.icon}
-            rightSection={option.indicator}
+            key={option}
+            icon={icon}
+            rightSection={indicator}
+            onClick={() => handleSortChange(option)}
           >
-            {option.text}
+            {text}
           </Menu.Item>
         ))}
       </Menu.Dropdown>

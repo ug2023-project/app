@@ -8,6 +8,7 @@ import { Image, Text } from '@mantine/core';
 import emphasizeText from '@/utils/emphasizeText';
 import Remove from './components/Remove';
 import Edit from './components/Edit';
+import Handle from './components/Handle';
 
 const Item = memo(
   forwardRef<HTMLDivElement, ItemProps>(
@@ -22,6 +23,7 @@ const Item = memo(
         index,
         listeners,
         onRemove,
+        handleProps,
         sorting,
         transition,
         transform,
@@ -83,19 +85,17 @@ const Item = memo(
               color && styles.color,
             )}
             data-cypress="draggable-item"
-            {...listeners}
             {...props}
             tabIndex={0}
           >
-            <Image
-              width={40}
-              height={40}
-              mx="auto"
-              radius="md"
-              src={item.image}
-              alt={item.title}
-              withPlaceholder
-            />
+            <div className={styles.thumbnail}>
+              <img
+                className={styles['thumbnail-img']}
+                src={item.image}
+                alt={item.title}
+              />
+            </div>
+
             <div
               style={{
                 marginLeft: 10,
@@ -118,6 +118,7 @@ const Item = memo(
             </div>
           </div>
           <div className={styles.Actions}>
+            <Handle {...handleProps} {...listeners} />
             <Edit bookmark={item} className={styles.action} />
             <Remove className={styles.action} onClick={onRemove} />
           </div>
@@ -135,6 +136,7 @@ type ItemProps = {
   dragging?: boolean;
   height?: number;
   index?: number;
+  handleProps?: any;
   fadeIn?: boolean;
   transform?: Transform | null;
   listeners?: DraggableSyntheticListeners;

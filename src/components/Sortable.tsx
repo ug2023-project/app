@@ -21,12 +21,13 @@ import {
 import Item from './dnd-kit/Item';
 import Bookmark from '@/types/Bookmark';
 import { useParams } from 'react-router-dom';
-import useTypedDispatch from '@/hooks/useTypedDispatch';
-import removeBookmark from '@/containers/Dashboard/ducks/bookmarks/actions/removeBookmark';
-import changeBookmarksOrder from '@/containers/Dashboard/ducks/bookmarks/actions/changeBookmarkOrder';
 import List from './dnd-kit/List';
 import Wrapper from './dnd-kit/Wrapper';
 import SortableItem from './SortableItem';
+import {
+  useChangeBookmarksOrderMutation,
+  useRemoveBookmarkMutation,
+} from '../services/bookmarks';
 
 const dropAnimationConfig: DropAnimation = {
   sideEffects: defaultDropAnimationSideEffects({
@@ -50,9 +51,10 @@ const Sortable = ({
   wrapperStyle = () => ({}),
   disableSorting = false,
 }: SortableProps) => {
-  const dispatch = useTypedDispatch();
+  const [changeBookmarksOrder] = useChangeBookmarksOrderMutation();
+  const [removeBookmark] = useRemoveBookmarkMutation();
   const params = useParams();
-  const collectionId = parseInt(params.collectionId as string);
+  const collectionId = params.collectionId ?? '';
 
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
   const isFirstAnnouncement = useRef(true);
@@ -60,12 +62,7 @@ const Sortable = ({
     bookmarks.findIndex((b) => b.id === id);
   const activeIndex = activeId ? getIndex(activeId) : -1;
   const handleRemove = (id: UniqueIdentifier) => {
-    dispatch(
-      removeBookmark({
-        collectionId,
-        bookmarkId: parseInt(id.toString()),
-      }),
-    );
+    removeBookmark({ collectionId, bookmarkId: id });
   };
 
   useEffect(() => {
@@ -93,18 +90,12 @@ const Sortable = ({
     }
 
     const overIndex = getIndex(over.id);
-    if (activeIndex !== overIndex) {
-      dispatch(
-        changeBookmarksOrder({
-          params: {
-            collectionId,
-          },
-          body: {
-            bookmarkIds: [parseInt(active.id.toString())],
-            index: overIndex,
-          },
-        }),
-      );
+    if (activeIndex !== overIndex && over.data.current?.type === 'bookmark') {
+      changeBookmarksOrder({
+        collectionId,
+        bookmarkId: active.id,
+        index: overIndex,
+      });
     }
   };
 

@@ -1,12 +1,6 @@
 import styles from './CollectionList.module.css';
-import useTypedDispatch from '@/hooks/useTypedDispatch';
-import { Fragment, useEffect } from 'react';
-import useTypedSelector from '@/hooks/useTypedSelector';
+import { Fragment } from 'react';
 import { Resizable } from 're-resizable';
-import {
-  selectCustomCollections,
-  selectDefaultCollections,
-} from '@/redux/selectors';
 import CollectionListMenu from './CollectionListMenu';
 import { SortableTree } from '@/components/Tree/SortableTree';
 import { Divider } from '@mantine/core';
@@ -25,6 +19,7 @@ function buildTree(collections: Collection[]): TreeItems {
   const treeItemsWithChildren = collections.map((c) => ({
     id: c.id,
     title: c.title,
+    bookmarks: c.count,
     children: getChildren(collections, c.id),
     collapsed: c.collapsed,
     parentId: c.parentId,
@@ -41,13 +36,18 @@ function getChildren(
     .map((c) => ({
       id: c.id,
       title: c.title,
+      bookmarks: c.count,
       children: getChildren(collections, c.id),
       collapsed: c.collapsed,
     }));
 }
 
 const CollectionList = () => {
-  const { data: collections = [] } = useGetCollectionsQuery();
+  const { data: collections = [] } = useGetCollectionsQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+    refetchOnFocus: true,
+    refetchOnReconnect: true,
+  });
 
   const defaultCollections = buildTree(
     collections.filter((c) => CUSTOM_COLLECTIONS_IDS.includes(c.id)),

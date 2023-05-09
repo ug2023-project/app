@@ -4,6 +4,7 @@ import type { UniqueIdentifier } from '@dnd-kit/core';
 export type TreeItem = {
   id: UniqueIdentifier;
   title: string;
+  bookmarks: number;
   children: TreeItem[];
   collapsed?: boolean;
 };

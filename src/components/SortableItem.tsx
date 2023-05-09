@@ -24,6 +24,7 @@ const SortableItem = ({
     setNodeRef,
     transform,
     transition,
+    setActivatorNodeRef,
   } = useSortable({
     id,
     animateLayoutChanges,
@@ -46,6 +47,9 @@ const SortableItem = ({
       transition={transition}
       wrapperStyle={wrapperStyle?.({ index, isDragging, active, id })}
       listeners={listeners}
+      handleProps={{
+        ref: setActivatorNodeRef,
+      }}
       data-index={index}
       data-id={id}
       dragOverlay={!useDragOverlay && isDragging}

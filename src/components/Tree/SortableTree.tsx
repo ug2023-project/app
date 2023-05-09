@@ -135,12 +135,6 @@ export function SortableTree({
       ) as FlattenedItem[];
       const overIndex = clonedItems.findIndex(({ id }) => id === over.id);
 
-      console.log({
-        parentId: parentId,
-        collectionId: active.id,
-        index: overIndex,
-      });
-
       moveCollection({
         parentId: parentId,
         collectionId: active.id,
@@ -185,7 +179,7 @@ export function SortableTree({
 
   return (
     <SortableContext items={sortedIds} strategy={verticalListSortingStrategy}>
-      {flattenedItems.map(({ id, title, children, collapsed, depth }) => (
+      {flattenedItems.map(({ id, title, children, collapsed, depth, bookmarks }) => (
         <TreeItem
           key={id}
           id={id}
@@ -195,6 +189,7 @@ export function SortableTree({
           collapsed={Boolean(collapsed && children.length)}
           onCollapse={children.length ? () => handleCollapse(id) : undefined}
           draggable={!dragDisabled}
+          bookmarks={bookmarks}
         />
       ))}
       {createPortal(

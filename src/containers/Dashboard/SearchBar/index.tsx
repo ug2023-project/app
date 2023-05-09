@@ -3,10 +3,9 @@ import styles from './SearchBar.module.css';
 import AutocompleteCollection from '../AutocompleteCollection';
 import { useEffect } from 'react';
 import { BsFillStarFill } from 'react-icons/bs';
-import useTypedDispatch from '@/hooks/useTypedDispatch';
 import { useParams } from 'react-router-dom';
 import { useValidatedState } from '@mantine/hooks';
-import createBookmark from '../ducks/bookmarks/actions/createBookmark';
+import { useCreateBookmarkMutation } from '../../../services/bookmarks';
 
 const handleDefaultValue = async () => {
   const clipboard = await navigator.clipboard.readText();
@@ -15,6 +14,7 @@ const handleDefaultValue = async () => {
 };
 
 const SearchBar = () => {
+  const [createBookmark] = useCreateBookmarkMutation();
   const [{ value, valid }, setValue] = useValidatedState(
     '',
     (value) => {
@@ -26,15 +26,11 @@ const SearchBar = () => {
     true,
   );
 
-  const dispatch = useTypedDispatch();
-
   const { collectionId } = useParams();
 
   const createBookmarkHandler = (url: string) => {
-    if (collectionId === undefined) {
-      return;
-    }
-    dispatch(createBookmark({ collectionId, bookmark: { link: url } }));
+    if (collectionId === undefined) return;
+    createBookmark({ collectionId, link: url });
     setValue('');
   };
 
