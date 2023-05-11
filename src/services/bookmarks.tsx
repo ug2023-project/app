@@ -9,6 +9,7 @@ import equal from 'fast-deep-equal';
 import axios from '../utils/axios/axiosConfig';
 import { IconCheck } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
+import { XMarkIcon } from '@heroicons/react/24/solid';
 
 const TEMPORARY_ID = 'TEMPORARY_ID';
 const createTemporaryCollection = (
@@ -254,6 +255,54 @@ export const api = createApi({
       },
     }),
 
+    addBookmarkToFavorite: build.mutation<void, AddBookmarkToFavorite>({
+      query: ({ bookmarkId }) => ({
+        url: `bookmarks/${bookmarkId}/favorite`,
+        method: 'POST',
+      }),
+      async onQueryStarted(
+        { bookmarkId, collectionId, favorite },
+        { dispatch, queryFulfilled },
+      ) {
+        const patchBookmark = dispatch(
+          api.util.updateQueryData(
+            'getBookmarks',
+            { collectionId },
+            (draft) => {
+              const bookmarkToPatch = draft.find((x) => x.id === bookmarkId);
+
+              if (!bookmarkToPatch) {
+                throw new Error('Bookmark not found, should not be there');
+              }
+
+              bookmarkToPatch.favorite = !bookmarkToPatch.favorite;
+            },
+          ),
+        );
+        try {
+          await queryFulfilled;
+          notifications.show({
+            color: 'teal',
+            title: 'Success',
+            message: favorite ? 'Added to favorites' : 'Removed from favorites',
+            icon: <IconCheck size="1rem" />,
+            autoClose: 1500,
+          });
+        } catch {
+          notifications.show({
+            color: 'red',
+            title: 'Fail',
+            message: favorite
+              ? 'Failed to add to favorites'
+              : 'Failed to remove from favorites',
+            icon: <XMarkIcon className="h-4 w-4" />,
+            autoClose: 1500,
+          });
+          patchBookmark.undo();
+        }
+      },
+    }),
+
     moveBookmark: build.mutation<void, MoveBookmark>({
       query: ({ collectionId, ...patch }) => ({
         url: `collections/${collectionId}/move-bookmark`,
@@ -347,6 +396,68 @@ export const api = createApi({
         } catch {
           patchBookmarks.undo();
           patchCollections.undo();
+        }
+      },
+    }),
+
+    updateBookmark: build.mutation<void, UpdateBookmark>({
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      query: ({ bookmarkId, collectionId, ...body }) => ({
+        url: `bookmarks/${bookmarkId}`,
+        method: 'PUT',
+        body,
+      }),
+
+      async onQueryStarted(
+        { bookmarkId, collectionId, onFinish, ...patch },
+        { dispatch, queryFulfilled },
+      ) {
+        notifications.show({
+          id: 'process-edit-bookmark',
+          loading: true,
+          title: 'Editing bookmark is being processed',
+          message: 'It may take a while',
+          autoClose: false,
+          withCloseButton: false,
+        });
+        const patchBookmark = dispatch(
+          api.util.updateQueryData(
+            'getBookmarks',
+            { collectionId },
+            (draft) => {
+              const bookmarkToPatch = draft.find((x) => x.id === bookmarkId);
+
+              if (!bookmarkToPatch) {
+                throw new Error('Bookmark not found, should not be there');
+              }
+
+              Object.assign(bookmarkToPatch, patch);
+            },
+          ),
+        );
+        try {
+          await queryFulfilled;
+          notifications.update({
+            id: 'process-edit-bookmark',
+            color: 'teal',
+            loading: false,
+            title: 'Success',
+            message: 'Edited bookmark successfully',
+            autoClose: 1500,
+            withCloseButton: true,
+          });
+          onFinish?.();
+        } catch {
+          notifications.update({
+            id: 'process-edit-bookmark',
+            color: 'red',
+            title: 'Fail',
+            message: 'Failed to edit bookmark',
+            icon: <XMarkIcon className="h-4 w-4" />,
+            autoClose: 1500,
+            withCloseButton: true,
+          });
+          patchBookmark.undo();
         }
       },
     }),
@@ -488,6 +599,8 @@ export const {
   useMoveBookmarkMutation,
   useCreateBookmarkMutation,
   useUploadFileMutation,
+  useAddBookmarkToFavoriteMutation,
+  useUpdateBookmarkMutation,
 } = api;
 
 type GetBookmarksQuery = {
@@ -505,10 +618,12 @@ type CreateBookmark = {
 type UploadFile = FormData;
 
 type UpdateBookmark = {
-  id: UniqueIdentifier;
+  bookmarkId: UniqueIdentifier;
+  collectionId: UniqueIdentifier;
   title?: string;
   description?: string;
   tags?: string[];
+  onFinish?: () => void;
 };
 
 type CreateCollection = {
@@ -537,4 +652,10 @@ type MoveBookmark = {
   collectionId: UniqueIdentifier;
   bookmarkId: UniqueIdentifier;
   newCollectionId: UniqueIdentifier;
+};
+
+type AddBookmarkToFavorite = {
+  collectionId: UniqueIdentifier;
+  bookmarkId: UniqueIdentifier;
+  favorite: boolean;
 };

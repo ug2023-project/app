@@ -4,9 +4,12 @@ import Action, { ActionProps } from '../Action';
 import Bookmark from '@/types/Bookmark';
 import { PencilIcon } from '@heroicons/react/24/solid';
 import { isNotEmpty, useForm } from '@mantine/form';
+import { useUpdateBookmarkMutation } from '../../../../../services/bookmarks';
 
 const Edit = ({ bookmark, ...props }: EditProps) => {
   const [opened, { open, close }] = useDisclosure(false);
+  const [handleEditBookmark] = useUpdateBookmarkMutation();
+
   const editForm = useForm<EditFormValues>({
     initialValues: {
       title: bookmark.title,
@@ -19,15 +22,18 @@ const Edit = ({ bookmark, ...props }: EditProps) => {
     },
   });
 
-  const handleSubmit = (values: EditFormValues) => {
-    console.log(values);
-  };
-
   return (
     <>
       <Modal opened={opened} onClose={close} title="Edit bookmark" centered>
         <form
-          onSubmit={editForm.onSubmit(handleSubmit)}
+          onSubmit={editForm.onSubmit(({ ...newBookmark }) => {
+            handleEditBookmark({
+              bookmarkId: bookmark.id,
+              collectionId: bookmark.collectionId,
+              onFinish: close,
+              ...newBookmark,
+            });
+          })}
           className="flex flex-col gap-3"
         >
           <TextInput

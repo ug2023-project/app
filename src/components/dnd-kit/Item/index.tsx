@@ -9,6 +9,7 @@ import emphasizeText from '@/utils/emphasizeText';
 import Remove from './components/Remove';
 import Edit from './components/Edit';
 import Handle from './components/Handle';
+import Favorite from './components/Favorite';
 
 const Item = memo(
   forwardRef<HTMLDivElement, ItemProps>(
@@ -32,6 +33,7 @@ const Item = memo(
       },
       ref,
     ) => {
+      console.log(item);
       useEffect(() => {
         if (!dragOverlay) {
           return;
@@ -119,6 +121,7 @@ const Item = memo(
           </div>
           <div className={styles.Actions}>
             <Handle {...handleProps} {...listeners} />
+            <Favorite bookmark={item} className={styles.action} />
             <Edit bookmark={item} className={styles.action} />
             <Remove className={styles.action} onClick={onRemove} />
           </div>

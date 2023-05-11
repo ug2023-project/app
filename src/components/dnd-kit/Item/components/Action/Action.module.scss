@@ -23,6 +23,9 @@ $focused-outline-color: #4c9ffe;
       svg {
         fill: #6f7b88;
       }
+      .starIcon {
+        fill: #ffd27d;
+      }
     }
   }
 
@@ -32,6 +35,10 @@ $focused-outline-color: #4c9ffe;
     height: 100%;
     overflow: visible;
     fill: #919eab;
+  }
+
+  .starIcon {
+    fill: #ffd27d;
   }
 
   &:active {
