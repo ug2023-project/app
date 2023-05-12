@@ -11,7 +11,6 @@ const SortableItem = ({
   id,
   index,
   onRemove,
-  useDragOverlay,
   wrapperStyle,
   disableSorting = false,
 }: SortableItemProps) => {
@@ -40,7 +39,6 @@ const SortableItem = ({
       disabled={disabled}
       dragging={isDragging}
       sorting={isSorting}
-      index={index}
       onRemove={() => onRemove(id)}
       transform={disableSorting ? null : transform}
       transition={transition}
@@ -48,7 +46,7 @@ const SortableItem = ({
       listeners={listeners}
       data-index={index}
       data-id={id}
-      dragOverlay={!useDragOverlay && isDragging}
+      dragOverlay={isDragging}
       {...attributes}
     />
   );
@@ -60,7 +58,6 @@ type SortableItemProps = {
   disabled?: boolean;
   id: UniqueIdentifier;
   index: number;
-  useDragOverlay?: boolean;
   onRemove(id: UniqueIdentifier): void;
   wrapperStyle: SortableProps['wrapperStyle'];
   disableSorting?: boolean;

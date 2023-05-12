@@ -1,21 +1,22 @@
 import { Modal, Text } from '@mantine/core';
 import CollectionForm from './CollectionForm';
-import useTypedDispatch from '@/hooks/useTypedDispatch';
 import { UniqueIdentifier } from '@dnd-kit/core';
-import { selectCollectionById } from '@/redux/selectors';
-import useTypedSelector from '@/hooks/useTypedSelector';
-import editCollection from '@/containers/Dashboard/ducks/collections/actions/editCollection';
+import {
+  useGetCollectionsQuery,
+  useUpdateCollectionMutation,
+} from '../../../services/bookmarks';
 
 const EditCollectionModal = ({
   id,
   isModalOpen,
   setIsModalOpen,
 }: EditCollectionModalProps) => {
-  const collection = useTypedSelector(selectCollectionById(id));
-  const dispatch = useTypedDispatch();
+  const { data: collections } = useGetCollectionsQuery();
+  const collection = collections?.find((c) => c.id === id);
+  const [updateCollection] = useUpdateCollectionMutation();
 
   const handleEditCollection = async ({ title }: { title: string }) => {
-    dispatch(editCollection({ body: { title }, collectionId: id }));
+    updateCollection({ id, title });
     setIsModalOpen(false);
   };
 

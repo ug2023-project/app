@@ -9,6 +9,7 @@ import {
 } from '@heroicons/react/24/solid';
 
 import styles from './SortMenu.module.css';
+import { useCallback } from 'react';
 
 const baseOptions: SortOption[] = [
   {
@@ -38,8 +39,16 @@ const baseOptions: SortOption[] = [
 ];
 
 const useGetSortOptions = () => {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const isInSearchMode = searchParams.get('search') !== null;
+  const selectedSort = searchParams.get('sortBy');
+
+  const handleSortChange = useCallback(
+    (sortBy: string) => {
+      setSearchParams(sortBy ? { ...searchParams, sortBy } : searchParams);
+    },
+    [setSearchParams],
+  );
 
   const baseOption: SortOption = isInSearchMode
     ? {
@@ -55,7 +64,7 @@ const useGetSortOptions = () => {
 
   const sortOptions = [baseOption, ...baseOptions];
 
-  return sortOptions;
+  return { sortOptions, selectedSort, handleSortChange };
 };
 
 type SortOption = {

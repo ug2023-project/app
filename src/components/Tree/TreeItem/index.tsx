@@ -1,4 +1,4 @@
-import React, { CSSProperties, HTMLAttributes, useState } from 'react';
+import React, { CSSProperties, HTMLAttributes, memo, useState } from 'react';
 import { AnimateLayoutChanges, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { iOS } from '../utilities';
@@ -11,21 +11,25 @@ import { BsThreeDots } from 'react-icons/bs';
 import CreateCollectionModal from '@/components/Modals/CollectionModal/CreateCollectionModal';
 import EditCollectionModal from '@/components/Modals/CollectionModal/EditCollectionModal';
 import { useNavigate, useParams } from 'react-router-dom';
-import useTypedDispatch from '@/hooks/useTypedDispatch';
-import moveBookmarksToCollection from '@/containers/Dashboard/ducks/bookmarks/actions/moveBookmarksToCollection';
 import Action from '@/components/dnd-kit/Item/components/Action';
+import { useMoveBookmarkMutation } from '../../../services/bookmarks';
 
 const animateLayoutChanges: AnimateLayoutChanges = ({
   isSorting,
   wasDragging,
 }) => !(isSorting || wasDragging);
 
-const TreeItem = ({ id, depth, draggable = true, ...props }: TreeItemProps) => {
-  const collectionId = useParams().collectionId;
+const TreeItem = ({
+  id,
+  depth,
+  draggable = true,
+  bookmarks,
+  ...props
+}: TreeItemProps) => {
+  const collectionId = useParams().collectionId ?? '';
   const navigate = useNavigate();
-  const isActive = parseInt(collectionId ?? '') === id;
-
-  const dispatch = useTypedDispatch();
+  const isActive = collectionId === id;
+  const [moveBookmark] = useMoveBookmarkMutation();
 
   const {
     attributes,
@@ -62,17 +66,11 @@ const TreeItem = ({ id, depth, draggable = true, ...props }: TreeItemProps) => {
   useDndMonitor({
     onDragEnd() {
       if (dropAttempt) {
-        dispatch(
-          moveBookmarksToCollection({
-            params: {
-              collectionId: parseInt(collectionId ?? ''),
-            },
-            body: {
-              bookmarkIds: [parseInt(active?.id.toString())],
-              collectionId: id,
-            },
-          }),
-        );
+        moveBookmark({
+          collectionId,
+          bookmarkId: active.id,
+          newCollectionId: id,
+        });
       }
     },
   });
@@ -89,6 +87,7 @@ const TreeItem = ({ id, depth, draggable = true, ...props }: TreeItemProps) => {
       ref={setDroppableNodeRef}
       style={
         {
+          border: '1px solid red',
           '--spacing': `${props.indentationWidth * depth}px`,
         } as React.CSSProperties
       }
@@ -100,7 +99,8 @@ const TreeItem = ({ id, depth, draggable = true, ...props }: TreeItemProps) => {
           dropAttempt && styles.dropTarget,
         )}
         ref={setDraggableNodeRef}
-        style={style}
+        // {...handleProps}
+        style={{ ...style, border: '1px solid green' }}
       >
         {draggable ? <Handle {...handleProps} /> : null}
         {props.onCollapse && (
@@ -120,6 +120,7 @@ const TreeItem = ({ id, depth, draggable = true, ...props }: TreeItemProps) => {
         >
           {props.value}
         </span>
+        {bookmarks && <span>{bookmarks}</span>}
         <MenuButton id={id} />
         {props.clone && props.childCount && props.childCount > 1 ? (
           <span className={styles.Count}>{props.childCount}</span>
@@ -139,9 +140,10 @@ type MenuButtonProps = {
   id: UniqueIdentifier;
 };
 
-const MenuButton = ({ id }: MenuButtonProps) => {
+const MenuButton = memo(({ id }: MenuButtonProps) => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
   return (
     <>
       <Menu shadow="md" width={200}>
@@ -178,7 +180,7 @@ const MenuButton = ({ id }: MenuButtonProps) => {
       />
     </>
   );
-};
+});
 
 type TreeItemProps = Omit<HTMLAttributes<HTMLLIElement>, 'id'> & {
   id: UniqueIdentifier;
@@ -195,6 +197,7 @@ type TreeItemProps = Omit<HTMLAttributes<HTMLLIElement>, 'id'> & {
   onCollapse?(): void;
   onRemove?(): void;
   wrapperRef?(node: HTMLLIElement): void;
+  bookmarks?: number;
 };
 
 export default TreeItem;

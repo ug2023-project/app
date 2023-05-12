@@ -10,6 +10,11 @@ const Action = forwardRef<HTMLButtonElement, ActionProps>(
       {...props}
       className={classNames(styles.Action, className)}
       tabIndex={0}
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        props.onClick?.(e);
+      }}
       style={
         {
           ...style,

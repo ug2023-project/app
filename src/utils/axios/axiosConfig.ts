@@ -1,7 +1,7 @@
 import { configure } from 'axios-hooks';
-import Axios, { AxiosError } from 'axios';
+import axios, { AxiosError } from 'axios';
 
-const axios = Axios.create({
+const instance = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   withCredentials: true,
 });
@@ -18,4 +18,4 @@ axios.interceptors.response.use(
 
 configure({ axios });
 
-export default axios;
+export default instance;

@@ -1,26 +1,25 @@
-import { useParams, useSearchParams } from 'react-router-dom';
-import styles from './BookmarkList.module.css';
-import useTypedSelector from '@/hooks/useTypedSelector';
-import { useEffect, useMemo, useState } from 'react';
-import {
-  selectCollectionBookmarks,
-  selectCurrentSearchBookmarks,
-} from '@/redux/selectors';
-import useTypedDispatch from '@/hooks/useTypedDispatch';
-import { SortableProps } from '@/components/Sortable';
+import FileUpload from '@/components/FileUpload';
+import GridContainer from '@/components/GridContainer';
+import Sortable, { SortableProps } from '@/components/Sortable';
 import {
   AnimateLayoutChanges,
   defaultAnimateLayoutChanges,
   rectSortingStrategy,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { Button } from '@mantine/core';
-import fetchCollectionBookmarksSearch from '../ducks/bookmarks/actions/fetchCollectionBookmarkSearch';
-import Sortable from '@/components/Sortable';
-import GridContainer from '@/components/GridContainer';
-import SortMenu from './SortMenu';
-import FileUpload from '@/components/FileUpload';
+import { Button, Loader } from '@mantine/core';
+import { useMemo, useState } from 'react';
 import { Accept } from 'react-dropzone';
+import { useParams, useSearchParams } from 'react-router-dom';
+import {
+  useGetBookmarksQuery,
+  useUploadFileMutation,
+} from '../../../services/bookmarks';
+import styles from './BookmarkList.module.css';
+import SortMenu from './SortMenu';
+import useGetSortOptions from './useGetSortOptions';
+import { notifications } from '@mantine/notifications';
+import { IconCheck } from '@tabler/icons-react';
 
 const listProps: Partial<SortableProps> = {
   strategy: verticalListSortingStrategy,
@@ -39,44 +38,85 @@ const gridProps: Partial<SortableProps> = {
 const BookmarkList = () => {
   const [searchParams] = useSearchParams();
   const isSearchResult = useMemo(
-    () => [...searchParams.keys()].length > 0,
+    () => searchParams.get('search') !== null,
     [searchParams],
   );
   const params = useParams();
-  const collectionId = parseInt(params.collectionId as string);
-  const dispatch = useTypedDispatch();
+  const collectionId = params.collectionId ?? '';
   const [isList, setIsList] = useState(true);
   const [props, setProps] = useState<Partial<SortableProps>>(listProps);
+  const { selectedSort } = useGetSortOptions();
 
-  const bookmarks = useTypedSelector(
-    isSearchResult
-      ? selectCurrentSearchBookmarks
-      : selectCollectionBookmarks(collectionId),
+  const { data: bookmarks } = useGetBookmarksQuery(
+    {
+      collectionId: collectionId,
+      search: searchParams.get('search') ?? '',
+      // sort: selectedSort ?? '',
+    },
+    {
+      refetchOnMountOrArgChange: true,
+      refetchOnFocus: true,
+    },
   );
 
-  useEffect(() => {
-    dispatch(
-      fetchCollectionBookmarksSearch({
-        collectionId: collectionId,
-        searchQuery: searchParams.get('search') ?? '',
-      }),
-    );
-  }, [collectionId, searchParams]);
+  const [uploadFile, { isLoading, isSuccess }] = useUploadFileMutation();
+
+  if (isLoading) {
+    notifications.show({
+      id: 'upload-file',
+      loading: true,
+      title: 'Uploading file',
+      message: 'Please wait...',
+      autoClose: false,
+      withCloseButton: false,
+    });
+  }
+  if (isSuccess) {
+    notifications.update({
+      id: 'upload-file',
+      color: 'teal',
+      title: 'Success',
+      message: 'File uploaded successfully',
+      icon: <IconCheck size="1rem" />,
+      autoClose: 2000,
+    });
+  }
 
   const animateLayoutChanges: AnimateLayoutChanges = (args) =>
     defaultAnimateLayoutChanges({ ...args, wasDragging: true });
 
   const handleFileDrop = (file: File) => {
-    console.log(file);
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('collectionId', collectionId);
+    uploadFile(formData);
   };
 
-  const handleFileUploadError = (error: string) => {
-    console.log(error);
+  const handleFileUploadError = (_: string) => {
+    notifications.show({
+      title: 'Error',
+      message: 'File upload failed',
+    });
   };
 
   const acceptedFiles: Accept = {
-    text: ['.txt', '.pdf', '.doc', '.docx', '.odt', '.rtf', '.tex'],
+    text: ['.txt', '.pdf', '.png', '.jpg', '.jpeg', '.gif', '.webp'],
   };
+
+  if (!bookmarks) {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100%',
+        }}
+      >
+        <Loader color="violet" size="xl" />
+      </div>
+    );
+  }
 
   return (
     <FileUpload
@@ -98,12 +138,18 @@ const BookmarkList = () => {
         </Button>
         <SortMenu />
       </div>
-      <Sortable
-        {...props}
-        bookmarks={bookmarks}
-        animateLayoutChanges={animateLayoutChanges}
-        disableSorting={collectionId === 0}
-      />
+      {!bookmarks ? (
+        <Loader color="violet" size="xl" />
+      ) : bookmarks.length === 0 ? (
+        <div>No bookmarks</div>
+      ) : (
+        <Sortable
+          {...props}
+          bookmarks={bookmarks}
+          animateLayoutChanges={animateLayoutChanges}
+          disableSorting={isSearchResult}
+        />
+      )}
     </FileUpload>
   );
 };

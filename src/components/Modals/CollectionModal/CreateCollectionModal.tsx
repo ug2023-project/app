@@ -1,11 +1,10 @@
 import { Modal, Text } from '@mantine/core';
-import createCollection from '@/containers/Dashboard/ducks/collections/actions/createCollection';
-import useTypedDispatch from '@/hooks/useTypedDispatch';
 import CollectionForm from './CollectionForm';
 import { UniqueIdentifier } from '@dnd-kit/core';
+import { useCreateCollectionMutation } from '../../../services/bookmarks';
 
 type CreateCollectionModalProps = {
-  parentId: UniqueIdentifier;
+  parentId?: UniqueIdentifier | null;
   isModalOpen: boolean;
   setIsModalOpen: (value: boolean) => void;
 };
@@ -15,10 +14,10 @@ const CreateCollectionModal = ({
   isModalOpen,
   setIsModalOpen,
 }: CreateCollectionModalProps) => {
-  const dispatch = useTypedDispatch();
+  const [createCollection] = useCreateCollectionMutation();
 
   const handleCreateNewCollection = async ({ title }: { title: string }) => {
-    dispatch(createCollection({ body: { title, parentId } }));
+    createCollection({ title, parentId });
     setIsModalOpen(false);
   };
 

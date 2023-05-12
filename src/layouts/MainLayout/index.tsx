@@ -18,11 +18,13 @@ const measuring = {
   },
 };
 
-export const indentationWidth = 30;
-
 const MainLayout = ({ asideContent, searchBarContent }: MainLayoutProps) => {
   const sortableSensors = [
-    useSensor(MouseSensor, {}),
+    useSensor(MouseSensor, {
+      activationConstraint: {
+        distance: 0,
+      },
+    }),
     useSensor(TouchSensor, {}),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,

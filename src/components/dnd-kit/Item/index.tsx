@@ -1,48 +1,46 @@
-import React, { forwardRef, memo, useEffect } from 'react';
+import React, { forwardRef, useEffect } from 'react';
 import classNames from 'classnames';
 import type { DraggableSyntheticListeners } from '@dnd-kit/core';
 import type { Transform } from '@dnd-kit/utilities';
 import styles from './Item.module.css';
 import Bookmark from '@/types/Bookmark';
-import { Image, Text } from '@mantine/core';
-import emphasizeText from '@/utils/emphasizeText';
+import { Text } from '@mantine/core';
 import Remove from './components/Remove';
 import Edit from './components/Edit';
+import Favorite from './components/Favorite';
 
-const Item = memo(
-  forwardRef<HTMLDivElement, ItemProps>(
-    (
-      {
-        item,
-        color,
-        dragOverlay,
-        dragging,
-        disabled,
-        fadeIn,
-        index,
-        listeners,
-        onRemove,
-        sorting,
-        transition,
-        transform,
-        wrapperStyle,
-        ...props
-      },
-      ref,
-    ) => {
-      useEffect(() => {
-        if (!dragOverlay) {
-          return;
-        }
+const Item = forwardRef<HTMLDivElement, ItemProps>(
+  (
+    {
+      item,
+      dragOverlay,
+      dragging,
+      disabled,
+      fadeIn,
+      listeners,
+      onRemove,
+      sorting,
+      transition,
+      transform,
+      wrapperStyle,
+      ...props
+    },
+    ref,
+  ) => {
+    useEffect(() => {
+      if (!dragOverlay) {
+        return;
+      }
 
-        document.body.style.cursor = 'grabbing';
+      document.body.style.cursor = 'grabbing';
 
-        return () => {
-          document.body.style.cursor = '';
-        };
-      }, [dragOverlay]);
+      return () => {
+        document.body.style.cursor = '';
+      };
+    }, [dragOverlay]);
 
-      return (
+    return (
+      <a href={item.link} target="_blank" rel="noreferrer">
         <div
           className={classNames(
             styles.Wrapper,
@@ -53,6 +51,7 @@ const Item = memo(
           style={
             {
               ...wrapperStyle,
+              border: '3px solid red',
               transition: [transition, wrapperStyle?.transition]
                 .filter(Boolean)
                 .join(', '),
@@ -62,14 +61,8 @@ const Item = memo(
               '--translate-y': transform
                 ? `${Math.round(transform.y)}px`
                 : undefined,
-              '--scale-x': transform?.scaleX
-                ? `${transform.scaleX}`
-                : undefined,
-              '--scale-y': transform?.scaleY
-                ? `${transform.scaleY}`
-                : undefined,
-              '--index': index,
-              '--color': color,
+              // '--scale-x': transform?.scaleX ? `${transform.scaleX}` : undefined,
+              // '--scale-y': transform?.scaleY ? `${transform.scaleY}` : undefined,
             } as React.CSSProperties
           }
           ref={ref}
@@ -80,61 +73,51 @@ const Item = memo(
               dragging && styles.dragging,
               dragOverlay && styles.dragOverlay,
               disabled && styles.disabled,
-              color && styles.color,
             )}
             data-cypress="draggable-item"
             {...listeners}
             {...props}
             tabIndex={0}
           >
-            <Image
-              width={40}
-              height={40}
-              mx="auto"
-              radius="md"
-              src={item.image}
-              alt={item.title}
-              withPlaceholder
-            />
+            <div className={styles.thumbnail}>
+              <img
+                className={styles['thumbnail-img']}
+                src={item.image}
+                alt={item.title}
+              />
+            </div>
+
             <div
               style={{
                 marginLeft: 10,
               }}
             >
-              {emphasizeText(item.title).map((entry, index) =>
-                entry.bold ? (
-                  <span key={index} className={styles.titleBold}>
-                    {entry.text}
-                  </span>
-                ) : (
-                  entry.text
-                ),
-              )}
-              <a href={item.link} target="_blank" rel="noreferrer">
-                <Text color="dimmed" size="sm">
-                  {item.link}
-                </Text>
-              </a>
+              <span key={item.id} className={styles.titleBold}>
+                {item.title}
+              </span>
+
+              <Text color="dimmed" size="sm">
+                {item.link}
+              </Text>
             </div>
           </div>
           <div className={styles.Actions}>
+            <Favorite bookmark={item} className={styles.action} />
             <Edit bookmark={item} className={styles.action} />
             <Remove className={styles.action} onClick={onRemove} />
           </div>
         </div>
-      );
-    },
-  ),
+      </a>
+    );
+  },
 );
 
 type ItemProps = {
   item: Bookmark;
   dragOverlay?: boolean;
-  color?: string;
   disabled?: boolean;
   dragging?: boolean;
   height?: number;
-  index?: number;
   fadeIn?: boolean;
   transform?: Transform | null;
   listeners?: DraggableSyntheticListeners;

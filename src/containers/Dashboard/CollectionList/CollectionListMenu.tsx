@@ -1,17 +1,15 @@
 import CreateCollectionModal from '@/components/Modals/CollectionModal/CreateCollectionModal';
-import useTypedDispatch from '@/hooks/useTypedDispatch';
 import { Button, Menu } from '@mantine/core';
 import { useState } from 'react';
 import { BsThreeDots } from 'react-icons/bs';
-import collapseAllCollections from '../ducks/collections/actions/collapseAllCollection';
+import { useCollapseAllCollectionsMutation } from '../../../services/bookmarks';
 
 const CollectionListMenu = () => {
+  const [collapseAllCollections] = useCollapseAllCollectionsMutation();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
-  const dispatch = useTypedDispatch();
-
   const handleCollapseAll = () => {
-    dispatch(collapseAllCollections());
+    collapseAllCollections();
   };
 
   return (
@@ -43,7 +41,6 @@ const CollectionListMenu = () => {
         <Menu.Item onClick={handleCollapseAll}>Collapse all</Menu.Item>
       </Menu.Dropdown>
       <CreateCollectionModal
-        parentId={0}
         isModalOpen={isCreateModalOpen}
         setIsModalOpen={setIsCreateModalOpen}
       />

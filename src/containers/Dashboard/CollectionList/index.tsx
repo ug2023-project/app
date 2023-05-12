@@ -1,27 +1,60 @@
 import styles from './CollectionList.module.css';
-import useTypedDispatch from '@/hooks/useTypedDispatch';
-import { Fragment, useEffect } from 'react';
-import useTypedSelector from '@/hooks/useTypedSelector';
+import { Fragment } from 'react';
 import { Resizable } from 're-resizable';
-import {
-  selectCustomCollections,
-  selectDefaultCollections,
-} from '@/redux/selectors';
 import CollectionListMenu from './CollectionListMenu';
 import { SortableTree } from '@/components/Tree/SortableTree';
 import { Divider } from '@mantine/core';
-import fetchAllCollections from '../ducks/collections/actions/fetchAllCollections';
+import { useGetCollectionsQuery } from '../../../services/bookmarks';
+import { TreeItems } from '@/components/Tree/types';
+import Collection from '@/types/Collection';
+import { UniqueIdentifier } from '@dnd-kit/core';
+
+const CUSTOM_COLLECTIONS_IDS: UniqueIdentifier[] = [
+  'all',
+  'ungrouped',
+  'trash',
+];
+
+function buildTree(collections: Collection[]): TreeItems {
+  const treeItemsWithChildren = collections.map((c) => ({
+    id: c.id,
+    title: c.title,
+    bookmarks: c.count,
+    children: getChildren(collections, c.id),
+    collapsed: c.collapsed,
+    parentId: c.parentId,
+  }));
+  return treeItemsWithChildren.filter((c) => c.parentId === null);
+}
+
+function getChildren(
+  collections: Collection[],
+  parentId: UniqueIdentifier,
+): TreeItems {
+  return collections
+    .filter((c) => c.parentId === parentId)
+    .map((c) => ({
+      id: c.id,
+      title: c.title,
+      bookmarks: c.count,
+      children: getChildren(collections, c.id),
+      collapsed: c.collapsed,
+    }));
+}
 
 const CollectionList = () => {
-  const dispatch = useTypedDispatch();
+  const { data: collections = [] } = useGetCollectionsQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+    refetchOnFocus: true,
+    refetchOnReconnect: true,
+  });
 
-  const defaultCollections = useTypedSelector(selectDefaultCollections);
-  const customCollections = useTypedSelector(selectCustomCollections);
-
-  useEffect(() => {
-    dispatch(fetchAllCollections());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const defaultCollections = buildTree(
+    collections.filter((c) => CUSTOM_COLLECTIONS_IDS.includes(c.id)),
+  );
+  const customCollections = buildTree(
+    collections.filter((c) => !CUSTOM_COLLECTIONS_IDS.includes(c.id)),
+  );
 
   return (
     <Fragment>

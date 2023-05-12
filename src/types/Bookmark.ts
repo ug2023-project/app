@@ -1,4 +1,3 @@
-import BookmarkType from './BookmarkType';
 import { UniqueIdentifier } from '@dnd-kit/core';
 
 type Bookmark = {
@@ -7,14 +6,11 @@ type Bookmark = {
   title: string;
   description: string;
   favorite: boolean;
-  // deleted: boolean;
-  cacheUrl: string | null;
-  // authorId: number;
-  collectionId: UniqueIdentifier | null;
+  collectionId: UniqueIdentifier;
   tags: string[];
   image: string;
-  icon: string;
-  type: BookmarkType;
+  type: 'WEBSITE' | 'FILE';
+  status: 'NEW' | 'SUCCESS' | 'ERROR';
 };
 
 export default Bookmark;
