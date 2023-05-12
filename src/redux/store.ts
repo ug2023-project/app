@@ -12,12 +12,8 @@ import {
   REGISTER,
 } from 'redux-persist';
 import { api } from '../services/bookmarks';
-import bookmarkSlice from '@/containers/Dashboard/ducks/bookmarks/bookmarkSlice';
-import collectionsSlice from '@/containers/Dashboard/ducks/collections/collectionSlice';
 
 const rootReducer = combineReducers({
-  [collectionsSlice.name]: collectionsSlice.reducer,
-  [bookmarkSlice.name]: bookmarkSlice.reducer,
   [authSlice.name]: authSlice.reducer,
   [api.reducerPath]: api.reducer,
 });

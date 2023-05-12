@@ -89,7 +89,6 @@ const BookmarkList = () => {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('collectionId', collectionId);
-    console.log({ file, formData });
     uploadFile(formData);
   };
 

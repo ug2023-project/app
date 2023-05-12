@@ -27,6 +27,7 @@ const Edit = ({ bookmark, ...props }: EditProps) => {
       <Modal opened={opened} onClose={close} title="Edit bookmark" centered>
         <form
           onSubmit={editForm.onSubmit(({ ...newBookmark }) => {
+            close();
             handleEditBookmark({
               bookmarkId: bookmark.id,
               collectionId: bookmark.collectionId,

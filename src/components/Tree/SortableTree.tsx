@@ -100,9 +100,11 @@ export function SortableTree({
     () => flattenedItems.map(({ id }) => id),
     [flattenedItems],
   );
-  const activeItem = activeId
-    ? flattenedItems.find(({ id }) => id === activeId)
-    : null;
+
+  const activeItem = useMemo(
+    () => (activeId ? flattenedItems.find(({ id }) => id === activeId) : null),
+    [activeId, flattenedItems],
+  );
 
   const handleDragStart = ({
     active: { id: activeId, data },
@@ -179,19 +181,21 @@ export function SortableTree({
 
   return (
     <SortableContext items={sortedIds} strategy={verticalListSortingStrategy}>
-      {flattenedItems.map(({ id, title, children, collapsed, depth, bookmarks }) => (
-        <TreeItem
-          key={id}
-          id={id}
-          value={title}
-          depth={id === activeId && projected ? projected.depth : depth}
-          indentationWidth={indentationWidth}
-          collapsed={Boolean(collapsed && children.length)}
-          onCollapse={children.length ? () => handleCollapse(id) : undefined}
-          draggable={!dragDisabled}
-          bookmarks={bookmarks}
-        />
-      ))}
+      {flattenedItems.map(
+        ({ id, title, children, collapsed, depth, bookmarks }) => (
+          <TreeItem
+            key={id}
+            id={id}
+            value={title}
+            depth={id === activeId && projected ? projected.depth : depth}
+            indentationWidth={indentationWidth}
+            collapsed={Boolean(collapsed && children.length)}
+            onCollapse={children.length ? () => handleCollapse(id) : undefined}
+            draggable={!dragDisabled}
+            bookmarks={bookmarks}
+          />
+        ),
+      )}
       {createPortal(
         <DragOverlay dropAnimation={dropAnimationConfig}>
           {activeId && activeItem ? (

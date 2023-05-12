@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import {
@@ -29,25 +29,23 @@ import {
   useRemoveBookmarkMutation,
 } from '../services/bookmarks';
 
-const dropAnimationConfig: DropAnimation = {
-  sideEffects: defaultDropAnimationSideEffects({
-    styles: {
-      active: {
-        opacity: '0.5',
-      },
-    },
-  }),
-};
+// const dropAnimationConfig: DropAnimation = {
+//   sideEffects: defaultDropAnimationSideEffects({
+//     styles: {
+//       active: {
+//         opacity: '0.5',
+//       },
+//     },
+//   }),
+// };
 
 const Sortable = ({
   animateLayoutChanges,
-  adjustScale = false,
+  // adjustScale = false,
   Container = List,
-  dropAnimation = dropAnimationConfig,
+  // dropAnimation = dropAnimationConfig,
   bookmarks = [],
   strategy = rectSortingStrategy,
-  style,
-  useDragOverlay = true,
   wrapperStyle = () => ({}),
   disableSorting = false,
 }: SortableProps) => {
@@ -57,19 +55,12 @@ const Sortable = ({
   const collectionId = params.collectionId ?? '';
 
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
-  const isFirstAnnouncement = useRef(true);
   const getIndex = (id: UniqueIdentifier) =>
     bookmarks.findIndex((b) => b.id === id);
   const activeIndex = activeId ? getIndex(activeId) : -1;
   const handleRemove = (id: UniqueIdentifier) => {
     removeBookmark({ collectionId, bookmarkId: id });
   };
-
-  useEffect(() => {
-    if (!activeId) {
-      isFirstAnnouncement.current = true;
-    }
-  }, [activeId]);
 
   const handleDragStart = ({ active }: DragStartEvent) => {
     if (!active || active.data.current?.type !== 'bookmark') {
@@ -117,7 +108,7 @@ const Sortable = ({
 
   return (
     <>
-      <Wrapper style={style} center>
+      <Wrapper style={{ border: '1px solid red', height: '100%' }} center>
         <SortableContext items={bookmarks} strategy={strategy}>
           <Container>
             {bookmarks.map((value, index) => (
@@ -129,35 +120,29 @@ const Sortable = ({
                 wrapperStyle={wrapperStyle}
                 onRemove={handleRemove}
                 animateLayoutChanges={animateLayoutChanges}
-                useDragOverlay={useDragOverlay}
                 disableSorting={disableSorting}
               />
             ))}
           </Container>
         </SortableContext>
       </Wrapper>
-      {useDragOverlay
-        ? createPortal(
-            <DragOverlay
-              adjustScale={adjustScale}
-              dropAnimation={dropAnimation}
-            >
-              {activeId ? (
-                <Item
-                  item={bookmarks.find((b) => b.id === activeId) as Bookmark}
-                  wrapperStyle={wrapperStyle({
-                    active: { id: activeId },
-                    index: activeIndex,
-                    isDragging: true,
-                    id: bookmarks.findIndex((b) => b.id === activeId),
-                  })}
-                  dragOverlay
-                />
-              ) : null}
-            </DragOverlay>,
-            document.body,
-          )
-        : null}
+      {createPortal(
+        <DragOverlay>
+          {activeId ? (
+            <Item
+              item={bookmarks.find((b) => b.id === activeId) as Bookmark}
+              wrapperStyle={wrapperStyle({
+                active: { id: activeId },
+                index: activeIndex,
+                isDragging: true,
+                id: bookmarks.findIndex((b) => b.id === activeId),
+              })}
+              dragOverlay
+            />
+          ) : null}
+        </DragOverlay>,
+        document.body,
+      )}
     </>
   );
 };
@@ -169,8 +154,6 @@ export type SortableProps = {
   dropAnimation?: DropAnimation | null;
   bookmarks: Bookmark[];
   strategy?: SortingStrategy;
-  style?: React.CSSProperties;
-  useDragOverlay?: boolean;
   wrapperStyle?(args: {
     active: Pick<Active, 'id'> | null;
     index: number;

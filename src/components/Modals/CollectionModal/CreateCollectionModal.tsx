@@ -1,5 +1,4 @@
 import { Modal, Text } from '@mantine/core';
-import useTypedDispatch from '@/hooks/useTypedDispatch';
 import CollectionForm from './CollectionForm';
 import { UniqueIdentifier } from '@dnd-kit/core';
 import { useCreateCollectionMutation } from '../../../services/bookmarks';

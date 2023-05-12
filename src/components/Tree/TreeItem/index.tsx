@@ -1,4 +1,4 @@
-import React, { CSSProperties, HTMLAttributes, useState } from 'react';
+import React, { CSSProperties, HTMLAttributes, memo, useState } from 'react';
 import { AnimateLayoutChanges, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { iOS } from '../utilities';
@@ -19,7 +19,13 @@ const animateLayoutChanges: AnimateLayoutChanges = ({
   wasDragging,
 }) => !(isSorting || wasDragging);
 
-const TreeItem = ({ id, depth, draggable = true, ...props }: TreeItemProps) => {
+const TreeItem = ({
+  id,
+  depth,
+  draggable = true,
+  bookmarks,
+  ...props
+}: TreeItemProps) => {
   const collectionId = useParams().collectionId ?? '';
   const navigate = useNavigate();
   const isActive = collectionId === id;
@@ -81,6 +87,7 @@ const TreeItem = ({ id, depth, draggable = true, ...props }: TreeItemProps) => {
       ref={setDroppableNodeRef}
       style={
         {
+          border: '1px solid red',
           '--spacing': `${props.indentationWidth * depth}px`,
         } as React.CSSProperties
       }
@@ -92,7 +99,8 @@ const TreeItem = ({ id, depth, draggable = true, ...props }: TreeItemProps) => {
           dropAttempt && styles.dropTarget,
         )}
         ref={setDraggableNodeRef}
-        style={style}
+        // {...handleProps}
+        style={{ ...style, border: '1px solid green' }}
       >
         {draggable ? <Handle {...handleProps} /> : null}
         {props.onCollapse && (
@@ -112,7 +120,7 @@ const TreeItem = ({ id, depth, draggable = true, ...props }: TreeItemProps) => {
         >
           {props.value}
         </span>
-        <div>{props.bookmarks}</div>
+        {bookmarks && <span>{bookmarks}</span>}
         <MenuButton id={id} />
         {props.clone && props.childCount && props.childCount > 1 ? (
           <span className={styles.Count}>{props.childCount}</span>
@@ -132,9 +140,10 @@ type MenuButtonProps = {
   id: UniqueIdentifier;
 };
 
-const MenuButton = ({ id }: MenuButtonProps) => {
+const MenuButton = memo(({ id }: MenuButtonProps) => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
   return (
     <>
       <Menu shadow="md" width={200}>
@@ -171,7 +180,7 @@ const MenuButton = ({ id }: MenuButtonProps) => {
       />
     </>
   );
-};
+});
 
 type TreeItemProps = Omit<HTMLAttributes<HTMLLIElement>, 'id'> & {
   id: UniqueIdentifier;
@@ -188,7 +197,7 @@ type TreeItemProps = Omit<HTMLAttributes<HTMLLIElement>, 'id'> & {
   onCollapse?(): void;
   onRemove?(): void;
   wrapperRef?(node: HTMLLIElement): void;
-  bookmarks: number;
+  bookmarks?: number;
 };
 
 export default TreeItem;

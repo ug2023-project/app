@@ -11,7 +11,6 @@ const SortableItem = ({
   id,
   index,
   onRemove,
-  useDragOverlay,
   wrapperStyle,
   disableSorting = false,
 }: SortableItemProps) => {
@@ -24,7 +23,6 @@ const SortableItem = ({
     setNodeRef,
     transform,
     transition,
-    setActivatorNodeRef,
   } = useSortable({
     id,
     animateLayoutChanges,
@@ -41,18 +39,14 @@ const SortableItem = ({
       disabled={disabled}
       dragging={isDragging}
       sorting={isSorting}
-      index={index}
       onRemove={() => onRemove(id)}
       transform={disableSorting ? null : transform}
       transition={transition}
       wrapperStyle={wrapperStyle?.({ index, isDragging, active, id })}
       listeners={listeners}
-      handleProps={{
-        ref: setActivatorNodeRef,
-      }}
       data-index={index}
       data-id={id}
-      dragOverlay={!useDragOverlay && isDragging}
+      dragOverlay={isDragging}
       {...attributes}
     />
   );
@@ -64,7 +58,6 @@ type SortableItemProps = {
   disabled?: boolean;
   id: UniqueIdentifier;
   index: number;
-  useDragOverlay?: boolean;
   onRemove(id: UniqueIdentifier): void;
   wrapperStyle: SortableProps['wrapperStyle'];
   disableSorting?: boolean;
