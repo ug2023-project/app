@@ -6,13 +6,14 @@ import classNames from 'classnames';
 import styles from '@/components/Tree/TreeItem/TreeItem.module.scss';
 import Handle from '@/components/dnd-kit/Item/components/Handle';
 import { UniqueIdentifier, useDndMonitor } from '@dnd-kit/core';
-import { Button, Menu } from '@mantine/core';
+import { Menu } from '@mantine/core';
 import { BsThreeDots } from 'react-icons/bs';
 import CreateCollectionModal from '@/components/Modals/CollectionModal/CreateCollectionModal';
 import EditCollectionModal from '@/components/Modals/CollectionModal/EditCollectionModal';
 import { useNavigate, useParams } from 'react-router-dom';
 import Action from '@/components/dnd-kit/Item/components/Action';
 import { useMoveBookmarkMutation } from '../../../services/bookmarks';
+import { useTranslation } from 'react-i18next';
 
 const animateLayoutChanges: AnimateLayoutChanges = ({
   isSorting,
@@ -87,7 +88,6 @@ const TreeItem = ({
       ref={setDroppableNodeRef}
       style={
         {
-          border: '1px solid red',
           '--spacing': `${props.indentationWidth * depth}px`,
         } as React.CSSProperties
       }
@@ -100,7 +100,7 @@ const TreeItem = ({
         )}
         ref={setDraggableNodeRef}
         // {...handleProps}
-        style={{ ...style, border: '1px solid green' }}
+        style={{ ...style }}
       >
         {draggable ? <Handle {...handleProps} /> : null}
         {props.onCollapse && (
@@ -124,7 +124,7 @@ const TreeItem = ({
         >
           {props.value}
         </span>
-        {bookmarks && <span>{bookmarks}</span>}
+        <span className={styles.Count}>{bookmarks}</span>
         <MenuButton id={id} />
         {props.clone && props.childCount && props.childCount > 1 ? (
           <span className={styles.Count}>{props.childCount}</span>
@@ -145,30 +145,40 @@ type MenuButtonProps = {
 };
 
 const MenuButton = memo(({ id }: MenuButtonProps) => {
+  const { t } = useTranslation();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   return (
     <>
-      <Menu shadow="md" width={200}>
+      <Menu
+        shadow="md"
+        width={200}
+        styles={{
+          dropdown: {
+            background: '#f9f9ff',
+          },
+        }}
+      >
         <Menu.Target>
-          <Button size="xs" compact>
+          <Action className="ml-3">
             <BsThreeDots />
-          </Button>
+          </Action>
         </Menu.Target>
 
         <Menu.Dropdown
           style={{
             marginLeft: '80px',
           }}
+          className={styles.menu}
         >
-          <Menu.Item>Open all bookmarks</Menu.Item>
+          <Menu.Item>{t('OpenAllBookmarks')}</Menu.Item>
           <Menu.Divider />
           <Menu.Item onClick={() => setIsCreateModalOpen(true)}>
-            Create nested collections
+            {t('CreateNestedCollections')}
           </Menu.Item>
           <Menu.Item onClick={() => setIsEditModalOpen(true)}>
-            Edit collection
+            {t('EditCollection')}
           </Menu.Item>
         </Menu.Dropdown>
       </Menu>
@@ -202,7 +212,7 @@ type TreeItemProps = Omit<HTMLAttributes<HTMLLIElement>, 'id' | 'color'> & {
   onRemove?(): void;
   wrapperRef?(node: HTMLLIElement): void;
   bookmarks?: number;
-  color: string | null;
+  color: string;
 };
 
 export default TreeItem;

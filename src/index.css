@@ -4,6 +4,6 @@
 
 @layer components {
   body {
-    @apply bg-gray-100;
+    @apply bg-white font-rubik text-main-700;
   }
 }

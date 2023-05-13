@@ -1,0 +1,7 @@
+.input :global(.mantine-TextInput-input) {
+  @apply rounded-md border border-[#e6eaed] text-main-600 placeholder:text-main-600 focus-visible:border-[#00175b];
+}
+
+.input :global(.mantine-ColorInput-input) {
+  @apply rounded-md border border-[#e6eaed] bg-main-400 text-main-600 placeholder:text-[#00175b] placeholder:text-main-600 focus-visible:border-[#00175b];
+}

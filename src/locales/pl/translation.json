@@ -17,5 +17,22 @@
   "Login_Error": "Nieprawidłowy email lub hasło",
   "Login_Button": "Zaloguj",
   "Register_Header": "Zarejestruj się",
-  "Register_Button": "Zarejestruj"
+  "Register_Button": "Zarejestruj",
+  "Change_View": "Zmień wygląd",
+  "Sort_By": "Sortuj według",
+  "Collections": "Kolekcje",
+  "Add": "Dodaj",
+  "Date_Added": "Data dodania",
+  "Name": "Nazwa",
+  "Relevance": "Stosowność",
+  "Default": "Domyślne",
+  "OpenAllBookmarks": "Otwórz wszystkie zakładki",
+  "CreateNestedCollections": "Utwórz zagnieżdżone kolekcje",
+  "EditCollection": "Edytuj kolekcję",
+  "Collection_Name": "Nazwa kolekcji",
+  "Color": "Kolor",
+  "Submit": "Zatwierdź",
+  "CreateNewCollection": "Utwórz nową kolekcję",
+  "CollapseAll": "Zwiń wszystkie",
+  "Collection_Name_Placeholder": "np. Zakupy, Praca.."
 }

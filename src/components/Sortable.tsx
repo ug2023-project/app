@@ -108,7 +108,7 @@ const Sortable = ({
 
   return (
     <>
-      <Wrapper style={{ border: '1px solid red', height: '100%' }} center>
+      <Wrapper style={{ height: '100%' }} center>
         <SortableContext items={bookmarks} strategy={strategy}>
           <Container>
             {bookmarks.map((value, index) => (

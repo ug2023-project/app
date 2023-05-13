@@ -7,41 +7,57 @@ import {
   ListBulletIcon,
   TagIcon,
 } from '@heroicons/react/24/solid';
-
-import styles from './SortMenu.module.css';
 import { useCallback } from 'react';
 
-const baseOptions: SortOption[] = [
-  {
-    text: 'Date added',
-    icon: <ClockIcon className={styles.icon} />,
-    indicator: <ChevronUpIcon className={styles.menuRight} />,
-    option: 'createdAt',
-  },
-  {
-    text: 'Date added',
-    icon: <ClockIcon className={styles.icon} />,
-    indicator: <ChevronDownIcon className={styles.menuRight} />,
-    option: '-createdAt',
-  },
-  {
-    text: 'Name',
-    icon: <TagIcon className={styles.icon} />,
-    indicator: <ChevronUpIcon className={styles.menuRight} />,
-    option: 'name',
-  },
-  {
-    text: 'Name',
-    icon: <TagIcon className={styles.icon} />,
-    indicator: <ChevronDownIcon className={styles.menuRight} />,
-    option: '-name',
-  },
-];
+import styles from './SortMenu.module.css';
+import { useTranslation } from 'react-i18next';
 
 const useGetSortOptions = () => {
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const isInSearchMode = searchParams.get('search') !== null;
   const selectedSort = searchParams.get('sortBy');
+
+  const baseOptions: SortOption[] = [
+    {
+      text: t('Date_Added'),
+      icon: <ClockIcon className={styles.icon} />,
+      indicator: <ChevronUpIcon className={styles.menuRight} />,
+      option: 'createdAt',
+    },
+    {
+      text: t('Date_Added'),
+      icon: <ClockIcon className={styles.icon} />,
+      indicator: <ChevronDownIcon className={styles.menuRight} />,
+      option: '-createdAt',
+    },
+    {
+      text: t('Name'),
+      icon: <TagIcon className={styles.icon} />,
+      indicator: <ChevronUpIcon className={styles.menuRight} />,
+      option: 'name',
+    },
+    {
+      text: t('Name'),
+      icon: <TagIcon className={styles.icon} />,
+      indicator: <ChevronDownIcon className={styles.menuRight} />,
+      option: '-name',
+    },
+  ];
+
+  const baseOption: SortOption = isInSearchMode
+    ? {
+        text: t('Relevance'),
+        icon: <CursorArrowRaysIcon className={styles.icon} />,
+        option: 'relevance',
+      }
+    : {
+        text: t('Default'),
+        icon: <ListBulletIcon className={styles.icon} />,
+        option: 'default',
+      };
+
+  const sortOptions = [baseOption, ...baseOptions];
 
   const handleSortChange = useCallback(
     (sortBy: string) => {
@@ -49,20 +65,6 @@ const useGetSortOptions = () => {
     },
     [setSearchParams],
   );
-
-  const baseOption: SortOption = isInSearchMode
-    ? {
-        text: 'Relevance',
-        icon: <CursorArrowRaysIcon className={styles.icon} />,
-        option: 'relevance',
-      }
-    : {
-        text: 'Default',
-        icon: <ListBulletIcon className={styles.icon} />,
-        option: 'default',
-      };
-
-  const sortOptions = [baseOption, ...baseOptions];
 
   return { sortOptions, selectedSort, handleSortChange };
 };

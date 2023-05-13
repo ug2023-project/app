@@ -6,11 +6,15 @@ import {
   useUpdateCollectionMutation,
 } from '../../../services/bookmarks';
 
+import styles from './Modal.module.css';
+import { useTranslation } from 'react-i18next';
+
 const EditCollectionModal = ({
   id,
   isModalOpen,
   setIsModalOpen,
 }: EditCollectionModalProps) => {
+  const { t } = useTranslation();
   const { data: collections } = useGetCollectionsQuery();
   const collection = collections?.find((c) => c.id === id);
   const [updateCollection] = useUpdateCollectionMutation();
@@ -27,9 +31,13 @@ const EditCollectionModal = ({
   };
 
   return (
-    <Modal opened={isModalOpen} onClose={() => setIsModalOpen(false)}>
-      <Text size="xl" weight={500} mb="md">
-        Edit collection
+    <Modal
+      opened={isModalOpen}
+      onClose={() => setIsModalOpen(false)}
+      className={styles.modal}
+    >
+      <Text size="xl" weight={500} mb="md" className="text-[#06257f]">
+        {t('EditCollection')}
       </Text>
       <CollectionForm
         onSubmit={(values) => handleEditCollection(values)}

@@ -4,6 +4,9 @@ import useAutocompleteCollection from './useAutocompleteCollection';
 import { useDebouncedValue } from '@mantine/hooks';
 import { useEffect, useState } from 'react';
 
+import styles from './Autocomplete.module.css';
+import { MagnifyingGlassIcon } from '@heroicons/react/24/solid';
+
 const AutocompleteCollection = () => {
   const { t } = useTranslation();
   const { value, handleChange } = useAutocompleteCollection();
@@ -22,6 +25,8 @@ const AutocompleteCollection = () => {
       defaultValue={value}
       value={input}
       onChange={setInput}
+      icon={<MagnifyingGlassIcon className="h-4 w-4" />}
+      className={styles.autocomplete}
     />
   );
 };

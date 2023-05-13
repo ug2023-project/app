@@ -1,11 +1,19 @@
-.languageSelect .mantine-Select-input {
-  @apply bg-main-500 text-main-200;
+.languageSelect {
+  @apply mr-3;
 }
 
-.languageSelect > :global(.mantine-Select-dropdown) {
-  @apply bg-red-400;
+.languageSelect :global(.mantine-Select-dropdown) {
+  @apply bg-main-400;
 }
 
-.languageSelect > :global(.mantine-Select-label) {
-  @apply text-main-200;
+.languageSelect :global(.mantine-Select-item) {
+  @apply bg-main-400 text-main-600;
+}
+
+.languageSelect :hover:global(.mantine-Select-item) {
+  @apply bg-main-400 font-semibold text-[#00175b];
+}
+
+.languageSelect :global(.mantine-Select-input) {
+  @apply rounded-md border border-[#e6eaed] bg-main-400 text-main-600 placeholder:text-[#00175b] placeholder:text-main-600 focus-visible:border-[#00175b];
 }

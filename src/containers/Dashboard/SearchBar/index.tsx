@@ -6,6 +6,8 @@ import { BsFillStarFill } from 'react-icons/bs';
 import { useParams } from 'react-router-dom';
 import { useValidatedState } from '@mantine/hooks';
 import { useCreateBookmarkMutation } from '../../../services/bookmarks';
+import LanguageSelect from '@/components/LanguageSelect';
+import { useTranslation } from 'react-i18next';
 
 const handleDefaultValue = async () => {
   const clipboard = await navigator.clipboard.readText();
@@ -14,6 +16,7 @@ const handleDefaultValue = async () => {
 };
 
 const SearchBar = () => {
+  const { t } = useTranslation();
   const [createBookmark] = useCreateBookmarkMutation();
   const [{ value, valid }, setValue] = useValidatedState(
     '',
@@ -48,20 +51,18 @@ const SearchBar = () => {
         </ul>
       </nav>
       <nav className={styles.mainNav}>
+        <LanguageSelect />
         <Popover width={300} trapFocus position="bottom" withArrow shadow="md">
           <Popover.Target>
-            <Button variant="outline" leftIcon={<BsFillStarFill />}>
-              Add
+            <Button
+              variant="filled"
+              leftIcon={<BsFillStarFill />}
+              className="bg-[#06257f] hover:bg-[#00175b]"
+            >
+              {t('Add')}
             </Button>
           </Popover.Target>
-          <Popover.Dropdown
-            sx={(theme) => ({
-              background:
-                theme.colorScheme === 'dark'
-                  ? theme.colors.dark[7]
-                  : theme.white,
-            })}
-          >
+          <Popover.Dropdown className="bg-[#f9f9ff]">
             <TextInput
               label="URL"
               placeholder="https://"
@@ -69,14 +70,15 @@ const SearchBar = () => {
               value={value}
               onChange={(e) => setValue(e.currentTarget.value)}
               error={!valid && 'Invalid URL'}
+              className={styles.input}
             />
             <Button
-              variant="outline"
               color="blue"
               onClick={() => createBookmarkHandler(value)}
               disabled={!valid || value === ''}
+              className="mt-2 bg-[#06257f] hover:bg-[#00175b] disabled:cursor-not-allowed disabled:bg-[#020e32] disabled:text-white"
             >
-              Add
+              {t('Add')}
             </Button>
           </Popover.Dropdown>
         </Popover>

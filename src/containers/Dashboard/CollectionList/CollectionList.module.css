@@ -1,3 +1,11 @@
 .collectionList {
-  @apply flex w-[300px] flex-col border-r border-alpha-400 bg-main-500 text-main-200;
+  @apply flex min-h-screen w-[300px] flex-col border-r border-r border-alpha-400 border-r-[#e6eaed] bg-main-500 text-main-200;
+}
+
+.menu :global(.mantine-Menu-item) {
+  @apply bg-main-500 text-[#1f2e4d];
+}
+
+.menu :hover:global(.mantine-Menu-item) {
+  @apply font-semibold text-[#00175b];
 }

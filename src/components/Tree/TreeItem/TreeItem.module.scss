@@ -36,8 +36,8 @@
   display: flex;
   align-items: center;
   padding: var(--vertical-padding) 10px;
-  background-color: #232325;
-  border: 1px solid transparent;
+  background-color: #ffffff;
+  // border: 1px solid transparent;
   margin-bottom: 2px;
   margin-top: 1px;
   color: #e5e5e6;
@@ -45,7 +45,7 @@
 
   &:hover {
     cursor: pointer;
-    background-color: #333334;
+    background: linear-gradient(180deg, #f7f9fc, rgba(242, 244, 247, 0));
   }
 }
 
@@ -58,22 +58,13 @@
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
+  color: #1f2e4d;
+  font-weight: 400;
 }
 
 .Count {
-  position: absolute;
-  top: -10px;
-  right: -10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background-color: #2389ff;
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #fff;
+  font-weight: 400;
+  color: #1f2e4d;
 }
 
 .disableInteraction {
@@ -85,7 +76,7 @@
 }
 
 .active {
-  background-color: #36373a;
+  background-color: linear-gradient(180deg, #f7f9fc, rgba(242, 244, 247, 0));
 }
 
 .disableSelection,
@@ -105,4 +96,12 @@
   &.collapsed svg {
     transform: rotate(-90deg);
   }
+}
+
+.menu :global(.mantine-Menu-item) {
+  @apply bg-main-500 text-[#1f2e4d];
+}
+
+.menu :hover:global(.mantine-Menu-item) {
+  @apply font-semibold text-[#00175b];
 }
