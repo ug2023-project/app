@@ -115,6 +115,10 @@ const TreeItem = ({
           </Action>
         )}
         <span
+          className="h-3 w-3 rounded-full"
+          style={{ backgroundColor: props.color ?? '#00ff4d' }}
+        ></span>
+        <span
           className={styles.Text}
           onClick={() => navigate(`/collections/${id}`)}
         >
@@ -182,7 +186,7 @@ const MenuButton = memo(({ id }: MenuButtonProps) => {
   );
 });
 
-type TreeItemProps = Omit<HTMLAttributes<HTMLLIElement>, 'id'> & {
+type TreeItemProps = Omit<HTMLAttributes<HTMLLIElement>, 'id' | 'color'> & {
   id: UniqueIdentifier;
   childCount?: number;
   clone?: boolean;
@@ -198,6 +202,7 @@ type TreeItemProps = Omit<HTMLAttributes<HTMLLIElement>, 'id'> & {
   onRemove?(): void;
   wrapperRef?(node: HTMLLIElement): void;
   bookmarks?: number;
+  color: string | null;
 };
 
 export default TreeItem;

@@ -15,8 +15,14 @@ const EditCollectionModal = ({
   const collection = collections?.find((c) => c.id === id);
   const [updateCollection] = useUpdateCollectionMutation();
 
-  const handleEditCollection = async ({ title }: { title: string }) => {
-    updateCollection({ id, title });
+  const handleEditCollection = async ({
+    title,
+    color,
+  }: {
+    title: string;
+    color: string;
+  }) => {
+    updateCollection({ id, color, title });
     setIsModalOpen(false);
   };
 
