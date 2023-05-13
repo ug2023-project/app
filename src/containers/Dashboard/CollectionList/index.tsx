@@ -23,6 +23,7 @@ function buildTree(collections: Collection[]): TreeItems {
     children: getChildren(collections, c.id),
     collapsed: c.collapsed,
     parentId: c.parentId,
+    color: c.color,
   }));
   return treeItemsWithChildren.filter((c) => c.parentId === null);
 }
@@ -39,6 +40,7 @@ function getChildren(
       bookmarks: c.count,
       children: getChildren(collections, c.id),
       collapsed: c.collapsed,
+      color: c.color,
     }));
 }
 
@@ -48,6 +50,8 @@ const CollectionList = () => {
     refetchOnFocus: true,
     refetchOnReconnect: true,
   });
+
+  console.log(collections);
 
   const defaultCollections = buildTree(
     collections.filter((c) => CUSTOM_COLLECTIONS_IDS.includes(c.id)),
