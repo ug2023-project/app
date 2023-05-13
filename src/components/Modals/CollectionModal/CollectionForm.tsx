@@ -1,11 +1,16 @@
-import { Button, Group, TextInput } from '@mantine/core';
+import { Button, ColorInput, Group, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import Collection from '@/types/Collection';
+import useColorLocalStorage from '@/hooks/useColorLocalStorage';
 
 const CollectionForm = ({ onSubmit, collection }: CollectionFormProps) => {
+  const { colorsLocalStorage, handleColorLocalStorageChange } =
+    useColorLocalStorage();
+
   const collectionForm = useForm({
     initialValues: {
       title: collection?.title || '',
+      color: collection?.color || '#00ff4d',
     },
 
     validate: {
@@ -14,12 +19,24 @@ const CollectionForm = ({ onSubmit, collection }: CollectionFormProps) => {
   });
 
   return (
-    <form onSubmit={collectionForm.onSubmit((values) => onSubmit(values))}>
+    <form
+      onSubmit={collectionForm.onSubmit((values) => {
+        onSubmit(values);
+        handleColorLocalStorageChange(values.color);
+      })}
+    >
       <TextInput
         withAsterisk
         label="Title"
         placeholder="e.g. Inspiration, shopping.."
         {...collectionForm.getInputProps('title')}
+      />
+      <ColorInput
+        format="hex"
+        disallowInput
+        label="Color"
+        swatches={colorsLocalStorage}
+        {...collectionForm.getInputProps('color')}
       />
       <Group position="right" mt="md">
         <Button type="submit">Submit</Button>
@@ -29,7 +46,7 @@ const CollectionForm = ({ onSubmit, collection }: CollectionFormProps) => {
 };
 
 type CollectionFormProps = {
-  onSubmit: ({ title }: { title: string }) => void;
+  onSubmit: ({ title, color }: { title: string; color: string }) => void;
   collection?: Collection;
 };
 

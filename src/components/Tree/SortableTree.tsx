@@ -182,7 +182,7 @@ export function SortableTree({
   return (
     <SortableContext items={sortedIds} strategy={verticalListSortingStrategy}>
       {flattenedItems.map(
-        ({ id, title, children, collapsed, depth, bookmarks }) => (
+        ({ id, title, children, collapsed, depth, bookmarks, color }) => (
           <TreeItem
             key={id}
             id={id}
@@ -193,6 +193,7 @@ export function SortableTree({
             onCollapse={children.length ? () => handleCollapse(id) : undefined}
             draggable={!dragDisabled}
             bookmarks={bookmarks}
+            color={color}
           />
         ),
       )}
@@ -206,6 +207,7 @@ export function SortableTree({
               childCount={getChildCount(items, activeId) + 1}
               value={activeItem.title}
               indentationWidth={indentationWidth}
+              color={activeItem.color}
             />
           ) : null}
         </DragOverlay>,

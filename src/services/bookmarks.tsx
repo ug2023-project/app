@@ -14,13 +14,14 @@ import { XMarkIcon } from '@heroicons/react/24/solid';
 const TEMPORARY_ID = 'TEMPORARY_ID';
 const createTemporaryCollection = (
   title: string,
+  color: string,
   parentId?: UniqueIdentifier | null,
 ): Collection => ({
   id: TEMPORARY_ID,
   parentId: parentId ?? null,
   title,
   cover: null,
-  color: null,
+  color,
   count: 0,
   collapsed: false,
   createdAt: new Date().toISOString(),
@@ -65,13 +66,20 @@ export const api = createApi({
         method: 'POST',
         body,
       }),
-      async onQueryStarted({ title, parentId }, { dispatch, queryFulfilled }) {
+      async onQueryStarted(
+        { title, parentId, color },
+        { dispatch, queryFulfilled },
+      ) {
         const patchResult = dispatch(
           api.util.updateQueryData('getCollections', undefined, (draft) => {
             const parentCollectionIndex = draft.findIndex(
               (collection) => collection.id === parentId,
             );
-            const newCollection = createTemporaryCollection(title, parentId);
+            const newCollection = createTemporaryCollection(
+              title,
+              color,
+              parentId,
+            );
             draft.splice(parentCollectionIndex + 1, 0, newCollection);
           }),
         );
@@ -629,11 +637,13 @@ type UpdateBookmark = {
 type CreateCollection = {
   title: string;
   parentId?: UniqueIdentifier | null;
+  color: string;
 };
 
 type UpdateCollection = {
   id: UniqueIdentifier;
   title: string;
+  color: string;
 };
 
 type MoveCollection = {

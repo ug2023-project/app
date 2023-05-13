@@ -3,12 +3,6 @@ import CollectionForm from './CollectionForm';
 import { UniqueIdentifier } from '@dnd-kit/core';
 import { useCreateCollectionMutation } from '../../../services/bookmarks';
 
-type CreateCollectionModalProps = {
-  parentId?: UniqueIdentifier | null;
-  isModalOpen: boolean;
-  setIsModalOpen: (value: boolean) => void;
-};
-
 const CreateCollectionModal = ({
   parentId,
   isModalOpen,
@@ -16,8 +10,14 @@ const CreateCollectionModal = ({
 }: CreateCollectionModalProps) => {
   const [createCollection] = useCreateCollectionMutation();
 
-  const handleCreateNewCollection = async ({ title }: { title: string }) => {
-    createCollection({ title, parentId });
+  const handleCreateNewCollection = async ({
+    title,
+    color,
+  }: {
+    title: string;
+    color: string;
+  }) => {
+    createCollection({ title, color, parentId });
     setIsModalOpen(false);
   };
 
@@ -31,6 +31,12 @@ const CreateCollectionModal = ({
       />
     </Modal>
   );
+};
+
+type CreateCollectionModalProps = {
+  parentId?: UniqueIdentifier | null;
+  isModalOpen: boolean;
+  setIsModalOpen: (value: boolean) => void;
 };
 
 export default CreateCollectionModal;

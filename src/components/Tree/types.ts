@@ -7,6 +7,7 @@ export type TreeItem = {
   bookmarks?: number;
   children: TreeItem[];
   collapsed?: boolean;
+  color: string | null;
 };
 
 export type TreeItems = TreeItem[];
