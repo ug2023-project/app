@@ -1,0 +1,7 @@
+.modal :global(.mantine-Modal-content) {
+  @apply bg-main-400;
+}
+
+.modal :global(.mantine-Modal-header) {
+  @apply bg-main-400;
+}

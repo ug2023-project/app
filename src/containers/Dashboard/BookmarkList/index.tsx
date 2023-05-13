@@ -20,6 +20,7 @@ import SortMenu from './SortMenu';
 import useGetSortOptions from './useGetSortOptions';
 import { notifications } from '@mantine/notifications';
 import { IconCheck } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
 
 const listProps: Partial<SortableProps> = {
   strategy: verticalListSortingStrategy,
@@ -37,6 +38,7 @@ const gridProps: Partial<SortableProps> = {
 
 const BookmarkList = () => {
   const [searchParams] = useSearchParams();
+  const { t } = useTranslation();
   const isSearchResult = useMemo(
     () => searchParams.get('search') !== null,
     [searchParams],
@@ -132,9 +134,9 @@ const BookmarkList = () => {
             setIsList(!isList);
             setProps(isList ? gridProps : listProps);
           }}
-          style={{ border: '1px solid green' }}
+          className="bg-[#06257f] hover:bg-[#00175b]"
         >
-          Change view
+          {t('Change_View')}
         </Button>
         <SortMenu />
       </div>

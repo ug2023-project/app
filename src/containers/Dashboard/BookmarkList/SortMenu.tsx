@@ -3,20 +3,29 @@ import { Button, Menu } from '@mantine/core';
 
 import styles from './SortMenu.module.css';
 import useGetSortOptions from './useGetSortOptions';
+import { useTranslation } from 'react-i18next';
 
 const SortMenu = () => {
+  const { t } = useTranslation();
   const { sortOptions, handleSortChange } = useGetSortOptions();
   return (
-    <Menu withArrow>
+    <Menu
+      withArrow
+      styles={{
+        dropdown: {
+          background: '#f9f9ff',
+        },
+      }}
+    >
       <Menu.Target>
         <Button
           leftIcon={<AdjustmentsHorizontalIcon className={styles.icon} />}
-          className={styles.button}
+          className="bg-[#06257f] hover:bg-[#00175b]"
         >
-          Sort by
+          {t('Sort_By')}
         </Button>
       </Menu.Target>
-      <Menu.Dropdown>
+      <Menu.Dropdown className={styles.menu}>
         {sortOptions.map(({ option, icon, indicator, text }) => (
           <Menu.Item
             key={option}

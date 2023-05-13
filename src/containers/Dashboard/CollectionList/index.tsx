@@ -51,8 +51,6 @@ const CollectionList = () => {
     refetchOnReconnect: true,
   });
 
-  console.log(collections);
-
   const defaultCollections = buildTree(
     collections.filter((c) => CUSTOM_COLLECTIONS_IDS.includes(c.id)),
   );
@@ -74,12 +72,9 @@ const CollectionList = () => {
           right: true,
         }}
       >
-        <div>--- Some user panel ---</div>
         <SortableTree items={defaultCollections} dragDisabled={true} />
-        <Divider size="xs" />
         <CollectionListMenu />
         <SortableTree items={customCollections} />
-        <Divider size="xs" />
       </Resizable>
     </Fragment>
   );

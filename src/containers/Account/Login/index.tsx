@@ -53,6 +53,7 @@ const Login = () => {
         <TextInput
           label={t('Email_Label')}
           withAsterisk
+          className={styles.input}
           {...form.getInputProps('email')}
         />
         <TextInput
@@ -66,9 +67,14 @@ const Login = () => {
               <EyeSlashIcon onClick={toggle} className={styles.icon} />
             )
           }
+          className={styles.input}
           {...form.getInputProps('password')}
         />
-        <Button type="submit" disabled={!form.isValid()}>
+        <Button
+          type="submit"
+          disabled={!form.isValid()}
+          className="mt-2 bg-[#06257f] hover:bg-[#00175b] disabled:text-white"
+        >
           {t('Login_Button')}
         </Button>
       </form>

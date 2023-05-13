@@ -2,12 +2,15 @@ import { Modal, Text } from '@mantine/core';
 import CollectionForm from './CollectionForm';
 import { UniqueIdentifier } from '@dnd-kit/core';
 import { useCreateCollectionMutation } from '../../../services/bookmarks';
+import styles from './Modal.module.css';
+import { useTranslation } from 'react-i18next';
 
 const CreateCollectionModal = ({
   parentId,
   isModalOpen,
   setIsModalOpen,
 }: CreateCollectionModalProps) => {
+  const { t } = useTranslation();
   const [createCollection] = useCreateCollectionMutation();
 
   const handleCreateNewCollection = async ({
@@ -22,9 +25,13 @@ const CreateCollectionModal = ({
   };
 
   return (
-    <Modal opened={isModalOpen} onClose={() => setIsModalOpen(false)}>
-      <Text size="xl" weight={500} mb="md">
-        Create new collection
+    <Modal
+      opened={isModalOpen}
+      onClose={() => setIsModalOpen(false)}
+      className={styles.modal}
+    >
+      <Text size="xl" weight={500} mb="md" className="text-[#06257f]">
+        {t('CreateNewCollection')}
       </Text>
       <CollectionForm
         onSubmit={(values) => handleCreateNewCollection(values)}

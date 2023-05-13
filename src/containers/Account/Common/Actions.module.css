@@ -3,5 +3,13 @@
 }
 
 .formWrapper {
-  @apply min-w-[300px] rounded-lg bg-main-300 p-4;
+  @apply min-w-[300px] rounded-lg border border-[#e6eaed] bg-main-500 p-6;
+}
+
+.input :global(.mantine-TextInput-input) {
+  @apply rounded-md border border-[#e6eaed] text-main-600 placeholder:text-main-600 focus-visible:border-[#00175b];
+}
+
+.input :global(.mantine-TextInput-label) {
+  @apply text-main-600;
 }

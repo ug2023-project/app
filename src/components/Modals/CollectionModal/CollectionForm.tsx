@@ -3,7 +3,11 @@ import { useForm } from '@mantine/form';
 import Collection from '@/types/Collection';
 import useColorLocalStorage from '@/hooks/useColorLocalStorage';
 
+import styles from './Form.module.css';
+import { useTranslation } from 'react-i18next';
+
 const CollectionForm = ({ onSubmit, collection }: CollectionFormProps) => {
+  const { t } = useTranslation();
   const { colorsLocalStorage, handleColorLocalStorageChange } =
     useColorLocalStorage();
 
@@ -27,19 +31,23 @@ const CollectionForm = ({ onSubmit, collection }: CollectionFormProps) => {
     >
       <TextInput
         withAsterisk
-        label="Title"
-        placeholder="e.g. Inspiration, shopping.."
+        label={t('Collection_Name')}
+        placeholder={t('Collection_Name_Placeholder')}
+        className={styles.input}
         {...collectionForm.getInputProps('title')}
       />
       <ColorInput
         format="hex"
         disallowInput
-        label="Color"
+        label={t('Color')}
         swatches={colorsLocalStorage}
+        className={styles.input}
         {...collectionForm.getInputProps('color')}
       />
       <Group position="right" mt="md">
-        <Button type="submit">Submit</Button>
+        <Button type="submit" className="bg-[#06257f] hover:bg-[#00175b]">
+          {t('Submit')}
+        </Button>
       </Group>
     </form>
   );

@@ -51,7 +51,6 @@ const Item = forwardRef<HTMLDivElement, ItemProps>(
           style={
             {
               ...wrapperStyle,
-              border: '3px solid red',
               transition: [transition, wrapperStyle?.transition]
                 .filter(Boolean)
                 .join(', '),

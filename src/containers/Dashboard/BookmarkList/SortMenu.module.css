@@ -6,6 +6,10 @@
   @apply ml-[0.625rem] h-4 w-4;
 }
 
-.button {
-  @apply border border-blue-300;
+.menu :global(.mantine-Menu-item) {
+  @apply bg-main-500 text-[#1f2e4d];
+}
+
+.menu :hover:global(.mantine-Menu-item) {
+  @apply font-semibold text-[#00175b];
 }
