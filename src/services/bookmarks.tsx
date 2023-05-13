@@ -188,7 +188,7 @@ export const api = createApi({
     updateCollection: build.mutation<void, UpdateCollection>({
       query: ({ id, ...patch }) => ({
         url: `collections/${id}`,
-        method: 'POST',
+        method: 'PUT',
         body: patch,
       }),
       async onQueryStarted({ id, ...patch }, { dispatch, queryFulfilled }) {

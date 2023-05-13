@@ -116,7 +116,7 @@ const TreeItem = ({
         )}
         <span
           className="h-3 w-3 rounded-full"
-          style={{ backgroundColor: props.color ?? '#00ff4d' }}
+          style={{ backgroundColor: props.color }}
         ></span>
         <span
           className={styles.Text}
