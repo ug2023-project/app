@@ -1,15 +1,16 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import Collection from '@/types/Collection';
+import Bookmark from '@/types/Bookmark';
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { arrayMove } from '@dnd-kit/sortable';
 import { REHYDRATE } from 'redux-persist';
-import Bookmark from '@/types/Bookmark';
 import { UniqueIdentifier } from '@dnd-kit/core';
 import { copy } from 'copy-anything';
-import equal from 'fast-deep-equal';
 import axios from '../utils/axios/axiosConfig';
-import { IconCheck } from '@tabler/icons-react';
+import { IconCheck, IconX } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
-import { XMarkIcon } from '@heroicons/react/24/solid';
+import { deepEquals } from '@/utils/deepEquals';
+import { PatchCollection } from '@reduxjs/toolkit/dist/query/core/buildThunks';
+import React from 'react';
 
 const TEMPORARY_ID = 'TEMPORARY_ID';
 const createTemporaryCollection = (
@@ -30,7 +31,6 @@ const createTemporaryCollection = (
 
 const COLLECTION_TAG = 'Collection' as const;
 const BOOKMARK_TAG = 'Bookmark' as const;
-
 const DEFAULT_COLLECTIONS_OFFSET = 3;
 
 export const api = createApi({
@@ -55,6 +55,7 @@ export const api = createApi({
   endpoints: (build) => ({
     getCollections: build.query<Collection[], void>({
       query: () => 'collections',
+      providesTags: [{ type: COLLECTION_TAG, id: 'ALL' }],
     }),
 
     createCollection: build.mutation<
@@ -124,13 +125,11 @@ export const api = createApi({
             const newDraft = copy(draft);
             const collection = newDraft[collectionIndex];
             collection.parentId = parentId;
-            draft = arrayMove(
+            return arrayMove(
               newDraft,
               collectionIndex,
               index + DEFAULT_COLLECTIONS_OFFSET,
             );
-
-            return draft;
           }),
         );
         try {
@@ -212,23 +211,22 @@ export const api = createApi({
         url: `collections/${collectionId}/bookmarks`,
         params,
       }),
-      // serializeQueryArgs: ({
-      //   queryArgs: { collectionId },
-      //   endpointDefinition,
-      //   endpointName,
-      // }) =>
-      //   defaultSerializeQueryArgs({
-      //     endpointName,
-      //     queryArgs: { collectionId },
-      //     endpointDefinition,
-      //   }),
-      serializeQueryArgs: ({ queryArgs: { collectionId } }) => collectionId,
+      keepUnusedDataFor: 15,
+      providesTags: (result, error, page) =>
+        result
+          ? [
+              ...result.map(({ id }) => ({ type: BOOKMARK_TAG, id })),
+              { type: BOOKMARK_TAG, id: 'PARTIAL-LIST' },
+            ]
+          : [{ type: BOOKMARK_TAG, id: 'PARTIAL-LIST' }],
+
       // merge: (currentCache, newItems) => {
       //   currentCache.push(...newItems);
       // },
-      // forceRefetch({ currentArg, previousArg }) {
-      //   return equal(currentArg, previousArg);
-      // },
+      forceRefetch({ currentArg, previousArg }) {
+        console.log('forceRefetch', deepEquals(currentArg, previousArg));
+        return !deepEquals(currentArg, previousArg);
+      },
     }),
 
     changeBookmarksOrder: build.mutation<void, ChangeBookmarksOrder>({
@@ -269,44 +267,31 @@ export const api = createApi({
         method: 'POST',
       }),
       async onQueryStarted(
-        { bookmarkId, collectionId, favorite },
-        { dispatch, queryFulfilled },
+        { bookmarkId },
+        { dispatch, queryFulfilled, getState },
       ) {
-        const patchBookmark = dispatch(
-          api.util.updateQueryData(
-            'getBookmarks',
-            { collectionId },
-            (draft) => {
+        const patchResults: PatchCollection[] = [];
+        for (const {
+          endpointName,
+          originalArgs,
+        } of api.util.selectInvalidatedBy(getState(), [
+          { type: BOOKMARK_TAG, id: 'PARTIAL-LIST' },
+        ])) {
+          if (endpointName !== 'getBookmarks') continue;
+          const patchResult = dispatch(
+            api.util.updateQueryData(endpointName, originalArgs, (draft) => {
               const bookmarkToPatch = draft.find((x) => x.id === bookmarkId);
-
-              if (!bookmarkToPatch) {
-                throw new Error('Bookmark not found, should not be there');
-              }
-
+              if (!bookmarkToPatch) return;
               bookmarkToPatch.favorite = !bookmarkToPatch.favorite;
-            },
-          ),
-        );
+            }),
+          );
+          patchResults.push(patchResult);
+        }
+
         try {
           await queryFulfilled;
-          notifications.show({
-            color: 'teal',
-            title: 'Success',
-            message: favorite ? 'Added to favorites' : 'Removed from favorites',
-            icon: <IconCheck size="1rem" />,
-            autoClose: 1500,
-          });
         } catch {
-          notifications.show({
-            color: 'red',
-            title: 'Fail',
-            message: favorite
-              ? 'Failed to add to favorites'
-              : 'Failed to remove from favorites',
-            icon: <XMarkIcon className="h-4 w-4" />,
-            autoClose: 1500,
-          });
-          patchBookmark.undo();
+          patchResults.forEach((patch) => patch.undo());
         }
       },
     }),
@@ -322,21 +307,27 @@ export const api = createApi({
       }),
       async onQueryStarted(
         { collectionId, bookmarkId, newCollectionId },
-        { dispatch, queryFulfilled },
+        { dispatch, queryFulfilled, getState },
       ) {
-        if (collectionId === newCollectionId) return;
-        if (collectionId === 'all' || newCollectionId === 'all') return;
-        if (collectionId === 'trash' || newCollectionId === 'trash') return;
-        const patchBookmarks = dispatch(
-          api.util.updateQueryData(
-            'getBookmarks',
-            { collectionId },
-            (draft) => {
-              draft = draft.filter((bookmark) => bookmark.id !== bookmarkId);
+        const patchResults: PatchCollection[] = [];
+        for (const {
+          endpointName,
+          originalArgs,
+        } of api.util.selectInvalidatedBy(getState(), [
+          { type: BOOKMARK_TAG, id: 'PARTIAL-LIST' },
+        ])) {
+          if (endpointName !== 'getBookmarks') continue;
+          const patchResult = dispatch(
+            api.util.updateQueryData(endpointName, originalArgs, (draft) => {
+              if (originalArgs?.collectionId === collectionId) {
+                draft = draft.filter((bookmark) => bookmark.id !== bookmarkId);
+              }
               return draft;
-            },
-          ),
-        );
+            }),
+          );
+          patchResults.push(patchResult);
+        }
+
         const patchCollections = dispatch(
           api.util.updateQueryData('getCollections', undefined, (draft) => {
             const collection = draft.find(
@@ -355,7 +346,7 @@ export const api = createApi({
         try {
           await queryFulfilled;
         } catch {
-          patchBookmarks.undo();
+          patchResults.forEach((patch) => patch.undo());
           patchCollections.undo();
         }
       },
@@ -371,18 +362,25 @@ export const api = createApi({
       }),
       async onQueryStarted(
         { collectionId, bookmarkId },
-        { dispatch, queryFulfilled },
+        { dispatch, queryFulfilled, getState },
       ) {
-        const patchBookmarks = dispatch(
-          api.util.updateQueryData(
-            'getBookmarks',
-            { collectionId },
-            (draft) => {
+        const patchResults: PatchCollection[] = [];
+        for (const {
+          endpointName,
+          originalArgs,
+        } of api.util.selectInvalidatedBy(getState(), [
+          { type: BOOKMARK_TAG, id: 'PARTIAL-LIST' },
+        ])) {
+          if (endpointName !== 'getBookmarks') continue;
+          const patchResult = dispatch(
+            api.util.updateQueryData(endpointName, originalArgs, (draft) => {
               draft = draft.filter((bookmark) => bookmark.id !== bookmarkId);
               return draft;
-            },
-          ),
-        );
+            }),
+          );
+          patchResults.push(patchResult);
+        }
+
         const patchCollections = dispatch(
           api.util.updateQueryData('getCollections', undefined, (draft) => {
             const trash = draft.find((collection) => collection.id === 'trash');
@@ -402,7 +400,7 @@ export const api = createApi({
         try {
           await queryFulfilled;
         } catch {
-          patchBookmarks.undo();
+          patchResults.forEach((patch) => patch.undo());
           patchCollections.undo();
         }
       },
@@ -417,55 +415,32 @@ export const api = createApi({
       }),
 
       async onQueryStarted(
-        { bookmarkId, collectionId, onFinish, ...patch },
-        { dispatch, queryFulfilled },
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        { bookmarkId, collectionId, ...patch },
+        { dispatch, queryFulfilled, getState },
       ) {
-        notifications.show({
-          id: 'process-edit-bookmark',
-          loading: true,
-          title: 'Editing bookmark is being processed',
-          message: 'It may take a while',
-          autoClose: false,
-          withCloseButton: false,
-        });
-        const patchBookmark = dispatch(
-          api.util.updateQueryData(
-            'getBookmarks',
-            { collectionId },
-            (draft) => {
+        const patchResults: PatchCollection[] = [];
+        for (const {
+          endpointName,
+          originalArgs,
+        } of api.util.selectInvalidatedBy(getState(), [
+          { type: BOOKMARK_TAG, id: 'PARTIAL-LIST' },
+        ])) {
+          if (endpointName !== 'getBookmarks') continue;
+          const patchResult = dispatch(
+            api.util.updateQueryData(endpointName, originalArgs, (draft) => {
               const bookmarkToPatch = draft.find((x) => x.id === bookmarkId);
-
-              if (!bookmarkToPatch) {
-                throw new Error('Bookmark not found, should not be there');
-              }
-
+              if (!bookmarkToPatch) return;
               Object.assign(bookmarkToPatch, patch);
-            },
-          ),
-        );
+            }),
+          );
+          patchResults.push(patchResult);
+        }
+
         try {
           await queryFulfilled;
-          notifications.update({
-            id: 'process-edit-bookmark',
-            color: 'teal',
-            loading: false,
-            title: 'Success',
-            message: 'Edited bookmark successfully',
-            autoClose: 1500,
-            withCloseButton: true,
-          });
-          onFinish?.();
         } catch {
-          notifications.update({
-            id: 'process-edit-bookmark',
-            color: 'red',
-            title: 'Fail',
-            message: 'Failed to edit bookmark',
-            icon: <XMarkIcon className="h-4 w-4" />,
-            autoClose: 1500,
-            withCloseButton: true,
-          });
-          patchBookmark.undo();
+          patchResults.forEach((patch) => patch.undo());
         }
       },
     }),
@@ -477,7 +452,7 @@ export const api = createApi({
         body,
       }),
 
-      async onQueryStarted({ collectionId }, { dispatch, queryFulfilled }) {
+      async onQueryStarted(_, { dispatch, queryFulfilled, getState }) {
         try {
           const {
             data: { id },
@@ -508,15 +483,24 @@ export const api = createApi({
                   icon: <IconCheck size="1rem" />,
                   autoClose: 2000,
                 });
-                dispatch(
-                  api.util.updateQueryData(
-                    'getBookmarks',
-                    { collectionId: collectionId },
-                    (draft) => {
-                      draft.unshift(bookmark);
-                    },
-                  ),
-                );
+
+                for (const {
+                  endpointName,
+                  originalArgs,
+                } of api.util.selectInvalidatedBy(getState(), [
+                  { type: BOOKMARK_TAG, id: 'PARTIAL-LIST' },
+                ])) {
+                  if (endpointName !== 'getBookmarks') continue;
+                  dispatch(
+                    api.util.updateQueryData(
+                      endpointName,
+                      originalArgs,
+                      (draft) => {
+                        draft.unshift(bookmark);
+                      },
+                    ),
+                  );
+                }
 
                 dispatch(
                   api.util.updateQueryData(
@@ -538,15 +522,16 @@ export const api = createApi({
                 );
               }
             } catch {}
-            if (count > 5) {
-              clearInterval(interval);
-              notifications.show({
+            if (count >= 4) {
+              notifications.update({
                 id: 'process-bookmark',
                 title: 'Processing error',
                 message: 'Failed to process bookmark',
                 color: 'red',
                 autoClose: 2000,
+                icon: <IconX size="1rem" />,
               });
+              clearInterval(interval);
             }
             count++;
           }, 2000);
@@ -586,6 +571,9 @@ export const api = createApi({
               );
               if (!collection) return;
               collection.count += 1;
+              const all = draft.find((collection) => collection.id === 'all');
+              if (!all) return;
+              all.count += 1;
             }),
           );
         } catch {}
@@ -631,7 +619,6 @@ type UpdateBookmark = {
   title?: string;
   description?: string;
   tags?: string[];
-  onFinish?: () => void;
 };
 
 type CreateCollection = {
