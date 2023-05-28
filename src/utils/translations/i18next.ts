@@ -3,8 +3,6 @@ import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import resourcesToBackend from 'i18next-resources-to-backend';
 
-const selectedLang = localStorage.getItem('lng') || 'en';
-
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
@@ -19,7 +17,7 @@ i18n
     preload: ['en'],
     debug: process.env.NODE_ENV !== 'production',
     detection: {
-      order: ['localStorage'],
+      order: ['localStorage', 'navigator'],
       caches: ['localStorage'],
       lookupLocalStorage: 'lng',
     },
@@ -27,7 +25,6 @@ i18n
       loadPath: '/locales/{{lng}}/{{ns}}.json',
     },
     defaultNS: 'translation',
-    lng: selectedLang,
     interpolation: {
       escapeValue: false,
     },

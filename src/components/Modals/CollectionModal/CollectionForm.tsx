@@ -14,7 +14,7 @@ const CollectionForm = ({ onSubmit, collection }: CollectionFormProps) => {
   const collectionForm = useForm({
     initialValues: {
       title: collection?.title || '',
-      color: collection?.color || '#00ff4d',
+      color: collection?.color?.trim() || '#00ff4d',
     },
 
     validate: {
@@ -34,6 +34,7 @@ const CollectionForm = ({ onSubmit, collection }: CollectionFormProps) => {
         label={t('Collection_Name')}
         placeholder={t('Collection_Name_Placeholder')}
         className={styles.input}
+        data-testid="create-collection-input"
         {...collectionForm.getInputProps('title')}
       />
       <ColorInput
@@ -45,7 +46,11 @@ const CollectionForm = ({ onSubmit, collection }: CollectionFormProps) => {
         {...collectionForm.getInputProps('color')}
       />
       <Group position="right" mt="md">
-        <Button type="submit" className="bg-[#06257f] hover:bg-[#00175b]">
+        <Button
+          type="submit"
+          className="bg-[#06257f] hover:bg-[#00175b]"
+          data-testid="create-collection-btn"
+        >
           {t('Submit')}
         </Button>
       </Group>

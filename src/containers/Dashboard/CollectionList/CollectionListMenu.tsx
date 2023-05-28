@@ -29,7 +29,7 @@ const CollectionListMenu = () => {
     >
       <div className="flex items-center justify-between px-3">
         <span className="text-main-600">{t('Collections')}</span>
-        <Menu.Target>
+        <Menu.Target data-testid="create-collection-menu-btn">
           <Action>
             <BsThreeDots />
           </Action>
@@ -41,8 +41,12 @@ const CollectionListMenu = () => {
           marginLeft: '80px',
         }}
         className={styles.menu}
+        data-testid="create-collection-dropdown"
       >
-        <Menu.Item onClick={() => setIsCreateModalOpen(true)}>
+        <Menu.Item
+          onClick={() => setIsCreateModalOpen(true)}
+          data-testid="create-collection-open-modal-btn"
+        >
           {t('CreateNewCollection')}
         </Menu.Item>
         <Menu.Divider />
