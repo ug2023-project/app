@@ -29,6 +29,7 @@ const CreateCollectionModal = ({
       opened={isModalOpen}
       onClose={() => setIsModalOpen(false)}
       className={styles.modal}
+      data-testid="create-collection-modal"
     >
       <Text size="xl" weight={500} mb="md" className="text-[#06257f]">
         {t('CreateNewCollection')}
