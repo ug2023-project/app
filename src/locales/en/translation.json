@@ -18,7 +18,6 @@
   "Login_Header": "Login to your account",
   "Register_Header": "Register an account",
   "Register_Button": "Register",
-  "Change_View": "Change view",
   "Sort_By": "Sort by",
   "Collections": "Collections",
   "Add": "Add",
@@ -34,5 +33,8 @@
   "Submit": "Submit",
   "CreateNewCollection": "Create new collection",
   "CollapseAll": "Collapse all",
-  "Collection_Name_Placeholder": "e.g Shopping, Work.."
+  "Collection_Name_Placeholder": "e.g Shopping, Work..",
+  "Trash": "Trash",
+  "Ungroupedbookmarks": "Ungrouped Bookmarks",
+  "Allbookmarks": "All Bookmarks"
 }

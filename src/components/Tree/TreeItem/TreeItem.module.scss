@@ -37,7 +37,6 @@
   align-items: center;
   padding: var(--vertical-padding) 10px;
   background-color: #ffffff;
-  // border: 1px solid transparent;
   margin-bottom: 2px;
   margin-top: 1px;
   color: #e5e5e6;
@@ -72,11 +71,11 @@
 }
 
 .dropTarget {
-  border-color: #2389ff;
+  border: 1px dashed #2389ff;
 }
 
 .active {
-  background-color: linear-gradient(180deg, #f7f9fc, rgba(242, 244, 247, 0));
+  background: linear-gradient(180deg, #f7f9fc, rgba(242, 244, 247, 0));
 }
 
 .disableSelection,

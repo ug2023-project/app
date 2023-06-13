@@ -31,6 +31,7 @@ const TreeItem = ({
   const navigate = useNavigate();
   const isActive = collectionId === id;
   const [moveBookmark] = useMoveBookmarkMutation();
+  const { t } = useTranslation();
 
   const {
     attributes,
@@ -99,7 +100,6 @@ const TreeItem = ({
           dropAttempt && styles.dropTarget,
         )}
         ref={setDraggableNodeRef}
-        // {...handleProps}
         style={{ ...style }}
       >
         {draggable ? <Handle {...handleProps} /> : null}
@@ -116,13 +116,13 @@ const TreeItem = ({
         )}
         <span
           className="h-3 w-3 rounded-full"
-          style={{ backgroundColor: props.color }}
+          style={{ backgroundColor: props?.color ?? 'transparent' }}
         ></span>
         <span
           className={styles.Text}
           onClick={() => navigate(`/collections/${id}`)}
         >
-          {props.value}
+          {t(props.value.toString().replace(' ', ''), props.value.toString())}
         </span>
         <span className={styles.Count}>{bookmarks}</span>
         <MenuButton id={id} />
@@ -149,6 +149,10 @@ const MenuButton = memo(({ id }: MenuButtonProps) => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
+  function openAllBookmarks() {
+    console.log('open all bookmarks');
+  }
+
   return (
     <>
       <Menu
@@ -172,7 +176,7 @@ const MenuButton = memo(({ id }: MenuButtonProps) => {
           }}
           className={styles.menu}
         >
-          <Menu.Item>{t('OpenAllBookmarks')}</Menu.Item>
+          <Menu.Item onClick={() => openAllBookmarks()}>{t('OpenAllBookmarks')}</Menu.Item>
           <Menu.Divider />
           <Menu.Item onClick={() => setIsCreateModalOpen(true)}>
             {t('CreateNestedCollections')}
@@ -212,7 +216,7 @@ type TreeItemProps = Omit<HTMLAttributes<HTMLLIElement>, 'id' | 'color'> & {
   onRemove?(): void;
   wrapperRef?(node: HTMLLIElement): void;
   bookmarks?: number;
-  color: string;
+  color: string | null;
 };
 
 export default TreeItem;

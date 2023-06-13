@@ -23,6 +23,7 @@ const Item = forwardRef<HTMLDivElement, ItemProps>(
       transition,
       transform,
       wrapperStyle,
+      style,
       ...props
     },
     ref,
@@ -51,6 +52,7 @@ const Item = forwardRef<HTMLDivElement, ItemProps>(
           style={
             {
               ...wrapperStyle,
+              ...style,
               transition: [transition, wrapperStyle?.transition]
                 .filter(Boolean)
                 .join(', '),
@@ -60,8 +62,12 @@ const Item = forwardRef<HTMLDivElement, ItemProps>(
               '--translate-y': transform
                 ? `${Math.round(transform.y)}px`
                 : undefined,
-              // '--scale-x': transform?.scaleX ? `${transform.scaleX}` : undefined,
-              // '--scale-y': transform?.scaleY ? `${transform.scaleY}` : undefined,
+              '--scale-x': transform?.scaleX
+                ? `${transform.scaleX}`
+                : undefined,
+              '--scale-y': transform?.scaleY
+                ? `${transform.scaleY}`
+                : undefined,
             } as React.CSSProperties
           }
           ref={ref}
@@ -99,11 +105,11 @@ const Item = forwardRef<HTMLDivElement, ItemProps>(
                 {item.link}
               </Text>
             </div>
-          </div>
-          <div className={styles.Actions}>
-            <Favorite bookmark={item} className={styles.action} />
-            <Edit bookmark={item} className={styles.action} />
-            <Remove className={styles.action} onClick={onRemove} />
+            <div className={styles.Actions}>
+              <Favorite bookmark={item} className={styles.action} />
+              <Edit bookmark={item} className={styles.action} />
+              <Remove className={styles.action} onClick={onRemove} />
+            </div>
           </div>
         </div>
       </a>
@@ -124,6 +130,7 @@ type ItemProps = {
   transition?: string | null;
   wrapperStyle?: React.CSSProperties;
   onRemove?(): void;
+  style?: React.CSSProperties;
 };
 
 export default Item;

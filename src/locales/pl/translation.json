@@ -18,7 +18,6 @@
   "Login_Button": "Zaloguj",
   "Register_Header": "Zarejestruj się",
   "Register_Button": "Zarejestruj",
-  "Change_View": "Zmień wygląd",
   "Sort_By": "Sortuj według",
   "Collections": "Kolekcje",
   "Add": "Dodaj",
@@ -34,5 +33,8 @@
   "Submit": "Zatwierdź",
   "CreateNewCollection": "Utwórz nową kolekcję",
   "CollapseAll": "Zwiń wszystkie",
-  "Collection_Name_Placeholder": "np. Zakupy, Praca.."
+  "Collection_Name_Placeholder": "np. Zakupy, Praca..",
+  "Trash": "Śmietnik",
+  "Ungroupedbookmarks": "Niepogrupowane zakładki",
+  "Allbookmarks": "Wszystkie zakładki"
 }

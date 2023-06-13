@@ -1,7 +1,5 @@
 import { createStyles, Text } from '@mantine/core';
 import Bookmark from '@/types/Bookmark';
-import styles from './BookmarkItem.module.css';
-import emphasizeText from '@/utils/emphasizeText';
 
 const useStyles = createStyles((theme) => ({
   item: {
@@ -39,15 +37,7 @@ const BookmarkItem = ({ item }: BookmarkItemProps) => {
     <>
       <Text className={classes.symbol}>{item.id}</Text>
       <div>
-        {emphasizeText(item.title).map((entry, index) =>
-          entry.bold ? (
-            <span key={index} className={styles.titleBold}>
-              {entry.text}
-            </span>
-          ) : (
-            entry.text
-          ),
-        )}
+        entry.text
         <a href={item.link} target="_blank" rel="noreferrer">
           <Text color="dimmed" size="sm">
             {item.link}

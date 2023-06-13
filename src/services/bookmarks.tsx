@@ -10,7 +10,6 @@ import { IconCheck, IconX } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
 import { deepEquals } from '@/utils/deepEquals';
 import { PatchCollection } from '@reduxjs/toolkit/dist/query/core/buildThunks';
-import React from 'react';
 
 const TEMPORARY_ID = 'TEMPORARY_ID';
 const createTemporaryCollection = (
@@ -224,7 +223,6 @@ export const api = createApi({
       //   currentCache.push(...newItems);
       // },
       forceRefetch({ currentArg, previousArg }) {
-        console.log('forceRefetch', deepEquals(currentArg, previousArg));
         return !deepEquals(currentArg, previousArg);
       },
     }),
@@ -305,10 +303,13 @@ export const api = createApi({
           collectionId: patch.newCollectionId,
         },
       }),
+      invalidatesTags: [COLLECTION_TAG],
       async onQueryStarted(
         { collectionId, bookmarkId, newCollectionId },
         { dispatch, queryFulfilled, getState },
       ) {
+        if (collectionId === newCollectionId) return;
+        if (collectionId === 'ungrouped' && newCollectionId === 'all') return;
         const patchResults: PatchCollection[] = [];
         for (const {
           endpointName,
@@ -320,6 +321,8 @@ export const api = createApi({
           const patchResult = dispatch(
             api.util.updateQueryData(endpointName, originalArgs, (draft) => {
               if (originalArgs?.collectionId === collectionId) {
+                if (collectionId === 'all' && newCollectionId !== 'trash')
+                  return;
                 draft = draft.filter((bookmark) => bookmark.id !== bookmarkId);
               }
               return draft;
@@ -328,26 +331,10 @@ export const api = createApi({
           patchResults.push(patchResult);
         }
 
-        const patchCollections = dispatch(
-          api.util.updateQueryData('getCollections', undefined, (draft) => {
-            const collection = draft.find(
-              (collection) => collection.id === collectionId,
-            );
-            if (!collection) return;
-            collection.count -= 1;
-            const newCollection = draft.find(
-              (collection) => collection.id === newCollectionId,
-            );
-            if (!newCollection) return;
-            newCollection.count += 1;
-          }),
-        );
-
         try {
           await queryFulfilled;
         } catch {
           patchResults.forEach((patch) => patch.undo());
-          patchCollections.undo();
         }
       },
     }),
@@ -360,8 +347,9 @@ export const api = createApi({
         url: `bookmarks/${bookmarkId}`,
         method: 'DELETE',
       }),
+      invalidatesTags: [COLLECTION_TAG],
       async onQueryStarted(
-        { collectionId, bookmarkId },
+        { bookmarkId },
         { dispatch, queryFulfilled, getState },
       ) {
         const patchResults: PatchCollection[] = [];
@@ -381,27 +369,10 @@ export const api = createApi({
           patchResults.push(patchResult);
         }
 
-        const patchCollections = dispatch(
-          api.util.updateQueryData('getCollections', undefined, (draft) => {
-            const trash = draft.find((collection) => collection.id === 'trash');
-            if (!trash) return;
-            trash.count += collectionId === 'trash' ? -1 : 1;
-            const collection = draft.find(
-              (collection) => collection.id === collectionId,
-            );
-            if (!collection) return;
-            collection.count += collectionId !== 'trash' ? -1 : 0;
-            const all = draft.find((collection) => collection.id === 'all');
-            if (!all) return;
-            all.count -= collectionId === 'trash' ? 0 : 1;
-          }),
-        );
-
         try {
           await queryFulfilled;
         } catch {
           patchResults.forEach((patch) => patch.undo());
-          patchCollections.undo();
         }
       },
     }),
@@ -522,7 +493,7 @@ export const api = createApi({
                 );
               }
             } catch {}
-            if (count >= 4) {
+            if (count >= 10) {
               notifications.update({
                 id: 'process-bookmark',
                 title: 'Processing error',
