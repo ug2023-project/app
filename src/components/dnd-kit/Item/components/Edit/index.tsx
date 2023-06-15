@@ -18,7 +18,6 @@ const Edit = ({ bookmark, ...props }: EditProps) => {
     },
     validate: {
       title: isNotEmpty('Bookmark title is required'),
-      description: isNotEmpty('Bookmark description is required'),
     },
   });
 

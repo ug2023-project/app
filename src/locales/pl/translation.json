@@ -36,5 +36,8 @@
   "Collection_Name_Placeholder": "np. Zakupy, Praca..",
   "Trash": "Śmietnik",
   "Ungroupedbookmarks": "Niepogrupowane zakładki",
-  "Allbookmarks": "Wszystkie zakładki"
+  "Allbookmarks": "Wszystkie zakładki",
+  "NoBookmarksHeader": "Cholercia!",
+  "NoBookmarksMessage": "Nic tu nie ma...",
+  "Remove": "Usuń kolekcję"
 }

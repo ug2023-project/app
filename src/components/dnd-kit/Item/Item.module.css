@@ -59,6 +59,7 @@ $focused-outline-color: #4c9ffe;
   display: flex;
   flex-grow: 1;
   align-items: center;
+  justify-content: space-between;
   padding: 8px 8px;
   background-color: $background-color;
   outline: none;
@@ -147,4 +148,13 @@ $focused-outline-color: #4c9ffe;
   top: 50%;
   height: 100%;
   transform: translate(-50%,-50%);
+}
+
+.imageDesc{
+  display: flex;
+  flex-direction: row;
+}
+
+.tags{
+  color: rgb(255, 123, 0);
 }

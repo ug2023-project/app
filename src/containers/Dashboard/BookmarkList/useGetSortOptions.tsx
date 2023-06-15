@@ -35,13 +35,13 @@ const useGetSortOptions = () => {
       text: t('Name'),
       icon: <TagIcon className={styles.icon} />,
       indicator: <ChevronUpIcon className={styles.menuRight} />,
-      option: 'name',
+      option: 'title',
     },
     {
       text: t('Name'),
       icon: <TagIcon className={styles.icon} />,
       indicator: <ChevronDownIcon className={styles.menuRight} />,
-      option: '-name',
+      option: '-title',
     },
   ];
 
@@ -54,7 +54,7 @@ const useGetSortOptions = () => {
     : {
         text: t('Default'),
         icon: <ListBulletIcon className={styles.icon} />,
-        option: 'default',
+        option: 'manual',
       };
 
   const sortOptions = [baseOption, ...baseOptions];

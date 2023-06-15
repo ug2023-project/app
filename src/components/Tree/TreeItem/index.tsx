@@ -12,7 +12,11 @@ import CreateCollectionModal from '@/components/Modals/CollectionModal/CreateCol
 import EditCollectionModal from '@/components/Modals/CollectionModal/EditCollectionModal';
 import { useNavigate, useParams } from 'react-router-dom';
 import Action from '@/components/dnd-kit/Item/components/Action';
-import { useMoveBookmarkMutation } from '../../../services/bookmarks';
+import {
+  useGetBookmarksQuery,
+  useMoveBookmarkMutation,
+  useRemoveCollectionMutation,
+} from '../../../services/bookmarks';
 import { useTranslation } from 'react-i18next';
 
 const animateLayoutChanges: AnimateLayoutChanges = ({
@@ -148,9 +152,14 @@ const MenuButton = memo(({ id }: MenuButtonProps) => {
   const { t } = useTranslation();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const { data: bookmarks } = useGetBookmarksQuery({ collectionId: id });
+  const [removeCollection] = useRemoveCollectionMutation();
 
-  function openAllBookmarks() {
-    console.log('open all bookmarks');
+  function openAllBookmarks(id) {
+    bookmarks &&
+      bookmarks.forEach((bookmark) => {
+        window.open(bookmark.link, '_blank');
+      });
   }
 
   return (
@@ -176,13 +185,19 @@ const MenuButton = memo(({ id }: MenuButtonProps) => {
           }}
           className={styles.menu}
         >
-          <Menu.Item onClick={() => openAllBookmarks()}>{t('OpenAllBookmarks')}</Menu.Item>
+          <Menu.Item onClick={() => openAllBookmarks(id)}>
+            {t('OpenAllBookmarks')}
+          </Menu.Item>
           <Menu.Divider />
           <Menu.Item onClick={() => setIsCreateModalOpen(true)}>
             {t('CreateNestedCollections')}
           </Menu.Item>
           <Menu.Item onClick={() => setIsEditModalOpen(true)}>
             {t('EditCollection')}
+          </Menu.Item>
+          <Menu.Divider />
+          <Menu.Item onClick={() => removeCollection({ id })}>
+            {t('Remove')}
           </Menu.Item>
         </Menu.Dropdown>
       </Menu>

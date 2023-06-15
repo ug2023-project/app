@@ -36,5 +36,8 @@
   "Collection_Name_Placeholder": "e.g Shopping, Work..",
   "Trash": "Trash",
   "Ungroupedbookmarks": "Ungrouped Bookmarks",
-  "Allbookmarks": "All Bookmarks"
+  "Allbookmarks": "All Bookmarks",
+  "NoBookmarksHeader": "Holy guacamole!",
+  "NoBookmarksMessage": "There's nothing here...",
+  "Remove": "Remove collection"
 }

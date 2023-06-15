@@ -73,7 +73,7 @@ export const api = createApi({
         const patchResult = dispatch(
           api.util.updateQueryData('getCollections', undefined, (draft) => {
             const parentCollectionIndex = draft.findIndex(
-              (collection) => collection.id === parentId,
+              (collection) => collection?.id === parentId,
             );
             const newCollection = createTemporaryCollection(
               title,
@@ -88,7 +88,7 @@ export const api = createApi({
           dispatch(
             api.util.updateQueryData('getCollections', undefined, (draft) => {
               const parentCollectionIndex = draft.findIndex(
-                (collection) => collection.id === parentId,
+                (collection) => collection?.id === parentId,
               );
               draft[parentCollectionIndex + 1].id = data.id;
             }),
@@ -112,10 +112,10 @@ export const api = createApi({
         const patchResult = dispatch(
           api.util.updateQueryData('getCollections', undefined, (draft) => {
             const collectionIndex = draft.findIndex(
-              (collection) => collection.id === collectionId,
+              (collection) => collection?.id === collectionId,
             );
             const parentCollection = draft.find(
-              (collection) => collection.id === parentId,
+              (collection) => collection?.id === parentId,
             );
             if (collectionIndex === -1 || (parentId && !parentCollection)) {
               return;
@@ -148,7 +148,7 @@ export const api = createApi({
         const patchResult = dispatch(
           api.util.updateQueryData('getCollections', undefined, (draft) => {
             const collection = draft.find(
-              (collection) => collection.id === collectionId,
+              (collection) => collection?.id === collectionId,
             );
             if (!collection) return;
             collection.collapsed = !collection.collapsed;
@@ -192,9 +192,34 @@ export const api = createApi({
       async onQueryStarted({ id, ...patch }, { dispatch, queryFulfilled }) {
         const patchResult = dispatch(
           api.util.updateQueryData('getCollections', undefined, (draft) => {
-            const collection = draft.find((collection) => collection.id === id);
+            const collection = draft.find(
+              (collection) => collection?.id === id,
+            );
             if (!collection) return;
             Object.assign(collection, patch);
+          }),
+        );
+        try {
+          await queryFulfilled;
+        } catch {
+          patchResult.undo();
+        }
+      },
+    }),
+
+    removeCollection: build.mutation<void, RemoveCollection>({
+      query: ({ id }) => ({
+        url: `collections/${id}`,
+        method: 'DELETE',
+      }),
+      async onQueryStarted({ id }, { dispatch, queryFulfilled }) {
+        const patchResult = dispatch(
+          api.util.updateQueryData('getCollections', undefined, (draft) => {
+            const collections = draft.filter(
+              (collection) => collection?.id !== id,
+            );
+
+            return collections;
           }),
         );
         try {
@@ -236,15 +261,41 @@ export const api = createApi({
 
       async onQueryStarted(
         { collectionId, bookmarkId, index },
-        { dispatch, queryFulfilled },
+        { dispatch, queryFulfilled, getState },
       ) {
+        const patchResults: PatchCollection[] = [];
+        for (const {
+          endpointName,
+          originalArgs,
+        } of api.util.selectInvalidatedBy(getState(), [
+          { type: BOOKMARK_TAG, id: 'PARTIAL-LIST' },
+        ])) {
+          if (endpointName !== 'getBookmarks') continue;
+          const patchResult = dispatch(
+            api.util.updateQueryData(endpointName, originalArgs, (draft) => {
+              const bookmarkIndex = draft.findIndex(
+                (bookmark) => bookmark?.id === bookmarkId,
+              );
+              draft = arrayMove(draft, bookmarkIndex, index);
+              return draft;
+            }),
+          );
+          patchResults.push(patchResult);
+        }
+
+        try {
+          await queryFulfilled;
+        } catch {
+          patchResults.forEach((patch) => patch.undo());
+        }
+
         const patchResult = dispatch(
           api.util.updateQueryData(
             'getBookmarks',
             { collectionId },
             (draft) => {
               const bookmarkIndex = draft.findIndex(
-                (bookmark) => bookmark.id === bookmarkId,
+                (bookmark) => bookmark?.id === bookmarkId,
               );
               draft = arrayMove(draft, bookmarkIndex, index);
               return draft;
@@ -278,7 +329,7 @@ export const api = createApi({
           if (endpointName !== 'getBookmarks') continue;
           const patchResult = dispatch(
             api.util.updateQueryData(endpointName, originalArgs, (draft) => {
-              const bookmarkToPatch = draft.find((x) => x.id === bookmarkId);
+              const bookmarkToPatch = draft.find((x) => x?.id === bookmarkId);
               if (!bookmarkToPatch) return;
               bookmarkToPatch.favorite = !bookmarkToPatch.favorite;
             }),
@@ -323,7 +374,7 @@ export const api = createApi({
               if (originalArgs?.collectionId === collectionId) {
                 if (collectionId === 'all' && newCollectionId !== 'trash')
                   return;
-                draft = draft.filter((bookmark) => bookmark.id !== bookmarkId);
+                draft = draft.filter((bookmark) => bookmark?.id !== bookmarkId);
               }
               return draft;
             }),
@@ -362,7 +413,7 @@ export const api = createApi({
           if (endpointName !== 'getBookmarks') continue;
           const patchResult = dispatch(
             api.util.updateQueryData(endpointName, originalArgs, (draft) => {
-              draft = draft.filter((bookmark) => bookmark.id !== bookmarkId);
+              draft = draft.filter((bookmark) => bookmark?.id !== bookmarkId);
               return draft;
             }),
           );
@@ -400,8 +451,9 @@ export const api = createApi({
           if (endpointName !== 'getBookmarks') continue;
           const patchResult = dispatch(
             api.util.updateQueryData(endpointName, originalArgs, (draft) => {
-              const bookmarkToPatch = draft.find((x) => x.id === bookmarkId);
+              const bookmarkToPatch = draft.find((el) => el?.id === bookmarkId);
               if (!bookmarkToPatch) return;
+              console.log({ patch });
               Object.assign(bookmarkToPatch, patch);
             }),
           );
@@ -479,12 +531,13 @@ export const api = createApi({
                     undefined,
                     (draft) => {
                       const collection = draft.find(
-                        (collection) => collection.id === bookmark.collectionId,
+                        (collection) =>
+                          collection?.id === bookmark.collectionId,
                       );
                       if (!collection) return;
                       collection.count += 1;
                       const all = draft.find(
-                        (collection) => collection.id === 'all',
+                        (collection) => collection?.id === 'all',
                       );
                       if (!all) return;
                       all.count += 1;
@@ -523,26 +576,32 @@ export const api = createApi({
         body,
       }),
 
-      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+      async onQueryStarted(_, { dispatch, queryFulfilled, getState }) {
         try {
           const { data: newBookmark } = await queryFulfilled;
-          dispatch(
-            api.util.updateQueryData(
-              'getBookmarks',
-              { collectionId: newBookmark.collectionId },
-              (draft) => {
+
+          for (const {
+            endpointName,
+            originalArgs,
+          } of api.util.selectInvalidatedBy(getState(), [
+            { type: BOOKMARK_TAG, id: 'PARTIAL-LIST' },
+          ])) {
+            if (endpointName !== 'getBookmarks') continue;
+            dispatch(
+              api.util.updateQueryData(endpointName, originalArgs, (draft) => {
                 draft.unshift(newBookmark);
-              },
-            ),
-          );
+              }),
+            );
+          }
+
           dispatch(
             api.util.updateQueryData('getCollections', undefined, (draft) => {
               const collection = draft.find(
-                (collection) => collection.id === newBookmark.collectionId,
+                (collection) => collection?.id === newBookmark.collectionId,
               );
               if (!collection) return;
               collection.count += 1;
-              const all = draft.find((collection) => collection.id === 'all');
+              const all = draft.find((collection) => collection?.id === 'all');
               if (!all) return;
               all.count += 1;
             }),
@@ -556,6 +615,7 @@ export const api = createApi({
 export const {
   useGetCollectionsQuery,
   useUpdateCollectionMutation,
+  useRemoveCollectionMutation,
   useCreateCollectionMutation,
   useMoveCollectionMutation,
   useToggleCollectionCollapsedMutation,
@@ -602,6 +662,10 @@ type UpdateCollection = {
   id: UniqueIdentifier;
   title: string;
   color: string;
+};
+
+type RemoveCollection = {
+  id: UniqueIdentifier;
 };
 
 type MoveCollection = {

@@ -21,6 +21,7 @@ import useGetSortOptions from './useGetSortOptions';
 import { notifications } from '@mantine/notifications';
 import { IconCheck } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
+import SadIcon from './SadIcon';
 
 const listProps: Partial<SortableProps> = {
   strategy: verticalListSortingStrategy,
@@ -37,7 +38,7 @@ const gridProps: Partial<SortableProps> = {
 
 const BookmarkList = () => {
   const [searchParams] = useSearchParams();
-  const { t } = useTranslation();
+  // const { t } = useTranslation();
   const isSearchResult = useMemo(
     () => searchParams.get('search') !== null,
     [searchParams],
@@ -46,12 +47,13 @@ const BookmarkList = () => {
   const collectionId = params.collectionId ?? '';
   const [props] = useState<Partial<SortableProps>>(listProps);
   const { selectedSort } = useGetSortOptions();
+  const { t } = useTranslation();
 
   const { data: bookmarks } = useGetBookmarksQuery(
     {
       collectionId: collectionId,
       search: searchParams.get('search') ?? '',
-      // sort: selectedSort ?? '',
+      sort: selectedSort ?? 'manual',
     },
     {
       refetchOnMountOrArgChange: true,
@@ -132,13 +134,17 @@ const BookmarkList = () => {
       {!bookmarks ? (
         <Loader color="violet" size="xl" />
       ) : bookmarks.length === 0 ? (
-        <div>No bookmarks</div>
+        <div className="flex flex-col items-center">
+          <SadIcon />
+          <h1>{t('NoBookmarksHeader')}</h1>
+          <h2>{t('NoBookmarksMessage')}</h2>
+        </div>
       ) : (
         <Sortable
           {...props}
           bookmarks={bookmarks}
           animateLayoutChanges={animateLayoutChanges}
-          disableSorting={isSearchResult}
+          disableSorting={isSearchResult || selectedSort !== 'manual'}
         />
       )}
     </FileUpload>

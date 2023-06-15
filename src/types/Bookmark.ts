@@ -11,6 +11,7 @@ type Bookmark = {
   image: string;
   type: 'WEBSITE' | 'FILE';
   status: 'NEW' | 'SUCCESS' | 'ERROR';
+  createdAt: string;
 };
 
 export default Bookmark;

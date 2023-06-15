@@ -27,66 +27,55 @@ const Item = forwardRef<HTMLDivElement, ItemProps>(
       ...props
     },
     ref,
-  ) => {
-    useEffect(() => {
-      if (!dragOverlay) {
-        return;
-      }
-
-      document.body.style.cursor = 'grabbing';
-
-      return () => {
-        document.body.style.cursor = '';
-      };
-    }, [dragOverlay]);
-
-    return (
-      <a href={item.link} target="_blank" rel="noreferrer">
+  ) => (
+    <a href={item.link} target="_blank" rel="noreferrer">
+      <div
+        className={classNames(
+          styles.Wrapper,
+          fadeIn && styles.fadeIn,
+          sorting && styles.sorting,
+          dragOverlay && styles.dragOverlay,
+        )}
+        style={
+          {
+            ...wrapperStyle,
+            ...style,
+            transition: [transition, wrapperStyle?.transition]
+              .filter(Boolean)
+              .join(', '),
+            '--translate-x': transform
+              ? `${Math.round(transform.x)}px`
+              : undefined,
+            '--translate-y': transform
+              ? `${Math.round(transform.y)}px`
+              : undefined,
+            '--scale-x': transform?.scaleX ? `${transform.scaleX}` : undefined,
+            '--scale-y': transform?.scaleY ? `${transform.scaleY}` : undefined,
+            // cursor: 'grabbing',
+          } as React.CSSProperties
+        }
+        ref={ref}
+      >
         <div
           className={classNames(
-            styles.Wrapper,
-            fadeIn && styles.fadeIn,
-            sorting && styles.sorting,
+            styles.Item,
+            dragging && styles.dragging,
             dragOverlay && styles.dragOverlay,
+            disabled && styles.disabled,
           )}
-          style={
-            {
-              ...wrapperStyle,
-              ...style,
-              transition: [transition, wrapperStyle?.transition]
-                .filter(Boolean)
-                .join(', '),
-              '--translate-x': transform
-                ? `${Math.round(transform.x)}px`
-                : undefined,
-              '--translate-y': transform
-                ? `${Math.round(transform.y)}px`
-                : undefined,
-              '--scale-x': transform?.scaleX
-                ? `${transform.scaleX}`
-                : undefined,
-              '--scale-y': transform?.scaleY
-                ? `${transform.scaleY}`
-                : undefined,
-            } as React.CSSProperties
-          }
-          ref={ref}
+          data-cypress="draggable-item"
+          {...listeners}
+          {...props}
+          tabIndex={0}
         >
-          <div
-            className={classNames(
-              styles.Item,
-              dragging && styles.dragging,
-              dragOverlay && styles.dragOverlay,
-              disabled && styles.disabled,
-            )}
-            data-cypress="draggable-item"
-            {...listeners}
-            {...props}
-            tabIndex={0}
-          >
+          <div className={styles.imageDesc}>
             <div className={styles.thumbnail}>
               <img
                 className={styles['thumbnail-img']}
+                onError={({ currentTarget }) => {
+                  (currentTarget as HTMLImageElement).src =
+                    'https://static.vecteezy.com/system/resources/previews/004/141/669/non_2x/no-photo-or-blank-image-icon-loading-images-or-missing-image-mark-image-not-available-or-image-coming-soon-sign-simple-nature-silhouette-in-frame-isolated-illustration-vector.jpg';
+                }}
                 src={item.image}
                 alt={item.title}
               />
@@ -98,23 +87,37 @@ const Item = forwardRef<HTMLDivElement, ItemProps>(
               }}
             >
               <span key={item.id} className={styles.titleBold}>
-                {item.title}
+                {item.title.length >= 50 === true
+                  ? item.title.substring(0, 50) + '...'
+                  : item.title}
               </span>
-
               <Text color="dimmed" size="sm">
-                {item.link}
+                {item.link.substring(0, 50) + '...'}
+              </Text>
+              <Text color="dimmed" size="sm">
+                {item.description
+                  ? item.description.length >= 50 === true
+                    ? item.description?.substring(0, 60) + '...'
+                    : item.description
+                  : 'No description'}
+              </Text>
+              <Text color="dimmed" size="sm">
+                {new Date(item.createdAt).toLocaleString()}{' '}
+                <span className={styles.tags}>
+                  {item.tags.map((tag) => `#${tag} `).join('')}
+                </span>
               </Text>
             </div>
-            <div className={styles.Actions}>
-              <Favorite bookmark={item} className={styles.action} />
-              <Edit bookmark={item} className={styles.action} />
-              <Remove className={styles.action} onClick={onRemove} />
-            </div>
+          </div>
+          <div className={styles.Actions}>
+            <Favorite bookmark={item} className={styles.action} />
+            <Edit bookmark={item} className={styles.action} />
+            <Remove className={styles.action} onClick={onRemove} />
           </div>
         </div>
-      </a>
-    );
-  },
+      </div>
+    </a>
+  ),
 );
 
 type ItemProps = {
