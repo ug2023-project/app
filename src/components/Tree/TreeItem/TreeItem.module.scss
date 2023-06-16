@@ -99,6 +99,7 @@
 
 .menu :global(.mantine-Menu-item) {
   @apply bg-main-500 text-[#1f2e4d];
+  font-size: 14px;
 }
 
 .menu :hover:global(.mantine-Menu-item) {
