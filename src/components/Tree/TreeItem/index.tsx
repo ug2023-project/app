@@ -155,7 +155,7 @@ const MenuButton = memo(({ id }: MenuButtonProps) => {
   const { data: bookmarks } = useGetBookmarksQuery({ collectionId: id });
   const [removeCollection] = useRemoveCollectionMutation();
 
-  function openAllBookmarks(id) {
+  function openAllBookmarks() {
     bookmarks &&
       bookmarks.forEach((bookmark) => {
         window.open(bookmark.link, '_blank');
@@ -185,7 +185,7 @@ const MenuButton = memo(({ id }: MenuButtonProps) => {
           }}
           className={styles.menu}
         >
-          <Menu.Item onClick={() => openAllBookmarks(id)}>
+          <Menu.Item onClick={() => openAllBookmarks()}>
             {t('OpenAllBookmarks')}
           </Menu.Item>
           <Menu.Divider />
