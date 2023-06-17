@@ -24,7 +24,13 @@ dist-ssr
 *.sw?
 
 # Environment variables
-.env
+.env*
+!.env.example
+
+# Local Netlify folder
+.netlify
+
+# Tests
 /test-results/
 /playwright-report/
 /playwright/.cache/

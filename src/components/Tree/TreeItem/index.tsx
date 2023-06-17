@@ -12,7 +12,11 @@ import CreateCollectionModal from '@/components/Modals/CollectionModal/CreateCol
 import EditCollectionModal from '@/components/Modals/CollectionModal/EditCollectionModal';
 import { useNavigate, useParams } from 'react-router-dom';
 import Action from '@/components/dnd-kit/Item/components/Action';
-import { useMoveBookmarkMutation } from '../../../services/bookmarks';
+import {
+  useGetBookmarksQuery,
+  useMoveBookmarkMutation,
+  useRemoveCollectionMutation,
+} from '../../../services/bookmarks';
 import { useTranslation } from 'react-i18next';
 
 const animateLayoutChanges: AnimateLayoutChanges = ({
@@ -31,6 +35,7 @@ const TreeItem = ({
   const navigate = useNavigate();
   const isActive = collectionId === id;
   const [moveBookmark] = useMoveBookmarkMutation();
+  const { t } = useTranslation();
 
   const {
     attributes,
@@ -99,7 +104,6 @@ const TreeItem = ({
           dropAttempt && styles.dropTarget,
         )}
         ref={setDraggableNodeRef}
-        // {...handleProps}
         style={{ ...style }}
         data-testid="tree-item"
       >
@@ -117,14 +121,14 @@ const TreeItem = ({
         )}
         <span
           className="h-3 w-3 rounded-full"
-          style={{ backgroundColor: props.color }}
+          style={{ backgroundColor: props?.color ?? 'transparent' }}
         ></span>
         <span
           className={styles.Text}
           onClick={() => navigate(`/collections/${id}`)}
           data-testid="tree-item-text"
         >
-          {props.value}
+          {t(props.value.toString().replace(' ', ''), props.value.toString())}
         </span>
         <span className={styles.Count}>{bookmarks}</span>
         <MenuButton id={id} />
@@ -150,6 +154,15 @@ const MenuButton = memo(({ id }: MenuButtonProps) => {
   const { t } = useTranslation();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const { data: bookmarks } = useGetBookmarksQuery({ collectionId: id });
+  const [removeCollection] = useRemoveCollectionMutation();
+
+  function openAllBookmarks() {
+    bookmarks &&
+      bookmarks.forEach((bookmark) => {
+        window.open(bookmark.link, '_blank');
+      });
+  }
 
   return (
     <>
@@ -174,7 +187,9 @@ const MenuButton = memo(({ id }: MenuButtonProps) => {
           }}
           className={styles.menu}
         >
-          <Menu.Item>{t('OpenAllBookmarks')}</Menu.Item>
+          <Menu.Item onClick={() => openAllBookmarks()}>
+            {t('OpenAllBookmarks')}
+          </Menu.Item>
           <Menu.Divider />
           <Menu.Item onClick={() => setIsCreateModalOpen(true)}>
             {t('CreateNestedCollections')}
@@ -184,6 +199,10 @@ const MenuButton = memo(({ id }: MenuButtonProps) => {
             date-testid="edit-collection-dropdown-btn"
           >
             {t('EditCollection')}
+          </Menu.Item>
+          <Menu.Divider />
+          <Menu.Item onClick={() => removeCollection({ id })}>
+            {t('Remove')}
           </Menu.Item>
         </Menu.Dropdown>
       </Menu>
@@ -217,7 +236,7 @@ type TreeItemProps = Omit<HTMLAttributes<HTMLLIElement>, 'id' | 'color'> & {
   onRemove?(): void;
   wrapperRef?(node: HTMLLIElement): void;
   bookmarks?: number;
-  color: string;
+  color: string | null;
 };
 
 export default TreeItem;

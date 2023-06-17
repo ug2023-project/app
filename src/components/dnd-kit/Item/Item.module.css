@@ -41,7 +41,6 @@ $focused-outline-color: #4c9ffe;
   }
 
   &.dragOverlay {
-    /* --scale: 0.5; */
     --box-shadow: $box-shadow;
     --box-shadow-picked-up: $box-shadow-border,
       -1px 0 15px 0 rgba(34, 33, 81, 0.01),
@@ -50,11 +49,6 @@ $focused-outline-color: #4c9ffe;
     opacity: 0.2;
   }
 
-  &:hover {
-    .action {
-      visibility: visible;
-    }
-  }
   background-color: $background-color;
   border-radius: calc(4px / var(--scale-x, 1));
   box-shadow: $box-shadow;
@@ -65,6 +59,7 @@ $focused-outline-color: #4c9ffe;
   display: flex;
   flex-grow: 1;
   align-items: center;
+  justify-content: space-between;
   padding: 8px 8px;
   background-color: $background-color;
   outline: none;
@@ -134,10 +129,6 @@ $focused-outline-color: #4c9ffe;
   }
 }
 
-.action {
-  visibility: hidden;
-}
-
 .Actions {
   display: flex;
   align-self: flex-start;
@@ -150,12 +141,20 @@ $focused-outline-color: #4c9ffe;
   overflow: hidden;
 }
 .thumbnail-img {
+  object-fit: cover;
+  object-position: center;
   position: absolute;
   left: 50%;
   top: 50%;
   height: 100%;
-  width: auto;
-  -webkit-transform: translate(-50%,-50%);
-      -ms-transform: translate(-50%,-50%);
-          transform: translate(-50%,-50%);
+  transform: translate(-50%,-50%);
+}
+
+.imageDesc{
+  display: flex;
+  flex-direction: row;
+}
+
+.tags{
+  color: rgb(255, 123, 0);
 }

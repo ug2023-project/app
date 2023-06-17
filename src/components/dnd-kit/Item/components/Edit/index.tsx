@@ -8,7 +8,7 @@ import { useUpdateBookmarkMutation } from '../../../../../services/bookmarks';
 
 const Edit = ({ bookmark, ...props }: EditProps) => {
   const [opened, { open, close }] = useDisclosure(false);
-  const [handleEditBookmark] = useUpdateBookmarkMutation();
+  const [editBookmark] = useUpdateBookmarkMutation();
 
   const editForm = useForm<EditFormValues>({
     initialValues: {
@@ -18,7 +18,6 @@ const Edit = ({ bookmark, ...props }: EditProps) => {
     },
     validate: {
       title: isNotEmpty('Bookmark title is required'),
-      description: isNotEmpty('Bookmark description is required'),
     },
   });
 
@@ -28,10 +27,9 @@ const Edit = ({ bookmark, ...props }: EditProps) => {
         <form
           onSubmit={editForm.onSubmit(({ ...newBookmark }) => {
             close();
-            handleEditBookmark({
+            editBookmark({
               bookmarkId: bookmark.id,
               collectionId: bookmark.collectionId,
-              onFinish: close,
               ...newBookmark,
             });
           })}

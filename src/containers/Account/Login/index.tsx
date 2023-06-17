@@ -73,6 +73,7 @@ const Login = () => {
         <Button
           type="submit"
           disabled={!form.isValid()}
+          style={{ backgroundColor: form.isValid() ? 'indigo' : 'gray' }}
           className="mt-2 bg-[#06257f] hover:bg-[#00175b] disabled:text-white"
         >
           {t('Login_Button')}

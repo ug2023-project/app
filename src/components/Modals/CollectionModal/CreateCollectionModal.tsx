@@ -13,7 +13,7 @@ const CreateCollectionModal = ({
   const { t } = useTranslation();
   const [createCollection] = useCreateCollectionMutation();
 
-  const handleCreateNewCollection = async ({
+  const handleCreateNewCollection = ({
     title,
     color,
   }: {

@@ -21,13 +21,13 @@ import useGetSortOptions from './useGetSortOptions';
 import { notifications } from '@mantine/notifications';
 import { IconCheck } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
+import SadIcon from './SadIcon';
 
 const listProps: Partial<SortableProps> = {
   strategy: verticalListSortingStrategy,
 };
 
 const gridProps: Partial<SortableProps> = {
-  adjustScale: true,
   Container: (props: any) => <GridContainer {...props} columns={5} />,
   strategy: rectSortingStrategy,
   wrapperStyle: () => ({
@@ -38,22 +38,22 @@ const gridProps: Partial<SortableProps> = {
 
 const BookmarkList = () => {
   const [searchParams] = useSearchParams();
-  const { t } = useTranslation();
+  // const { t } = useTranslation();
   const isSearchResult = useMemo(
     () => searchParams.get('search') !== null,
     [searchParams],
   );
   const params = useParams();
   const collectionId = params.collectionId ?? '';
-  const [isList, setIsList] = useState(true);
-  const [props, setProps] = useState<Partial<SortableProps>>(listProps);
+  const [props] = useState<Partial<SortableProps>>(listProps);
   const { selectedSort } = useGetSortOptions();
+  const { t } = useTranslation();
 
   const { data: bookmarks } = useGetBookmarksQuery(
     {
       collectionId: collectionId,
       search: searchParams.get('search') ?? '',
-      // sort: selectedSort ?? '',
+      sort: selectedSort ?? 'manual',
     },
     {
       refetchOnMountOrArgChange: true,
@@ -129,27 +129,22 @@ const BookmarkList = () => {
       onDropStyles="before:top-0 before:left-0 before:absolute before:w-full before:h-full before:bg-amber-400 before:z-10 before:bg-amber-400/10 before:border-2 before:border-amber-400"
     >
       <div className={styles.controlPanel}>
-        <Button
-          onClick={() => {
-            setIsList(!isList);
-            setProps(isList ? gridProps : listProps);
-          }}
-          className="bg-[#06257f] hover:bg-[#00175b]"
-        >
-          {t('Change_View')}
-        </Button>
         <SortMenu />
       </div>
       {!bookmarks ? (
         <Loader color="violet" size="xl" />
       ) : bookmarks.length === 0 ? (
-        <div>No bookmarks</div>
+        <div className="flex flex-col items-center">
+          <SadIcon />
+          <h1>{t('NoBookmarksHeader')}</h1>
+          <h2>{t('NoBookmarksMessage')}</h2>
+        </div>
       ) : (
         <Sortable
           {...props}
           bookmarks={bookmarks}
           animateLayoutChanges={animateLayoutChanges}
-          disableSorting={isSearchResult}
+          disableSorting={isSearchResult || selectedSort !== 'manual'}
         />
       )}
     </FileUpload>

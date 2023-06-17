@@ -71,7 +71,11 @@ const Register = () => {
           {...form.getInputProps('email')}
         />
         <PasswordInputWithHints form={form} />
-        <Button type="submit" disabled={!form.isValid()}>
+        <Button
+          type="submit"
+          style={{ backgroundColor: form.isValid() ? 'indigo' : 'gray' }}
+          disabled={!form.isValid()}
+        >
           {t('Register_Button')}
         </Button>
       </form>

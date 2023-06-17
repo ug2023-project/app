@@ -3,11 +3,9 @@ import { createPortal } from 'react-dom';
 
 import {
   Active,
-  defaultDropAnimationSideEffects,
   DragEndEvent,
   DragOverlay,
   DragStartEvent,
-  DropAnimation,
   UniqueIdentifier,
   useDndMonitor,
 } from '@dnd-kit/core';
@@ -29,21 +27,9 @@ import {
   useRemoveBookmarkMutation,
 } from '../services/bookmarks';
 
-// const dropAnimationConfig: DropAnimation = {
-//   sideEffects: defaultDropAnimationSideEffects({
-//     styles: {
-//       active: {
-//         opacity: '0.5',
-//       },
-//     },
-//   }),
-// };
-
 const Sortable = ({
   animateLayoutChanges,
-  // adjustScale = false,
   Container = List,
-  // dropAnimation = dropAnimationConfig,
   bookmarks = [],
   strategy = rectSortingStrategy,
   wrapperStyle = () => ({}),
@@ -108,7 +94,7 @@ const Sortable = ({
 
   return (
     <>
-      <Wrapper style={{ height: '100%' }} center>
+      <Wrapper center>
         <SortableContext items={bookmarks} strategy={strategy}>
           <Container>
             {bookmarks.map((value, index) => (
@@ -149,9 +135,7 @@ const Sortable = ({
 
 export type SortableProps = {
   animateLayoutChanges?: AnimateLayoutChanges;
-  adjustScale?: boolean;
   Container?: any; // To-do: Fix me
-  dropAnimation?: DropAnimation | null;
   bookmarks: Bookmark[];
   strategy?: SortingStrategy;
   wrapperStyle?(args: {

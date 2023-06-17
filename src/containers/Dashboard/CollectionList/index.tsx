@@ -3,7 +3,6 @@ import { Fragment } from 'react';
 import { Resizable } from 're-resizable';
 import CollectionListMenu from './CollectionListMenu';
 import { SortableTree } from '@/components/Tree/SortableTree';
-import { Divider } from '@mantine/core';
 import { useGetCollectionsQuery } from '../../../services/bookmarks';
 import { TreeItems } from '@/components/Tree/types';
 import Collection from '@/types/Collection';
