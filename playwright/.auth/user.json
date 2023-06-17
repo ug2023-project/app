@@ -1,0 +1,29 @@
+{
+  "cookies": [
+    {
+      "name": "connect.sid",
+      "value": "s%3ANeMoBThuXT4bI-QUJ4_UwlEpq0NCWFX3.WUF1LJR1j5%2FvzjtLee8YNUNW43MKBqpn%2FiANrXu5cZI",
+      "domain": "localhost",
+      "path": "/",
+      "expires": 1716833089.261975,
+      "httpOnly": true,
+      "secure": false,
+      "sameSite": "Lax"
+    }
+  ],
+  "origins": [
+    {
+      "origin": "http://localhost:5173",
+      "localStorage": [
+        {
+          "name": "lng",
+          "value": "en-US"
+        },
+        {
+          "name": "persist:root",
+          "value": "{\"auth\":\"{\\\"user\\\":{\\\"id\\\":\\\"lTvcGlki63MYPvSctxnRe\\\",\\\"email\\\":\\\"test@yopmail.com\\\"},\\\"loading\\\":false}\",\"bookmarksApi\":\"{\\\"queries\\\":{\\\"getCollections(undefined)\\\":{\\\"status\\\":\\\"pending\\\",\\\"endpointName\\\":\\\"getCollections\\\",\\\"requestId\\\":\\\"C8Uh4n08mwS7CuLYuDQnp\\\",\\\"startedTimeStamp\\\":1685297089333},\\\"all\\\":{\\\"status\\\":\\\"pending\\\",\\\"endpointName\\\":\\\"getBookmarks\\\",\\\"requestId\\\":\\\"KUT8_tbyrXvuKfidx6VrN\\\",\\\"originalArgs\\\":{\\\"collectionId\\\":\\\"all\\\",\\\"search\\\":\\\"\\\"},\\\"startedTimeStamp\\\":1685297089358}},\\\"mutations\\\":{},\\\"provided\\\":{},\\\"subscriptions\\\":{\\\"getCollections(undefined)\\\":{\\\"C8Uh4n08mwS7CuLYuDQnp\\\":{\\\"refetchOnReconnect\\\":true,\\\"refetchOnFocus\\\":true,\\\"pollingInterval\\\":0}},\\\"all\\\":{\\\"KUT8_tbyrXvuKfidx6VrN\\\":{\\\"refetchOnFocus\\\":true,\\\"pollingInterval\\\":0}}},\\\"config\\\":{\\\"online\\\":true,\\\"focused\\\":true,\\\"middlewareRegistered\\\":true,\\\"refetchOnFocus\\\":false,\\\"refetchOnReconnect\\\":false,\\\"refetchOnMountOrArgChange\\\":false,\\\"keepUnusedDataFor\\\":60,\\\"reducerPath\\\":\\\"bookmarksApi\\\"}}\",\"_persist\":\"{\\\"version\\\":1,\\\"rehydrated\\\":true}\"}"
+        }
+      ]
+    }
+  ]
+}

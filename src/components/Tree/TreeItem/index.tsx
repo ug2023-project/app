@@ -105,6 +105,7 @@ const TreeItem = ({
         )}
         ref={setDraggableNodeRef}
         style={{ ...style }}
+        data-testid="tree-item"
       >
         {draggable ? <Handle {...handleProps} /> : null}
         {props.onCollapse && (
@@ -125,6 +126,7 @@ const TreeItem = ({
         <span
           className={styles.Text}
           onClick={() => navigate(`/collections/${id}`)}
+          data-testid="tree-item-text"
         >
           {t(props.value.toString().replace(' ', ''), props.value.toString())}
         </span>
@@ -174,7 +176,7 @@ const MenuButton = memo(({ id }: MenuButtonProps) => {
         }}
       >
         <Menu.Target>
-          <Action className="ml-3">
+          <Action className="ml-3" data-testid="edit-collection-item-btn">
             <BsThreeDots />
           </Action>
         </Menu.Target>
@@ -192,7 +194,10 @@ const MenuButton = memo(({ id }: MenuButtonProps) => {
           <Menu.Item onClick={() => setIsCreateModalOpen(true)}>
             {t('CreateNestedCollections')}
           </Menu.Item>
-          <Menu.Item onClick={() => setIsEditModalOpen(true)}>
+          <Menu.Item
+            onClick={() => setIsEditModalOpen(true)}
+            date-testid="edit-collection-dropdown-btn"
+          >
             {t('EditCollection')}
           </Menu.Item>
           <Menu.Divider />
