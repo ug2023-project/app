@@ -38,7 +38,6 @@ const gridProps: Partial<SortableProps> = {
 
 const BookmarkList = () => {
   const [searchParams] = useSearchParams();
-  // const { t } = useTranslation();
   const isSearchResult = useMemo(
     () => searchParams.get('search') !== null,
     [searchParams],

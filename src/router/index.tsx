@@ -16,7 +16,6 @@ import {
 import PrivateRoute from './PrivateRoute';
 
 const routes = createRoutesFromElements(
-  // main to implement later
   <Route path="/" element={<Outlet />}>
     <Route index element={<Navigate to="collections" />} />
     <Route

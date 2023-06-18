@@ -244,9 +244,6 @@ export const api = createApi({
             ]
           : [{ type: BOOKMARK_TAG, id: 'PARTIAL-LIST' }],
 
-      // merge: (currentCache, newItems) => {
-      //   currentCache.push(...newItems);
-      // },
       forceRefetch({ currentArg, previousArg }) {
         return !deepEquals(currentArg, previousArg);
       },

@@ -51,7 +51,6 @@ const Item = forwardRef<HTMLDivElement, ItemProps>(
               : undefined,
             '--scale-x': transform?.scaleX ? `${transform.scaleX}` : undefined,
             '--scale-y': transform?.scaleY ? `${transform.scaleY}` : undefined,
-            // cursor: 'grabbing',
           } as React.CSSProperties
         }
         ref={ref}

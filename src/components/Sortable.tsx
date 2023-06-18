@@ -135,7 +135,7 @@ const Sortable = ({
 
 export type SortableProps = {
   animateLayoutChanges?: AnimateLayoutChanges;
-  Container?: any; // To-do: Fix me
+  Container?: any;
   bookmarks: Bookmark[];
   strategy?: SortingStrategy;
   wrapperStyle?(args: {
